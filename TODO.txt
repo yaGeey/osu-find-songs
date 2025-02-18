@@ -1,0 +1,13 @@
+Spotify get playlist tracks to find beatmaps based on filters (useInfiniteQuery??)
+SEO
+change bg image
+responsive design
+
+## less important
+
+animations
+more appealing colors, design (not plain)
+warning when connecting with phone 
+
+## bugs
+selectors high z very
