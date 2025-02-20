@@ -73,7 +73,7 @@ export default function CreatePlaylistButton({ songQueries }: { songQueries: Use
       Promise.all(promises).then(() => {
          handleModal(<>
             <h1>Success! Visit your new playlist:</h1>
-            <a href={playlist.external_urls.spotify}>{playlist.external_urls.spotify}</a>
+            <a href={playlist.external_urls.spotify} target="_blank">{playlist.external_urls.spotify}</a>
          </>, 'success');
       }).catch(() => {
          handleModal(<h1>Failed to add tracks to playlist</h1>, 'error');
@@ -86,7 +86,7 @@ export default function CreatePlaylistButton({ songQueries }: { songQueries: Use
             onClick={() => handleCreatePlaylist()}
             data-tooltip-id="tooltip-1"
             data-tooltip-content="Create playlist on your Spotify account and populate it with tracks with filter 'Exact Spotify match'"
-            className="bg-main-border/50 text-white py-1.5"
+            className="bg-main-border/50 text-white py-0.5 md:py-1.5 md:whitespace-nowrap min-w-[135px] text-sm md:text-base"
          >Create Spotify playlist</Button>
 
          <Modal

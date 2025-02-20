@@ -19,9 +19,10 @@ const getSortValue = (sortFn: string, data: SongDataQueried) => {
    }
 } 
 
-export default function Card({ data, sortFn, onClick, className }: {
+export default function Card({ data, sortFn, selected, onClick, className }: {
    data: SongDataQueried,
    sortFn?: string;
+   selected: boolean;
    onClick?: ({ beatmapset, spotify, local }: SongData) => void,
    className?: string
 }) {
@@ -32,18 +33,20 @@ export default function Card({ data, sortFn, onClick, className }: {
          onClick({ beatmapset: beatmapsetQuery.data!, spotify: spotifyQuery.data ?? null, local });
       }
    }
+   console.log(beatmapsetQuery.isLoading)
 
    return (
       <div
          className={tw(
-            "select-none relative bg-song text-white flex w-[500px] min-h-[90px] border-[5px] border-song-border rounded-lg transition-all duration-300 ease-in-out hover:bg-song-select hover:-mt-1 hover:mb-2",
+            "select-none relative justify-center items-center bg-song text-white flex w-[500px] min-h-[90px] border-[5px] border-song-border rounded-lg transition-all duration-300 ease-in-out hover:bg-song-select hover:-mt-1 hover:mb-2",
+            selected && 'bg-song-select -mt-1 mb-2 mr-20',
             className,
          )}
          id={local.id}
          onClick={handleClick}
       >
          {(beatmapsetQuery.isLoading || spotifyQuery.isLoading) && <Loading />}
-         <div className="relative w-[150px] h-[80px] rounded-l-lg overflow-hidden">
+         <div className="relative w-[150px] h-[81px] rounded-l-sm overflow-hidden">
             <Image src={local.image} alt={local.title} fill style={{ objectFit: 'cover' }} />
          </div>
          <div className="flex justify-between items-center w-full py-2 px-4">
@@ -51,7 +54,10 @@ export default function Card({ data, sortFn, onClick, className }: {
                <h1 className="text-xl">{local.title}</h1>
                <h2>{local.author}</h2>
             </div>
-            <div className="flex gap-3.5 mt-2 items-center">
+            <div className={tw(
+               "flex gap-3.5 mt-2 items-center",
+               sortFn && getSortValue(sortFn, data) && 'min-w-[90px]',
+            )}>
                {sortFn && getSortValue(sortFn, data) &&
                   <span className="text-white bg-main-border/50 flex justify-center items-center font-semibold rounded-full px-2 text-xs h-[23px]">{getSortValue(sortFn, data)}</span>
                }

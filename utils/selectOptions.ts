@@ -11,14 +11,14 @@ export const sortOptions = [
 
 export const groupOptions = [
    { value: 'no', label: 'No Grouping' },
-   { value: 'artist', label: 'By Artist' },
+   // { value: 'artist', label: 'By Artist' },
    { value: 'bpm', label: 'By BPM' },
-   { value: 'creator', label: 'By Creator' },
-   { value: 'date', label: 'By Date Downloaded' },
-   { value: 'dif', label: 'By Difficulty' },
+   // { value: 'creator', label: 'By Creator' },
+   // { value: 'date', label: 'By Date Downloaded' },
+   // { value: 'dif', label: 'By Difficulty' },
    { value: 'genre', label: 'By Genre' },
    { value: 'length', label: 'By Length' },
-   { value: 'title', label: 'By Title' },
+   // { value: 'title', label: 'By Title' },
    { value: 'year', label: 'By Year' },
 ]
 

@@ -48,7 +48,7 @@ export type BeatmapSet = {
    discussion_enabled: boolean;
    discussion_locked: boolean;
    favourite_count: number;
-   genre_id: {
+   genre: {
       id: number;
       name: string;
    };

@@ -30,6 +30,7 @@ body {
   --color-main: #C07272;
   --color-main-border: #733F3F;
   --color-light: #FFA3A3;
+  --breakpoint-lgx: 75rem; 
   
 }
 /*

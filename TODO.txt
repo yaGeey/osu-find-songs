@@ -3,6 +3,9 @@ SEO
 change bg image
 responsive design
 
+апішка осу повільішне спотіая
+фікс лоадінг 
+
 ## less important
 
 animations

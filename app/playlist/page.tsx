@@ -23,6 +23,9 @@ import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
 import CreatePlaylistButton from "@/components/CreatePlaylistButton";
 import { Button } from "@/components/Buttons";
+import { group } from "console";
+import GroupSeparator from "@/components/GroupSeparator";
+import TextSwitch from "@/components/TextSwitch";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
 // gsap.registerPlugin(useGSAP);
@@ -36,42 +39,18 @@ export default function Home() {
 
    const [info, setInfo] = useState<SongData | null>(null);
    const [currentSong, setCurrentSong] = useState<HTMLElement | null>(null);
-   const [group, setGroup] = useState<string>('no');
    const [filters, setFilters] = useState<string[]>([]);
+   const [groupFn, setGroupFn] = useState<string>('no');
    const [sortFn, setSortFn] = useState('sort-title');
    const [isInfoVisible, setIsInfoVisible] = useState(false);
    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-
-   // select animation
-   useEffect(() => {
-      if (info) {
-         const song = document.getElementById(info?.local.id)
-         if (song) {
-            if (currentSong !== song) {
-               if (currentSong) {
-                  currentSong.className = tw(currentSong.className, 'mr-0 bg-song -mt-3 mb-0');
-               }
-               song.className = tw(song.className, 'mr-24 bg-song-select -mt-1 mb-2');
-               setCurrentSong(song);
-               setIsInfoVisible(false);
-            } else {
-               currentSong.className = tw(currentSong.className, 'mr-0 bg-song -mt-3 mb-0')
-               setCurrentSong(null);
-               setInfo(null);
-               setIsInfoVisible(true);
-            }
-         }
-      } else {
-         if (currentSong) {
-            currentSong.className = tw(currentSong.className, 'mr-0 bg-song -mt-3 mb-0')
-            setCurrentSong(null);
-         }
-      }
-   }, [info]);
+   const [groupedDict, setGroupedDict] = useState<any>(undefined);
+   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
    useEffect(() => {
       setInfo(null);
-   }, [filters, group, sortFn]);
+   }, [filters, groupFn, sortFn]);
 
    const songQueries = useQueries({
       queries: songs.map((song) => ({
@@ -92,6 +71,8 @@ export default function Home() {
          cacheTime: 1000 * 60 * 60 * 24,
       }))
    });
+   const isBeatmapsLoading = beatmapsetQueries.filter(q => q.data).length !== beatmapsetQueries.length;
+   console.log(isBeatmapsLoading)
 
    // Combine the arrays
    const combinedArray = songs.map((song, i) => ({
@@ -100,26 +81,72 @@ export default function Home() {
       beatmapsetQuery: beatmapsetQueries[i],
    }));
 
-   //! Add to card current sort value
-   const sortedCombinedArray = combinedArray.sort((a, b) => {
-      const aData = a.beatmapsetQuery.data;
-      const bData = b.beatmapsetQuery.data;
+   // Grouping and sorting
+   useEffect(() => {
+      let groupedArray;
+      if (isBeatmapsLoading) {
+         setGroupedDict({ '': combinedArray });
+         return;
+      };
 
-      if (!aData || !bData) return 0; // Якщо дані відсутні, не змінюємо порядок
-
-      switch (sortFn) {
-         case 'sort-artist': return aData.artist.localeCompare(bData.artist);
-         case 'sort-bpm': return aData.bpm - bData.bpm;
-         case 'sort-creator': return aData.creator.localeCompare(bData.creator);
-         case 'sort-date': return 0;
-         case 'sort-date-mapped': return new Date(aData.submitted_date).getTime() - new Date(bData.submitted_date).getTime();
-         // case 'sort-dif': return aData.difficulty - bData.difficulty;
-         case 'sort-length': return aData.beatmaps[0].total_length - bData.beatmaps[0].total_length;
-         case 'sort-title': return aData.title.localeCompare(bData.title);
+      // Grouping
+      if (groupFn === 'year') {
+         groupedArray = Object.groupBy(combinedArray, (q) => q.beatmapsetQuery.data?.submitted_date?.split('-')[0]!);
+      } else if (groupFn === 'genre') {
+         groupedArray = Object.groupBy(combinedArray, (q) => q.beatmapsetQuery.data?.genre.name!);
+      } else if (groupFn === 'length') {
+         groupedArray = Object.groupBy(combinedArray, (q) => {
+            const length = q.beatmapsetQuery.data?.beatmaps[0].total_length!;
+            if (length < 60) return '< 1 minute';
+            if (length < 120) return '1 - 2 minutes';
+            if (length < 300) return '2 - 5 minutes';
+            if (length < 600) return '5 - 10 minutes';
+            return '> 10 minutes';
+         });
+      } else if (groupFn === 'artist') {
+         groupedArray = Object.groupBy(combinedArray, (q) => q.beatmapsetQuery.data?.artist!);
+      } else if (groupFn === 'bpm') {
+         groupedArray = Object.groupBy(combinedArray, (q) => {
+            const bpm = q.beatmapsetQuery.data?.bpm!;
+            if (bpm < 100) return '< 100 bpm';
+            if (bpm < 200) return '100 - 200 bpm';
+            if (bpm < 300) return '200 - 300 bpm';
+            return '> 300 bpm';
+         });
+      } else if (groupFn === 'no') {
+         groupedArray = { '': combinedArray };
+      } else {
+         groupedArray = { '': combinedArray };
       }
-      return 0;
-   });
 
+      // Sort each group
+      const sortedGroupedArray = Object.entries(groupedArray).reduce((acc, [key, value]) => {
+         const sortedArray = value.sort((a, b) => {
+            const aData = sortOrder == 'desc' ? a.beatmapsetQuery.data : b.beatmapsetQuery.data;
+            const bData = sortOrder == 'desc' ? b.beatmapsetQuery.data : a.beatmapsetQuery.data;
+            if (!aData || !bData) return 0;
+
+            switch (sortFn) {
+               case 'sort-artist': return aData.artist.localeCompare(bData.artist);
+               case 'sort-bpm': return aData.bpm - bData.bpm;
+               case 'sort-creator': return aData.creator.localeCompare(bData.creator);
+               case 'sort-date': return 0;
+               case 'sort-date-mapped': return new Date(aData.submitted_date).getTime() - new Date(bData.submitted_date).getTime();
+               // case 'sort-dif': return aData.difficulty - bData.difficulty;
+               case 'sort-length': return aData.beatmaps[0].total_length - bData.beatmaps[0].total_length;
+               case 'sort-title': return aData.title.localeCompare(bData.title);
+               default: return 0;
+            }
+         });
+
+         acc[key] = sortedArray;
+         return acc;
+      }, {} as Record<string, typeof combinedArray>);
+
+      setGroupedDict(sortedGroupedArray);
+   }, [groupFn, sortFn, sortOrder]);
+
+   // filters
    const filterFn = (a: SongDataQueried) => {
       if (!filters.length) return true;
 
@@ -130,53 +157,75 @@ export default function Home() {
       });
    };
 
+   function handleCardClick(props: SongData) {
+      if (info?.local.id === props.local.id) setInfo(null);
+      else setInfo({ ...props });
+   }
+
    return (
       <div className="overflow-y-hidden max-h-screen">
          <BgImage image={info?.local.image} />
 
-         <header className="bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4">
-            <section className="flex gap-3 items-center">
+         <header className="bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
+            <section className="flex gap-3 items-center min-w-fit">
                {/* Може анімашку, але там бібліотека душна якась хз https://icons8.com/icon/set/home/ios */}
                <Link href="/">
-                  <Image src="/icons/home.svg" width={30} height={30} alt="settings" className="hover:scale-110 transition-all"/>
+                  <div className="relative w-[30px] h-[30px]">
+                     <Image src="/icons/home.svg" layout="fill" alt="settings" className="hover:scale-110 transition-all"/>
+                  </div>
                </Link>
                <Image src="/icons/settings.svg" width={30} height={30} alt="settings" onClick={() => setIsSettingsVisible(p => !p)}
                   // Зробити щоб можна змінювалась коли isSettingsVisible. Тре svg не імпорт а в окремий компонент можна
                   className={tw("hover:animate-spin hover:duration-2000 cursor-pointer", isSettingsVisible && 'brightness-130')}
                />
             </section>
-            <div className="border-l-3 border-l-main-border h-3/4 -ml-27"></div>
-            {isSettingsVisible &&
-               <SettingsPopup isOpen={isSettingsVisible} />
-            }
+            {/* <div className="border-l-3 border-l-main-border h-3/4 -ml-27"></div> */}
+            {isSettingsVisible && <SettingsPopup isOpen={isSettingsVisible} />}
 
-            {/* <div className="flex gap-3 w-1/4 items-center">
-               <label className="text-md" htmlFor="group-select">Group</label>
-               <Select className='w-full'
-                  onChange={(e: any) => setGroup(e.value)}
-                  id="group-select"
-                  defaultValue={groupOptions[0]}
-                  options={groupOptions}
-               />
-            </div> */}
-            {/* <Button onClick={() => handleCreatePlaylist()}>Create playlist with tracks</Button> */}
             <CreatePlaylistButton songQueries={songQueries} />
-            <div className="flex gap-3 w-1/4 items-center">
-               <label className="text-md" htmlFor="filter-select">Filters</label>
-               <Select className='w-full'
+
+            <div className="flex gap-3 items-center justify-center ">
+               <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="filter-select">Filters</label>
+               <Select className='lg:w-[200px] min-w-[75px] w-fit'
                   onChange={(e: any) => setFilters(e.map((f: any) => f.value))}
                   isMulti
                   id="filter-select"
                   options={filterOptions}
+                  isDisabled={isBeatmapsLoading}
                />
             </div>
-            <div className="flex gap-3 w-1/4 items-center">
-               <label className="text-md" htmlFor="sort-select">Sort</label>
-               <Select className='w-full'
+            <div className="flex gap-3 justify-center items-center ">
+               <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="group-select">Group</label>
+               <Select className='lg:w-[200px] min-w-[75px] w-fit'
+                  onChange={(e: any) => setGroupFn(e.value)}
+                  id="group-select"
+                  defaultValue={groupOptions[0]}
+                  options={groupOptions}
+                  isDisabled={isBeatmapsLoading}
+               />
+            </div>
+            <div className="flex gap-3 items-center justify-end">
+               <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="sort-select">Sort</label>
+               <Select className='lg:w-[200px] min-w-[75px] w-fit'
                   onChange={(e: any) => setSortFn(e.value)}
                   id="sort-select"
                   defaultValue={sortOptions[4]}
                   options={sortOptions}
+                  isDisabled={isBeatmapsLoading}
+               />
+               <TextSwitch
+                  options={[
+                     {
+                        value: 'desc',
+                        label: <Image src='/icons/desc.png' width={50} height={50} alt='desc' className="min-h-[22px] min-w-[22px] max-w-[22px] max-h-[22px]" />
+                     },
+                     {
+                        value: 'asc',
+                        label: <Image src='/icons/asc.png' width={50} height={50} alt='asc' className="min-h-[22px] min-w-[22px] max-w-[22px] max-h-[22px]" />
+                     }, 
+                  ]}
+                  selected={sortOrder}
+                  setSelected={(value: string) => setSortOrder(value as 'asc' | 'desc')}
                />
             </div>
          </header>
@@ -186,14 +235,29 @@ export default function Home() {
                {info && <Info data={info} isVisible={isInfoVisible} /> || <div className="w-1/2"></div>}
             </div>
 
-            <ul className="flex flex-col pt-3 overflow-y-auto items-end">
-               {sortedCombinedArray && sortedCombinedArray.filter(filterFn).map((songData, i) => (
-                  <Card
-                     data={songData}
-                     sortFn={sortFn}
-                     key={i}
-                     className='-mt-3'
-                     onClick={(props: SongData) => setInfo({ ...props })} />
+            <ul className="flex flex-col pt-3 overflow-y-auto">
+               {groupedDict && Object.keys(groupedDict).map((group, i) => (
+                  <div key={i} className="w-full">
+                     {group !== '' &&
+                        <GroupSeparator
+                           selected={group == selectedGroup}
+                           onClick={() => setSelectedGroup(group === selectedGroup ? null : group)}
+                        >{group}</GroupSeparator>
+                     }
+                     {(group == selectedGroup || group === '') &&
+                        <ul className="flex flex-col gap-2 items-end">
+                           {groupedDict[group].filter(filterFn).map((songData: any, i: number) => (
+                              <Card
+                                 data={songData}
+                                 sortFn={sortFn}
+                                 key={i}
+                                 className='-mt-3'
+                                 selected={info?.local.id === songData.local.id}
+                                 onClick={handleCardClick} />
+                           ))}
+                        </ul>
+                     }
+                  </div>
                ))}
             </ul>
          </main>
