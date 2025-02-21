@@ -50,7 +50,7 @@ export default function SelectPage() {
          <BgImage />
          <div className="absolute mx-auto top-1/2 -translate-y-1/2 left-0 right-0 w-fit">
             <div className="animate-pulse-size duration-8000 delay-3000 absolute top-0 left-0 w-full h-full bg-main rounded-xl"></div>
-            <div className="bg-linear-to-br from-main-border to-main px-10 py-6 hover:px-12 hover:py-8 text-lg border-main-border border-4 p-3 rounded-xl select-none cursor-pointer brightness-115 shadow-md hover:shadow-lg hover:brightness-130 font-semibold transition-all duration-300 flex flex-col justify-center items-center">
+            <div className="bg-main px-10 py-6 hover:px-12 hover:py-8 text-lg border-main-border border-4 p-3 rounded-xl select-none cursor-pointer brightness-115 shadow-md hover:shadow-lg hover:brightness-130 font-semibold transition-all duration-300 flex flex-col justify-center items-center">
                <h1>Choose your <span className="font-bold">osu!</span> beatmaps directory</h1>
                <h3 className="text-base text-black/60">.../osu!/Songs</h3>
                <h3 className="text-base mt-2">❗ This can take a lot of time depending on amount of maps ❗</h3>

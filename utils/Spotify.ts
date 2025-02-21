@@ -100,8 +100,24 @@ export async function getPlaylist(playlistId: string) {
    return await response.json();
 }
 
-export async function createPlaylist({ name, description, isPublic = false, collaborative = false }:
-   { name: string, isPublic?: boolean, collaborative?: boolean, description: string }): Promise<Playlist | undefined> {
+export async function fetchMyProfile() {
+   let token = (await cookies()).get('spotify_oauth_access_token')?.value
+   if (!token) {
+      console.error('No access token found');
+      return;
+   };
+
+   const response = await fetch('https://api.spotify.com/v1/me', {
+      method: "GET", headers: { Authorization: `Bearer ${token}` }
+   })
+   console.log(response);
+
+   if (!response.ok) throw new Error(await response.text());
+   return await response.json();
+}
+
+export async function createPlaylist({ userId, name, description, isPublic = false, collaborative = false }:
+   { userId: string, name: string, isPublic?: boolean, collaborative?: boolean, description: string }): Promise<Playlist | undefined> {
    
    let token = (await cookies()).get('spotify_oauth_access_token')?.value
    if (!token) {
@@ -109,7 +125,7 @@ export async function createPlaylist({ name, description, isPublic = false, coll
       return;
    };
 
-   const response = await fetch(`https://api.spotify.com/v1/users/${process.env.SPOTIFY_USER}/playlists`, {
+   const response = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, public: isPublic, collaborative, description })
@@ -143,7 +159,7 @@ export async function OAuthAuthorization(code: string) {
    const body = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: 'http://localhost:3000/auth/spotify/callback',
+      redirect_uri: process.env.NEXT_PUBLIC_URL! + '/auth/spotify/callback',
       client_id: process.env.AUTH_SPOTIFY_ID!,
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
    });

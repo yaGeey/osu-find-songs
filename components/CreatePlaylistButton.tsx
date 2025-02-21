@@ -1,5 +1,5 @@
 import { Track } from "@/types/Spotify";
-import { AddItemsToPlaylist, createPlaylist } from "@/utils/Spotify";
+import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from "@/utils/Spotify";
 import { useMutation, type UseQueryResult } from "@tanstack/react-query";
 import React, { useState } from "react";
 import Modal from "./Modal";
@@ -47,16 +47,28 @@ export default function CreatePlaylistButton({ songQueries }: { songQueries: Use
       }
 
       if (songQueries.filter(q => q.data).length !== songQueries.length) {
-         handleModal(<h1>Some songs are still loading, try again later.</h1>, 'warning',);
+         handleModal(<h1>Some songs are still loading, try again later</h1>, 'warning',);
          return;
       };
-      handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading');
 
-      const playlist = await createPlaylist({ name: 'Test', description: new Date().toLocaleString() });
+      handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading');
+      const profile = await fetchMyProfile();
+      if (!profile) {
+         handleModal(<h1>Failed to get profile data</h1>, 'error');
+         return;
+      };
+
+      handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading');
+      const playlist = await createPlaylist({
+         userId: profile.id,
+         name: 'osu! to Spotify',
+         description: `Generated playlist by ${process.env.NEXT_PUBLIC_URL} at ${new Date().toLocaleString()}`,
+      });
       if (!playlist) {
          handleModal(<h1>Failed to create playlist</h1>, 'error');
          return;
       };
+
       handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading');
 
       const allTracks = songQueries.map(q => q.data).filter(data => !!data);

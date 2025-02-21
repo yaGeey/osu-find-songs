@@ -1,10 +1,8 @@
 Spotify get playlist tracks to find beatmaps based on filters (useInfiniteQuery??)
 SEO
-change bg image
-responsive design
 
 апішка осу повільішне спотіая
-фікс лоадінг 
+варнінг коли нема коректниг файлів засунув на сайт юзер йоу 
 
 ## less important
 

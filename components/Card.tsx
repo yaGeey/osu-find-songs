@@ -9,7 +9,7 @@ const getSortValue = (sortFn: string, data: SongDataQueried) => {
    switch (sortFn) {
       case 'sort-title': return null;
       case 'sort-artist': return null;
-      case 'sort-bpm': return data.beatmapsetQuery.data?.bpm;
+      case 'sort-bpm': return Math.round(data.beatmapsetQuery.data?.bpm!);
       case 'sort-creator': return data.beatmapsetQuery.data?.creator;
       case 'sort-date': return null;
       case 'sort-date-mapped': return data.beatmapsetQuery.data?.last_updated ? new Date(data.beatmapsetQuery.data.last_updated).toLocaleDateString() : null;
@@ -33,13 +33,12 @@ export default function Card({ data, sortFn, selected, onClick, className }: {
          onClick({ beatmapset: beatmapsetQuery.data!, spotify: spotifyQuery.data ?? null, local });
       }
    }
-   console.log(beatmapsetQuery.isLoading)
 
    return (
       <div
          className={tw(
             "select-none relative justify-center items-center bg-song text-white flex w-[500px] min-h-[90px] border-[5px] border-song-border rounded-lg transition-all duration-300 ease-in-out hover:bg-song-select hover:-mt-1 hover:mb-2",
-            selected && 'bg-song-select -mt-1 mb-2 mr-20',
+            selected && 'bg-song-select -mt-1 mb-2 sm:mr-20',
             className,
          )}
          id={local.id}
@@ -55,7 +54,7 @@ export default function Card({ data, sortFn, selected, onClick, className }: {
                <h2>{local.author}</h2>
             </div>
             <div className={tw(
-               "flex gap-3.5 mt-2 items-center",
+               "flex gap-3.5 mt-2 items-center -mr-2.5",
                sortFn && getSortValue(sortFn, data) && 'min-w-[90px]',
             )}>
                {sortFn && getSortValue(sortFn, data) &&

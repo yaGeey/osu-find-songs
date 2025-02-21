@@ -16,14 +16,16 @@ import gsap from "gsap";
 import Cookies from "js-cookie";
 import YtVideo from "./embeds/YtVideo";
 import SpotifyEmbed from "./embeds/Spotify";
+import SVG from "./SVG";
+import { twMerge as tw } from "tailwind-merge";
 gsap.registerPlugin(useGSAP);
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
    data: SongData,
-   isVisible: boolean
+   onClose: () => void
 }
 
-export default function Info({ data, isVisible }: Props) {
+export default function Info({ data, onClose, className }: Props) {
    const { spotify, beatmapset, local } = data;
    const [selection, setSelection] = useState<'spotify' | 'youtube' | 'other'>('spotify');
    const container = useRef<HTMLDivElement>(null);
@@ -31,7 +33,12 @@ export default function Info({ data, isVisible }: Props) {
    useEffect(() => {
       if (spotify && spotify?.length !== 20 ) setSelection('spotify');
       else setSelection('youtube');
-   }, [spotify||null, beatmapset||null])
+   }, [spotify || null, beatmapset || null])
+   
+   useEffect(() => {
+      if (!Cookies.get('showSpotifyEmbeds')) Cookies.set('showSpotifyEmbeds', 'true');
+      if (!Cookies.get('showYouTubeEmbeds')) Cookies.set('showYouTubeEmbeds', 'true');
+   }, [])
 
    const yt = useQuery({
       queryKey: ['youtube', local.id],
@@ -52,7 +59,13 @@ export default function Info({ data, isVisible }: Props) {
    // });
 
    return (
-      <div ref={container} id='info-card' className="animate-in slide-in-from-left flex flex-col bg-main/80 border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[618px]">
+      <div ref={container} id='info-card' className={tw(
+         "relative animate-in slide-in-from-left flex flex-col bg-main/80 border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[618px]",
+         className,
+      )}>
+         <div className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all" onClick={onClose}>
+            <Image src='/icons/close.svg' layout="fill" alt="close"/>
+         </div>
          <div className="flex gap-4 h-[140px]">
             <div className="min-w-[140px] max-w-[140px] h-[140px]">
                <Image

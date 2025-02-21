@@ -5,7 +5,7 @@ const Select = dynamic(() => import('react-select'), { ssr: false });
 
 export default function SettingsPopup({ isOpen }: {isOpen: boolean}) {
    return (
-      <div className="absolute top-14 left-0 shadow-2xl z-10 animate-in slide-in-from-left bg-main border-4  border-main-border min-w-65 w-1/4 flex flex-col gap-4 p-4 rounded-xl rounded-t-none rounded-l-none border-t-0 border-l-0">
+      <div className="z-100 absolute top-14 left-0 shadow-2xl animate-in slide-in-from-left bg-main border-4  border-main-border min-w-65 w-1/4 flex flex-col gap-4 p-4 rounded-xl rounded-t-none rounded-l-none border-t-0 border-l-0">
          {/* <section className="flex items-center gap-2">
             <Select isDisabled
                id="select-language"

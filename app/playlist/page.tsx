@@ -26,6 +26,7 @@ import { Button } from "@/components/Buttons";
 import { group } from "console";
 import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
+import Modal from "@/components/Modal";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
 // gsap.registerPlugin(useGSAP);
@@ -38,15 +39,14 @@ export default function Home() {
    }, [songs]);
 
    const [info, setInfo] = useState<SongData | null>(null);
-   const [currentSong, setCurrentSong] = useState<HTMLElement | null>(null);
    const [filters, setFilters] = useState<string[]>([]);
    const [groupFn, setGroupFn] = useState<string>('no');
    const [sortFn, setSortFn] = useState('sort-title');
-   const [isInfoVisible, setIsInfoVisible] = useState(false);
    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
    const [groupedDict, setGroupedDict] = useState<any>(undefined);
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+   const [isHomeRedirectModalVisible, setIsHomeRedirectModalVisible] = useState(false);
 
    useEffect(() => {
       setInfo(null);
@@ -72,7 +72,6 @@ export default function Home() {
       }))
    });
    const isBeatmapsLoading = beatmapsetQueries.filter(q => q.data).length !== beatmapsetQueries.length;
-   console.log(isBeatmapsLoading)
 
    // Combine the arrays
    const combinedArray = songs.map((song, i) => ({
@@ -144,7 +143,7 @@ export default function Home() {
       }, {} as Record<string, typeof combinedArray>);
 
       setGroupedDict(sortedGroupedArray);
-   }, [groupFn, sortFn, sortOrder]);
+   }, [groupFn, sortFn, sortOrder, isBeatmapsLoading]);
 
    // filters
    const filterFn = (a: SongDataQueried) => {
@@ -163,17 +162,22 @@ export default function Home() {
    }
 
    return (
-      <div className="overflow-y-hidden max-h-screen">
+      <div className="overflow-y-hidden max-h-screen min-w-[600px]">
          <BgImage image={info?.local.image} />
+         <Modal isOpen={isHomeRedirectModalVisible} onClose={() => setIsHomeRedirectModalVisible(false)} onOkay={()=>router.push('/')} closeBtn='Stay' okBtn='Redirect' state='warning'>You are about to redirect to the landing page</Modal>
 
-         <header className="bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
+         {isBeatmapsLoading && <progress className="w-screen h-3 mb-2"
+            value={combinedArray.filter(q => !q.beatmapsetQuery.isLoading && !q.spotifyQuery.isLoading).length} max={combinedArray.length}></progress>}
+         
+         <header className={tw(
+            "bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3",
+            isBeatmapsLoading && '-mt-3.5 border-t-4'
+         )}>
             <section className="flex gap-3 items-center min-w-fit">
                {/* Може анімашку, але там бібліотека душна якась хз https://icons8.com/icon/set/home/ios */}
-               <Link href="/">
-                  <div className="relative w-[30px] h-[30px]">
-                     <Image src="/icons/home.svg" layout="fill" alt="settings" className="hover:scale-110 transition-all"/>
-                  </div>
-               </Link>
+               <div className="relative w-[30px] h-[30px]" onClick={() => setIsHomeRedirectModalVisible(true)}>
+                  <Image src="/icons/home.svg" layout="fill" alt="settings" className="hover:scale-110 transition-all"/>
+               </div>
                <Image src="/icons/settings.svg" width={30} height={30} alt="settings" onClick={() => setIsSettingsVisible(p => !p)}
                   // Зробити щоб можна змінювалась коли isSettingsVisible. Тре svg не імпорт а в окремий компонент можна
                   className={tw("hover:animate-spin hover:duration-2000 cursor-pointer", isSettingsVisible && 'brightness-130')}
@@ -186,7 +190,7 @@ export default function Home() {
 
             <div className="flex gap-3 items-center justify-center ">
                <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="filter-select">Filters</label>
-               <Select className='lg:w-[200px] min-w-[75px] w-fit'
+               <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
                   onChange={(e: any) => setFilters(e.map((f: any) => f.value))}
                   isMulti
                   id="filter-select"
@@ -196,7 +200,7 @@ export default function Home() {
             </div>
             <div className="flex gap-3 justify-center items-center ">
                <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="group-select">Group</label>
-               <Select className='lg:w-[200px] min-w-[75px] w-fit'
+               <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
                   onChange={(e: any) => setGroupFn(e.value)}
                   id="group-select"
                   defaultValue={groupOptions[0]}
@@ -206,7 +210,7 @@ export default function Home() {
             </div>
             <div className="flex gap-3 items-center justify-end">
                <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="sort-select">Sort</label>
-               <Select className='lg:w-[200px] min-w-[75px] w-fit'
+               <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
                   onChange={(e: any) => setSortFn(e.value)}
                   id="sort-select"
                   defaultValue={sortOptions[4]}
@@ -230,18 +234,19 @@ export default function Home() {
             </div>
          </header>
 
-         <main className="flex justify-between max-h-[calc(100dvh-56px)]">
-            <div className="h-[calc(100dvh-56px)] flex items-center justify-center">
-               {info && <Info data={info} isVisible={isInfoVisible} /> || <div className="w-1/2"></div>}
+         <main className="max-h-[calc(100dvh-56px)] flex justify-center sm:justify-end">
+            <div className="h-[calc(100dvh-56px)] absolute top-0 left-0 flex justify-center items-center mt-[56px] z-10">
+               {info && <Info data={info} onClose={()=>setInfo(null)}/> }
             </div>
 
             <ul className="flex flex-col pt-3 overflow-y-auto">
                {groupedDict && Object.keys(groupedDict).map((group, i) => (
-                  <div key={i} className="w-full">
+                  <div key={i} className="w-full flex flex-col items-end">
                      {group !== '' &&
                         <GroupSeparator
                            selected={group == selectedGroup}
                            onClick={() => setSelectedGroup(group === selectedGroup ? null : group)}
+                           className="z-1"
                         >{group}</GroupSeparator>
                      }
                      {(group == selectedGroup || group === '') &&
