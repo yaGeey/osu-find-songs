@@ -27,15 +27,15 @@ import { group } from "console";
 import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
 import Modal from "@/components/Modal";
+import Head from "next/head";
 const Select = dynamic(() => import('react-select'), { ssr: false });
-
 // gsap.registerPlugin(useGSAP);
 
 export default function Home() {
    const router = useRouter();
    const { songs } = useSongContext();
    useEffect(() => {
-      if (!songs.length) router.push('playlist/select');
+      if (!songs.length) router.push('songs/select');
    }, [songs]);
 
    const [info, setInfo] = useState<SongData | null>(null);
@@ -189,13 +189,19 @@ export default function Home() {
             <CreatePlaylistButton songQueries={songQueries} />
 
             <div className="flex gap-3 items-center justify-center ">
-               <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="filter-select">Filters</label>
-               <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
+               <label className="text-md font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>
+               {/* <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
                   onChange={(e: any) => setFilters(e.map((f: any) => f.value))}
                   isMulti
                   id="filter-select"
                   options={filterOptions}
                   isDisabled={isBeatmapsLoading}
+               /> */}
+               <input
+                  type="checkbox"
+                  id="filter-select"
+                  onChange={(e) => setFilters(e.target.checked ? ['exact-spotify'] : [])}
+                  className="mt-1 w-4 h-4 accent-main-border"
                />
             </div>
             <div className="flex gap-3 justify-center items-center ">
@@ -239,7 +245,7 @@ export default function Home() {
                {info && <Info data={info} onClose={()=>setInfo(null)}/> }
             </div>
 
-            <ul className="flex flex-col pt-3 overflow-y-auto">
+            <ul className="flex flex-col pt-3 overflow-y-auto scrollbar-none">
                {groupedDict && Object.keys(groupedDict).map((group, i) => (
                   <div key={i} className="w-full flex flex-col items-end">
                      {group !== '' &&

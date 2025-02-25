@@ -23,6 +23,7 @@ export default function SettingsPopup({ isOpen }: {isOpen: boolean}) {
                   id="performance-spotify"
                   defaultChecked={Cookies.get('showSpotifyEmbeds') === 'false'}
                   onChange={(e) => Cookies.set('showSpotifyEmbeds', (!e.target.checked).toString())}
+                  className="w-4 h-4 accent-main-border"
                />
                <label htmlFor="performance-spotify" >Show links instead of <em>Spotify</em> embeds</label>
             </section>
@@ -32,6 +33,7 @@ export default function SettingsPopup({ isOpen }: {isOpen: boolean}) {
                   id="performance-youtube"
                   defaultChecked={Cookies.get('showYouTubeEmbeds') === 'false'}
                   onChange={(e) => Cookies.set('showYouTubeEmbeds', (!e.target.checked).toString())}
+                  className="w-4 h-4 accent-main-border"
                />
                <label htmlFor="performance-youtube">Show links instead of <em>YouTube</em> embeds</label>
             </section>

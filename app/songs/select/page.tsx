@@ -39,7 +39,7 @@ export default function SelectPage() {
             });
          });
          setSongs(Array.from(songsMap.values()));
-         router.push('/playlist');
+         router.push('/songs');
       } else {
          alert('Please select a valid osu! beatmaps directory');
       }
@@ -52,8 +52,8 @@ export default function SelectPage() {
             <div className="animate-pulse-size duration-8000 delay-3000 absolute top-0 left-0 w-full h-full bg-main rounded-xl"></div>
             <div className="bg-main px-10 py-6 hover:px-12 hover:py-8 text-lg border-main-border border-4 p-3 rounded-xl select-none cursor-pointer brightness-115 shadow-md hover:shadow-lg hover:brightness-130 font-semibold transition-all duration-300 flex flex-col justify-center items-center">
                <h1>Choose your <span className="font-bold">osu!</span> beatmaps directory</h1>
-               <h3 className="text-base text-black/60">.../osu!/Songs</h3>
-               <h3 className="text-base mt-2">❗ This can take a lot of time depending on amount of maps ❗</h3>
+               <h3 className="text-base text-black/60 font-normal">C:/Users/.../AppData/Local/<span className="font-semibold">osu!/Songs</span></h3>
+               <h3 className="text-base mt-2">❗ This can take a while depending on amount of maps ❗</h3>
                {/* @ts-ignore */}
                <input directory="" webkitdirectory="" type="file" onChange={handleFileChange} className="opacity-0 absolute top-0 left-0 w-full h-full" />
             </div>
