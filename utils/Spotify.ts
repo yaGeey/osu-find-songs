@@ -179,3 +179,15 @@ export async function OAuthAuthorization(code: string) {
    storage.set('spotify_oauth_refresh_token', data.refresh_token, { maxAge: data.expires_in });
    return data;
 }
+
+export async function fetchWithToken(url: string) {
+   let token = (await cookies()).get('spotifyToken')?.value
+   if (!token) token = await revalidateSpotifyToken();
+
+   const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` }
+   });
+
+   if (!response.ok) throw new Error(await response.text());
+   return await response.json();
+}

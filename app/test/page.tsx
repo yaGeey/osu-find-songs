@@ -32,6 +32,7 @@ export default function Test() {
 
    return (
       <div className="m-4 absolute" ref={container}>
+         <span className="text-sm"> Test text</span>
          <span className="text-white bg-red-400 rounded-full absolute text-sm left-5 -top-1 font-bold w-4 h-4 flex items-center justify-center">4</span>
          <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" />
          <SpotifyBtn onClick={handleFetch} />

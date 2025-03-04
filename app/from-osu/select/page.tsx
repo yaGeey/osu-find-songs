@@ -3,10 +3,17 @@ import BgImage from "@/components/BgImage";
 import { Song } from "@/types/types";
 import { useSongContext } from "@/contexts/SongContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
 
 export default function SelectPage() {
    const { setSongs } = useSongContext();
    const router = useRouter();
+
+   useEffect(() => {
+      if (Cookies.get('showSpotifyEmbeds') === undefined) Cookies.set('showSpotifyEmbeds', 'true');
+      if (Cookies.get('showYouTubeEmbeds') === undefined) Cookies.set('showYouTubeEmbeds', 'true');
+   }, []);
 
    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
       const files = e.target.files;

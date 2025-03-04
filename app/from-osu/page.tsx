@@ -22,8 +22,6 @@ import SettingsPopup from "@/components/SettingsPopup";
 import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
 import CreatePlaylistButton from "@/components/CreatePlaylistButton";
-import { Button } from "@/components/Buttons";
-import { group } from "console";
 import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
 import Modal from "@/components/Modal";
@@ -45,7 +43,7 @@ export default function Home() {
    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
    const [groupedDict, setGroupedDict] = useState<any>(undefined);
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
    const [isHomeRedirectModalVisible, setIsHomeRedirectModalVisible] = useState(false);
 
    useEffect(() => {
@@ -71,7 +69,6 @@ export default function Home() {
          cacheTime: 1000 * 60 * 60 * 24,
       }))
    });
-   const isBeatmapsLoading = beatmapsetQueries.filter(q => q.data).length !== beatmapsetQueries.length;
 
    // Combine the arrays
    const combinedArray = songs.map((song, i) => ({
@@ -79,11 +76,12 @@ export default function Home() {
       spotifyQuery: songQueries[i],
       beatmapsetQuery: beatmapsetQueries[i],
    }));
+   const isLoading = combinedArray.some(q => q.spotifyQuery.isLoading || q.beatmapsetQuery.isLoading);
 
    // Grouping and sorting
    useEffect(() => {
       let groupedArray;
-      if (isBeatmapsLoading) {
+      if (isLoading) {
          setGroupedDict({ '': combinedArray });
          return;
       };
@@ -143,7 +141,7 @@ export default function Home() {
       }, {} as Record<string, typeof combinedArray>);
 
       setGroupedDict(sortedGroupedArray);
-   }, [groupFn, sortFn, sortOrder, isBeatmapsLoading]);
+   }, [groupFn, sortFn, sortOrder, beatmapsetQueries.filter(q => q.isLoading).length, songQueries.filter(q => q.isLoading).length]);
 
    // filters
    const filterFn = (a: SongDataQueried) => {
@@ -162,16 +160,16 @@ export default function Home() {
    }
 
    return (
-      <div className="overflow-y-hidden max-h-screen min-w-[600px]">
+      <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
          <BgImage image={info?.local.image} />
          <Modal isOpen={isHomeRedirectModalVisible} onClose={() => setIsHomeRedirectModalVisible(false)} onOkay={()=>router.push('/')} closeBtn='Stay' okBtn='Redirect' state='warning'>You are about to redirect to the landing page</Modal>
 
-         {isBeatmapsLoading && <progress className="w-screen h-3 mb-2"
+         {isLoading && <progress className="w-screen h-3 mb-2"
             value={combinedArray.filter(q => !q.beatmapsetQuery.isLoading && !q.spotifyQuery.isLoading).length} max={combinedArray.length}></progress>}
          
          <header className={tw(
             "bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3",
-            isBeatmapsLoading && '-mt-3.5 border-t-4'
+            isLoading && '-mt-3.5 border-t-4'
          )}>
             <section className="flex gap-3 items-center min-w-fit">
                {/* Може анімашку, але там бібліотека душна якась хз https://icons8.com/icon/set/home/ios */}
@@ -183,20 +181,12 @@ export default function Home() {
                   className={tw("hover:animate-spin hover:duration-2000 cursor-pointer", isSettingsVisible && 'brightness-130')}
                />
             </section>
-            {/* <div className="border-l-3 border-l-main-border h-3/4 -ml-27"></div> */}
             {isSettingsVisible && <SettingsPopup isOpen={isSettingsVisible} />}
 
             <CreatePlaylistButton songQueries={songQueries} />
 
             <div className="flex gap-3 items-center justify-center ">
                <label className="text-md font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>
-               {/* <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
-                  onChange={(e: any) => setFilters(e.map((f: any) => f.value))}
-                  isMulti
-                  id="filter-select"
-                  options={filterOptions}
-                  isDisabled={isBeatmapsLoading}
-               /> */}
                <input
                   type="checkbox"
                   id="filter-select"
@@ -211,7 +201,7 @@ export default function Home() {
                   id="group-select"
                   defaultValue={groupOptions[0]}
                   options={groupOptions}
-                  isDisabled={isBeatmapsLoading}
+                  isDisabled={isLoading}
                />
             </div>
             <div className="flex gap-3 items-center justify-end">
@@ -221,7 +211,7 @@ export default function Home() {
                   id="sort-select"
                   defaultValue={sortOptions[4]}
                   options={sortOptions}
-                  isDisabled={isBeatmapsLoading}
+                  isDisabled={isLoading}
                />
                <TextSwitch
                   options={[
@@ -257,14 +247,15 @@ export default function Home() {
                      }
                      {(group == selectedGroup || group === '') &&
                         <ul className="flex flex-col gap-2 items-end">
-                           {groupedDict[group].filter(filterFn).map((songData: any, i: number) => (
+                           {groupedDict[group].filter(filterFn).map((songData: SongDataQueried, i: number) => (
                               <Card
                                  data={songData}
                                  sortFn={sortFn}
                                  key={i}
                                  className='-mt-3'
                                  selected={info?.local.id === songData.local.id}
-                                 onClick={handleCardClick} />
+                                 onClick={handleCardClick}
+                              />
                            ))}
                         </ul>
                      }
@@ -273,11 +264,11 @@ export default function Home() {
             </ul>
          </main>
 
-         <div id="footer-hover-trigger" className="absolute bottom-0 left-0 w-full h-8 z-10 flex justify-center items-center hover:h-13"></div>
+         {/* <div id="footer-hover-trigger" className="absolute bottom-0 left-0 w-full h-8 z-10 flex justify-center items-center hover:h-13"></div>
          <footer className="footer bg-main border-t-4 border-main-border w-screen h-14 flex justify-between items-center px-8">
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-400/80 w-fit text-3xl/3 pb-4 px-4 rounded-t-xl select-none">...</div>
             <DebugButtons songs={songs} />
-         </footer>
+         </footer> */}
       </div>
    );
 }

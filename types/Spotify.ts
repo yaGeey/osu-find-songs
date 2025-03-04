@@ -92,3 +92,28 @@ export type Playlist = {
    type: string;
    uri: string;
 };
+
+export type PlaylistPage = {
+   href: string;
+   items: {
+      added_at: string;
+      added_by: {
+         external_urls: ExternalUrls;
+         href: string;
+         id: string;
+         type: string;
+         uri: string;
+      };
+      is_local: boolean;
+      primary_color: string | null;
+      track: Track;
+      video_thumbnail: {
+         url: string;
+      };
+   }[];
+   limit: number;
+   next: string | null;
+   offset: number;
+   previous: string | null;
+   total: number;
+};

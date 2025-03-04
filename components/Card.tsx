@@ -1,6 +1,5 @@
 import { Song, SongData } from "@/types/types";
 import Image from "next/image";
-import Link from "next/link";
 import Loading from "./state/Loading";
 import { twMerge as tw } from "tailwind-merge";
 import { SongDataQueried } from "@/types/types";
@@ -27,6 +26,7 @@ export default function Card({ data, sortFn, selected, onClick, className }: {
    className?: string
 }) {
    const { local, beatmapsetQuery, spotifyQuery } = data;
+   // console.log(beatmapsetQuery.isLoading, spotifyQuery.isLoading);
 
    const handleClick = () => {
       if (onClick && (beatmapsetQuery.data || spotifyQuery.data)) {

@@ -1,26 +1,46 @@
-// import { useInfiniteQuery } from "@tanstack/react-query"
+'use client'
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { fetchWithToken } from "@/utils/Spotify";
+import { PlaylistPage, Track } from "@/types/Spotify";
+import { useEffect } from "react";
 
-import { Playlist } from "@/types/Spotify";
-import { getPlaylist } from "@/utils/Spotify"
+type Data = {
+   pages: PlaylistPage[];
+   pageParams: string[];
+}
 
-export default async function FromSpotifyPage() {
-   // const data = useInfiniteQuery({
-   //    queryKey: ['songs'],
-   //    queryFn: async ({ pageParam = 0 }) => {
-   //       const res = await fetch(`/api/songs?page=${pageParam}`)
-   //       return res.json()
-   //    },
-   //    getNextPageParam: (lastPage: any[], allPages: any[]) => {
-   //       return lastPage.length ? allPages.length : undefined
-   //    },
-   //    initialPageParam: 0
-   // })
-   const data: Playlist = await getPlaylist('2uQjXuFRKw9JqcJzW1ADEz')
-   console.log(data);
-   
+const playlistId = '2uQjXuFRKw9JqcJzW1ADEz';
+
+export default function FromSpotifyPage() {
+   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+      queryKey: ['songs', playlistId],
+      queryFn: async ({ pageParam = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100` }) => await fetchWithToken(pageParam),
+      getNextPageParam: (lastPage) => lastPage.next ? lastPage.next : undefined,
+      getPreviousPageParam: (firstPage) => firstPage.previous ? firstPage.previous : undefined,
+      initialPageParam: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100`,
+   });
+   useEffect(() => {
+      if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
    return (
-      <div>
-         {data.toString()}
+      <div className="overflow-y-auto h-full">
+         <button
+            onClick={() => fetchNextPage()}
+            disabled={!hasNextPage || isFetchingNextPage}
+         >
+            {isFetchingNextPage ? 'Loading more...' : hasNextPage ? `Load More ${data!.pages.length*100}` : 'No more tracks'}
+         </button>
+
+         <div className="flex flex-col gap-2 h-[500px] bg-amber-200 overflow-y-auto">
+            {(data as Data)?.pages.map((page, i) => (
+               <div key={i}>
+                  {page.items.map((res, j) => (
+                     <div key={res.track.id + j.toString()}>{res.track.name}</div>
+                  ))}
+               </div>
+            ))}
+         </div>
       </div>
-   )
+   );
 }

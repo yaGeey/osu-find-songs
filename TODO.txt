@@ -1,4 +1,6 @@
-Spotify get playlist tracks to find beatmaps based on filters (useInfiniteQuery??)
+## features
+share beatmaps as link. Типу .../[slug]/ З вами поділилися картами? хочете скачати всі lenght з відео чи без?
+
 SEO
 
 апішка осу повільішне спотіая
