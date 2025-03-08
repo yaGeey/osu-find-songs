@@ -21,11 +21,12 @@ export async function getBeatmap(id: string): Promise<any> {
    return await response.json();
 }
 
-export async function beatmapsSearch(query: string): Promise<any> {
+export async function beatmapsSearch(query: string, sort:string): Promise<any> {
    let token = (await cookies()).get('osuToken')?.value;
    if (!token) token = await revalidateOsuToken();
 
-   const response = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/search?${encodeURIComponent(query)}`,
+   console.log(`search?q=${encodeURIComponent(query)}&${sort}`)
+   const response = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/search?q=${encodeURIComponent(query)}&${sort}`,
       {
          headers: {
             Authorization: `Bearer ${token}`,

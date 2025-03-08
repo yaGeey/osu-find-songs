@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 :root {
   overflow: hidden;
+  transition-behavior: allow-discrete;
+  interpolate-size: allow-keywords;
 }
 
 /* :root {
@@ -36,8 +38,10 @@ body {
   --color-darker: #905959;
   --color-main-border: #733F3F;
   --color-light: #FFA3A3;
+  --color-main-gray: #282828;
 
   --color-success: #3CA554;
+  --color-invalid: #ff4a4a;
   --color-highlight: #4CD2FF;
   --color-white-50: #D9D9D9;
 
@@ -46,7 +50,8 @@ body {
   --font-inter: 'Inter', sans-serif;
   --font-inter-tight: 'Inter Tight', sans-serif;
 
-  --text-shadow: '[text-shadow:_0_4px_4px_rgba(0,0,0,0.25)]';
+  --text-xs: 0.75rem;
+
 }
 .writing-mode-vertical-lr {
   writing-mode: vertical-lr;
@@ -54,27 +59,38 @@ body {
 .writing-mode-vertical-rl {
   writing-mode: vertical-rl;
 }
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-/* @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-} */
-.selected {
-  @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)]
+.text-shadow {
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
 
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #f6f7ed;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #e0cbcb; 
+    border-radius: 100vh;
+    border: 3px solid #f6f7ed;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c0a0b9;
+  }
+
+  .selected {
+    @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)]
+  }
+  .shadow-tight {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.20);
+  }
+}
 
 @plugin 'tailwind-scrollbar';
 @plugin 'tailwindcss-animate';

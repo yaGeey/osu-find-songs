@@ -49,7 +49,7 @@ export function OsuBtn({ onClick, ref, className, ...props }: BtnProps) {
 export function Button({ onClick, ref, className, children, ...props }: BtnProps) {
    return (
       <button onClick={onClick} ref={ref} {...props}
-         className={tw("button text-white px-4 py-2 rounded-md bg-main-border border-red-950 box-border flex justify-center items-center", className)}>
+         className={tw("button text-white px-4 py-2 rounded-md bg-darker border-main-border box-border flex justify-center items-center", className)}>
          {children}
       </button>
    )

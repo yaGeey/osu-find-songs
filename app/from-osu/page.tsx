@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Song, SongData, SongDataQueried } from "@/types/types";
 import { AddItemsToPlaylist, createPlaylist, findSong, revalidateSpotifyToken, searchSongWithConditions } from "@/utils/Spotify";
 import Image from "next/image";
-import Card from "@/components/Card";
+import Card from "@/components/cards/Card";
 import Info from "@/components/Info";
 import { twMerge as tw } from "tailwind-merge";
 import dynamic from "next/dynamic";
@@ -26,14 +26,32 @@ import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
 import Modal from "@/components/Modal";
 import Head from "next/head";
+import HomeBtn from "@/components/buttons/HomeBtn";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from "@fortawesome/free-solid-svg-icons";
+import SharePlaylistButton from "@/components/SharePlaylistButton";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 // gsap.registerPlugin(useGSAP);
+
+const selectStyles = {
+   control: base => ({
+      ...base,
+      height: 35,
+      minHeight: 35,
+      fontSize: '14px',
+      borderRadius: '8px',
+   }),
+   menu: base => ({
+      ...base,
+      fontSize: '14px',
+   }),
+};
 
 export default function Home() {
    const router = useRouter();
    const { songs } = useSongContext();
    useEffect(() => {
-      if (!songs.length) router.push('songs/select');
+      // if (!songs.length) router.push('from-osu/select');
    }, [songs]);
 
    const [info, setInfo] = useState<SongData | null>(null);
@@ -44,7 +62,6 @@ export default function Home() {
    const [groupedDict, setGroupedDict] = useState<any>(undefined);
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-   const [isHomeRedirectModalVisible, setIsHomeRedirectModalVisible] = useState(false);
 
    useEffect(() => {
       setInfo(null);
@@ -162,31 +179,31 @@ export default function Home() {
    return (
       <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
          <BgImage image={info?.local.image} />
-         <Modal isOpen={isHomeRedirectModalVisible} onClose={() => setIsHomeRedirectModalVisible(false)} onOkay={()=>router.push('/')} closeBtn='Stay' okBtn='Redirect' state='warning'>You are about to redirect to the landing page</Modal>
 
-         {isLoading && <progress className="w-screen h-3 mb-2"
-            value={combinedArray.filter(q => !q.beatmapsetQuery.isLoading && !q.spotifyQuery.isLoading).length} max={combinedArray.length}></progress>}
+         {isLoading && <progress
+            className="w-screen h-3 mb-2"
+            value={combinedArray.filter(q => !q.beatmapsetQuery.isLoading && !q.spotifyQuery.isLoading).length}
+            max={combinedArray.length}
+         ></progress> }
          
          <header className={tw(
             "bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3",
             isLoading && '-mt-3.5 border-t-4'
          )}>
             <section className="flex gap-3 items-center min-w-fit">
-               {/* Може анімашку, але там бібліотека душна якась хз https://icons8.com/icon/set/home/ios */}
-               <div className="relative w-[30px] h-[30px]" onClick={() => setIsHomeRedirectModalVisible(true)}>
-                  <Image src="/icons/home.svg" layout="fill" alt="settings" className="hover:scale-110 transition-all"/>
-               </div>
+               <HomeBtn />
                <Image src="/icons/settings.svg" width={30} height={30} alt="settings" onClick={() => setIsSettingsVisible(p => !p)}
                   // Зробити щоб можна змінювалась коли isSettingsVisible. Тре svg не імпорт а в окремий компонент можна
                   className={tw("hover:animate-spin hover:duration-2000 cursor-pointer", isSettingsVisible && 'brightness-130')}
                />
             </section>
+            <hr className="border-2 border-main-border h-3/4"></hr>
             {isSettingsVisible && <SettingsPopup isOpen={isSettingsVisible} />}
 
-            <CreatePlaylistButton songQueries={songQueries} />
+            {/* <CreatePlaylistButton songQueries={songQueries} /> */}
 
-            <div className="flex gap-3 items-center justify-center ">
-               <label className="text-md font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>
+            <div className="flex 2xl:gap-3 gap-1.5 items-center justify-center ">
+               <label className="font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>
                <input
                   type="checkbox"
                   id="filter-select"
@@ -195,15 +212,17 @@ export default function Home() {
                />
             </div>
             <div className="flex gap-3 justify-center items-center ">
-               <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="group-select">Group</label>
+               <label className="text-md font-semibold tracking-wider hidden xl:block" htmlFor="group-select">Group</label>
                <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
                   onChange={(e: any) => setGroupFn(e.value)}
                   id="group-select"
                   defaultValue={groupOptions[0]}
                   options={groupOptions}
                   isDisabled={isLoading}
+                  styles={selectStyles}
                />
             </div>
+            <hr className="border-2 border-main-border h-3/4"></hr>
             <div className="flex gap-3 items-center justify-end">
                <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="sort-select">Sort</label>
                <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
@@ -212,21 +231,28 @@ export default function Home() {
                   defaultValue={sortOptions[4]}
                   options={sortOptions}
                   isDisabled={isLoading}
+                  styles={selectStyles}
                />
                <TextSwitch
                   options={[
                      {
                         value: 'desc',
-                        label: <Image src='/icons/desc.png' width={50} height={50} alt='desc' className="min-h-[22px] min-w-[22px] max-w-[22px] max-h-[22px]" />
+                        label: <FontAwesomeIcon icon={faArrowDownWideShort}  />
                      },
                      {
                         value: 'asc',
-                        label: <Image src='/icons/asc.png' width={50} height={50} alt='asc' className="min-h-[22px] min-w-[22px] max-w-[22px] max-h-[22px]" />
+                        label: <FontAwesomeIcon icon={faArrowUpShortWide} />
                      }, 
                   ]}
                   selected={sortOrder}
                   setSelected={(value: string) => setSortOrder(value as 'asc' | 'desc')}
+                  className="h-[34px] ml-1"
                />
+            </div>
+            <hr className="border-2 border-main-border h-3/4"></hr>
+            <div className="relative">
+               <input type="text" className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]" placeholder="Search"/>
+               <FontAwesomeIcon icon={faSearch} className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-400 text-lg" />
             </div>
          </header>
 
@@ -235,7 +261,7 @@ export default function Home() {
                {info && <Info data={info} onClose={()=>setInfo(null)}/> }
             </div>
 
-            <ul className="flex flex-col pt-3 overflow-y-auto scrollbar-none">
+            <ul className="flex flex-col pt-3 overflow-y-auto scrollbar-none mt-2">
                {groupedDict && Object.keys(groupedDict).map((group, i) => (
                   <div key={i} className="w-full flex flex-col items-end">
                      {group !== '' &&
@@ -264,11 +290,19 @@ export default function Home() {
             </ul>
          </main>
 
-         {/* <div id="footer-hover-trigger" className="absolute bottom-0 left-0 w-full h-8 z-10 flex justify-center items-center hover:h-13"></div>
-         <footer className="footer bg-main border-t-4 border-main-border w-screen h-14 flex justify-between items-center px-8">
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-400/80 w-fit text-3xl/3 pb-4 px-4 rounded-t-xl select-none">...</div>
-            <DebugButtons songs={songs} />
-         </footer> */}
+         {/* <div id="footer-hover-trigger" className="absolute bottom-0 left-0 w-full h-8 z-10 flex justify-center items-center hover:h-13"></div> */}
+         <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-14 flex justify-center items-center px-8">
+            {/* <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-400/80 w-fit text-3xl/3 pb-4 px-4 rounded-t-xl select-none">...</div> */}
+            {/* <DebugButtons songs={songs} /> */}
+            <CreatePlaylistButton songQueries={songQueries} />
+            <SharePlaylistButton />
+         </footer>
       </div>
    );
 }
+
+{/* <div id="footer-hover-trigger" className="absolute bottom-0 left-0 w-full h-8 z-10 flex justify-center items-center hover:h-13"></div>
+   <footer className="footer bg-main border-t-4 border-main-border w-screen h-14 flex justify-between items-center px-8">
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-400/80 w-fit text-3xl/3 pb-4 px-4 rounded-t-xl select-none">...</div>
+      <DebugButtons songs={songs} />
+</footer> */}

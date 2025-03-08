@@ -1,8 +1,9 @@
-import { Song, SongData } from "@/types/types";
+import { SongData } from "@/types/types";
 import Image from "next/image";
-import Loading from "./state/Loading";
+import Loading from "../state/Loading";
 import { twMerge as tw } from "tailwind-merge";
 import { SongDataQueried } from "@/types/types";
+import React from "react";
 
 const getSortValue = (sortFn: string, data: SongDataQueried) => {
    switch (sortFn) {
@@ -18,7 +19,7 @@ const getSortValue = (sortFn: string, data: SongDataQueried) => {
    }
 } 
 
-export default function Card({ data, sortFn, selected, onClick, className }: {
+function Card({ data, sortFn, selected, onClick, className }: {
    data: SongDataQueried,
    sortFn?: string;
    selected: boolean;
@@ -26,7 +27,6 @@ export default function Card({ data, sortFn, selected, onClick, className }: {
    className?: string
 }) {
    const { local, beatmapsetQuery, spotifyQuery } = data;
-   // console.log(beatmapsetQuery.isLoading, spotifyQuery.isLoading);
 
    const handleClick = () => {
       if (onClick && (beatmapsetQuery.data || spotifyQuery.data)) {
@@ -65,7 +65,7 @@ export default function Card({ data, sortFn, selected, onClick, className }: {
                      className="hover:brightness-120 transition-all"
                      href={spotifyQuery.data[0].external_urls.spotify}
                   >
-                     <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" />
+                     <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className='animation animate fade-in'/>
                   </a>
                }
                {spotifyQuery.data && spotifyQuery.data?.length > 1 && spotifyQuery.data?.length !== 20 &&
@@ -80,3 +80,4 @@ export default function Card({ data, sortFn, selected, onClick, className }: {
       </div>
    )
 }
+export default React.memo(Card);

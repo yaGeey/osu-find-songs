@@ -10,7 +10,7 @@
    transition: all 0.3s ease;
 }
 .button:hover {
-   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.5);
+   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.35);
    filter:brightness(1.15);
 }
 .button:active,

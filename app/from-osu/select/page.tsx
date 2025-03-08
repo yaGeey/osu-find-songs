@@ -46,7 +46,7 @@ export default function SelectPage() {
             });
          });
          setSongs(Array.from(songsMap.values()));
-         router.push('/songs');
+         router.push('/from-osu');
       } else {
          alert('Please select a valid osu! beatmaps directory');
       }

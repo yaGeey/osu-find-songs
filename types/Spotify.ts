@@ -93,24 +93,26 @@ export type Playlist = {
    uri: string;
 };
 
+export type PageItem = {
+   added_at: string;
+   added_by: {
+      external_urls: ExternalUrls;
+      href: string;
+      id: string;
+      type: string;
+      uri: string;
+   };
+   is_local: boolean;
+   primary_color: string | null;
+   track: Track;
+   video_thumbnail: {
+      url: string;
+   };
+};
+
 export type PlaylistPage = {
    href: string;
-   items: {
-      added_at: string;
-      added_by: {
-         external_urls: ExternalUrls;
-         href: string;
-         id: string;
-         type: string;
-         uri: string;
-      };
-      is_local: boolean;
-      primary_color: string | null;
-      track: Track;
-      video_thumbnail: {
-         url: string;
-      };
-   }[];
+   items: PageItem[];
    limit: number;
    next: string | null;
    offset: number;
