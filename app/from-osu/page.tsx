@@ -1,16 +1,17 @@
 'use client'
 import { useEffect, useRef, useState } from "react";
+import { CSSObject } from "@emotion/react";
 import { Song, SongData, SongDataQueried } from "@/types/types";
-import { AddItemsToPlaylist, createPlaylist, findSong, revalidateSpotifyToken, searchSongWithConditions } from "@/utils/Spotify";
+import { AddItemsToPlaylist, createPlaylist, findSong, revalidateSpotifyToken, searchSongWithConditions } from "@/lib/Spotify";
 import Image from "next/image";
 import Card from "@/components/cards/Card";
 import Info from "@/components/Info";
 import { twMerge as tw } from "tailwind-merge";
 import dynamic from "next/dynamic";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import DebugButtons from "@/components/Debug";
 import { Track } from "@/types/Spotify";
-import { getBeatmap } from "@/utils/osu";
+import { getBeatmap } from "@/lib/osu";
 import { BeatmapSet } from "@/types/Osu";
 import { filterOptions, groupOptions, languageOptions, sortOptions } from "@/utils/selectOptions";
 // import gsap from "gsap";
@@ -19,7 +20,7 @@ import './page.css';
 import BgImage from "@/components/BgImage";
 import { useSongContext } from "@/contexts/SongContext";
 import SettingsPopup from "@/components/SettingsPopup";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import CreatePlaylistButton from "@/components/CreatePlaylistButton";
 import GroupSeparator from "@/components/GroupSeparator";
@@ -30,18 +31,19 @@ import HomeBtn from "@/components/buttons/HomeBtn";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from "@fortawesome/free-solid-svg-icons";
 import SharePlaylistButton from "@/components/SharePlaylistButton";
+import { ToastContainer, toast } from 'react-toastify';
 const Select = dynamic(() => import('react-select'), { ssr: false });
 // gsap.registerPlugin(useGSAP);
 
 const selectStyles = {
-   control: base => ({
+   control: (base: CSSObject) => ({
       ...base,
       height: 35,
       minHeight: 35,
       fontSize: '14px',
       borderRadius: '8px',
    }),
-   menu: base => ({
+   menu: (base: CSSObject) => ({
       ...base,
       fontSize: '14px',
    }),
@@ -49,10 +51,38 @@ const selectStyles = {
 
 export default function Home() {
    const router = useRouter();
-   const { songs } = useSongContext();
+   const searchParams = useSearchParams();
+   const pathname = usePathname();
+   const { songs: initialSongs } = useSongContext();
+   const [songs, setSongs] = useState<Song[]>(initialSongs);
+
    useEffect(() => {
-      // if (!songs.length) router.push('from-osu/select');
+      if (!songs.length && !searchParams.has('id')) {
+         console.warn('zzzzzzz???')
+         // router.push('from-osu/select');
+      };
    }, [songs]);
+   
+   const playlistQuery = useQuery({
+      queryKey: ['beatmapsets', searchParams.get('id')],
+      queryFn: async () => {
+         const res = await fetch(`/api/playlist?id=${searchParams.get('id')}`);
+         const data = await res.json();
+         console.log(data)
+         return data;
+      },
+      enabled: searchParams.has('id'),
+   });
+   useEffect(() => {
+      if (playlistQuery.isLoading) return;
+      if (!playlistQuery.data && !playlistQuery.isLoading && !songs.length && searchParams.has('id')) {
+         console.log(playlistQuery.data, playlistQuery.isLoading, songs.length, searchParams.has('id') )
+         // router.push('from-osu/select');
+      };
+      if (playlistQuery.data) setSongs(playlistQuery.data.beatmapsets.map((id: string) => (
+         { id, image: '', title: '', author: '', text: ''}
+      )));
+   }, [playlistQuery.data, playlistQuery.isLoading]);
 
    const [info, setInfo] = useState<SongData | null>(null);
    const [filters, setFilters] = useState<string[]>([]);
@@ -71,6 +101,7 @@ export default function Home() {
       queries: songs.map((song) => ({
          queryKey: ['spotify', song.id],
          queryFn: async (): Promise<Track[] | null> => {
+            console.log('searching', song.id)
             const tracks = await searchSongWithConditions(song);
             if (!tracks?.length) return null;
             return tracks;
@@ -86,6 +117,12 @@ export default function Home() {
          cacheTime: 1000 * 60 * 60 * 24,
       }))
    });
+
+   useEffect(() => {
+      console.log(songs)
+      songQueries.forEach(q => q.refetch());
+      beatmapsetQueries.forEach(q => q.refetch());
+   }, [playlistQuery.data]);
 
    // Combine the arrays
    const combinedArray = songs.map((song, i) => ({
@@ -158,7 +195,7 @@ export default function Home() {
       }, {} as Record<string, typeof combinedArray>);
 
       setGroupedDict(sortedGroupedArray);
-   }, [groupFn, sortFn, sortOrder, beatmapsetQueries.filter(q => q.isLoading).length, songQueries.filter(q => q.isLoading).length]);
+   }, [groupFn, sortFn, sortOrder, beatmapsetQueries.filter(q => q.isLoading).length, songQueries.filter(q => q.isLoading).length, playlistQuery.data]);
 
    // filters
    const filterFn = (a: SongDataQueried) => {
@@ -184,8 +221,8 @@ export default function Home() {
             className="w-screen h-3 mb-2"
             value={combinedArray.filter(q => !q.beatmapsetQuery.isLoading && !q.spotifyQuery.isLoading).length}
             max={combinedArray.length}
-         ></progress> }
-         
+         ></progress>}
+
          <header className={tw(
             "bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3",
             isLoading && '-mt-3.5 border-t-4'
@@ -237,12 +274,12 @@ export default function Home() {
                   options={[
                      {
                         value: 'desc',
-                        label: <FontAwesomeIcon icon={faArrowDownWideShort}  />
+                        label: <FontAwesomeIcon icon={faArrowDownWideShort} />
                      },
                      {
                         value: 'asc',
                         label: <FontAwesomeIcon icon={faArrowUpShortWide} />
-                     }, 
+                     },
                   ]}
                   selected={sortOrder}
                   setSelected={(value: string) => setSortOrder(value as 'asc' | 'desc')}
@@ -251,14 +288,14 @@ export default function Home() {
             </div>
             <hr className="border-2 border-main-border h-3/4"></hr>
             <div className="relative">
-               <input type="text" className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]" placeholder="Search"/>
+               <input type="text" className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]" placeholder="Search" />
                <FontAwesomeIcon icon={faSearch} className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-400 text-lg" />
             </div>
          </header>
 
          <main className="max-h-[calc(100dvh-56px)] flex justify-center sm:justify-end">
             <div className="h-[calc(100dvh-56px)] absolute top-0 left-0 flex justify-center items-center mt-[56px] z-10">
-               {info && <Info data={info} onClose={()=>setInfo(null)}/> }
+               {info && <Info data={info} onClose={() => setInfo(null)} />}
             </div>
 
             <ul className="flex flex-col pt-3 overflow-y-auto scrollbar-none mt-2">
@@ -290,13 +327,11 @@ export default function Home() {
             </ul>
          </main>
 
-         {/* <div id="footer-hover-trigger" className="absolute bottom-0 left-0 w-full h-8 z-10 flex justify-center items-center hover:h-13"></div> */}
-         <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-14 flex justify-center items-center px-8">
-            {/* <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-400/80 w-fit text-3xl/3 pb-4 px-4 rounded-t-xl select-none">...</div> */}
-            {/* <DebugButtons songs={songs} /> */}
-            <CreatePlaylistButton songQueries={songQueries} />
-            <SharePlaylistButton />
+         <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-13 flex justify-center items-center px-8 gap-8">
+            <CreatePlaylistButton songQueries={songQueries} className="w-[215px] py-1" />
+            <SharePlaylistButton data={combinedArray} className="w-[215px] py-1" />
          </footer>
+         <ToastContainer />
       </div>
    );
 }

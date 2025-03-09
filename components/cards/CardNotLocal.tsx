@@ -17,13 +17,12 @@ const getSortValue = (sortFn: string, data: SongDataQueried) => {
          new Date(data.beatmapsetQuery.data?.beatmaps[0].total_length * 1000).toISOString().slice(14, 19)
          : null;
    }
-} 
+}
 
-function Card({ data, sortFn, selected, onClick, isLocal = false, className }: {
+function Card({ data, sortFn, selected, onClick, className }: {
    data: SongDataQueried,
    sortFn?: string;
    selected: boolean;
-   isLocal?: boolean;
    onClick?: ({ beatmapset, spotify, local }: SongData) => void,
    className?: string
 }) {
@@ -47,12 +46,12 @@ function Card({ data, sortFn, selected, onClick, isLocal = false, className }: {
       >
          {(beatmapsetQuery.isLoading || spotifyQuery.isLoading) && <Loading />}
          <div className="relative w-[150px] h-[81px] rounded-l-sm overflow-hidden">
-            <Image src={local.image || beatmapsetQuery.data?.covers.card} alt={local.title || 'alt'} fill style={{ objectFit: 'cover' }} />
+            <Image src={local.image} alt={local.title} fill style={{ objectFit: 'cover' }} />
          </div>
          <div className="flex justify-between items-center w-full py-2 px-4">
             <div>
-               <h1 className="text-xl">{local.title || beatmapsetQuery.data?.title}</h1>
-               <h2>{local.author || beatmapsetQuery.data?.artist}</h2>
+               <h1 className="text-xl">{local.title}</h1>
+               <h2>{local.author}</h2>
             </div>
             <div className={tw(
                "flex gap-3.5 mt-2 items-center -mr-2.5",
@@ -66,14 +65,14 @@ function Card({ data, sortFn, selected, onClick, isLocal = false, className }: {
                      className="hover:brightness-120 transition-all"
                      href={spotifyQuery.data[0].external_urls.spotify}
                   >
-                     <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className='animation animate fade-in'/>
+                     <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className='animation animate fade-in' />
                   </a>
                }
                {spotifyQuery.data && spotifyQuery.data?.length > 1 && spotifyQuery.data?.length !== 20 &&
                   <div className="relative">
                      <span className="text-white bg-red-400 rounded-full absolute text-xs left-5 -top-1 font-bold w-4 h-4 flex items-center justify-center select-none">{spotifyQuery.data.length}</span>
                      {/* Link to detailed info page with parallel toured when implemented */}
-                        <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" />
+                     <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" />
                   </div>
                }
             </div>

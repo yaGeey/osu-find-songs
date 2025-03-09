@@ -1,7 +1,7 @@
 'use server'
 import { cookies } from 'next/headers'
 import { Song } from "@/types/types";
-import {conditions, hardConditions, applyAlwaysConditions} from './conditions';
+import {conditions, hardConditions, applyAlwaysConditions} from '../utils/conditions';
 import { Playlist } from '@/types/Spotify';
 
 export const findSong = async (song: Song) => {

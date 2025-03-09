@@ -4,7 +4,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef, useState } from "react";
-import { fetchMyProfile } from "@/utils/Spotify";
+import { fetchMyProfile } from "@/lib/Spotify";
 import { useRouter } from "next/navigation";
 gsap.registerPlugin(useGSAP);
 
@@ -37,7 +37,7 @@ export default function Test() {
          <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" />
          <SpotifyBtn onClick={handleFetch} />
          <Button onClick={navigateToAuth} > Login spotify </Button>
-         <SpotifyBtn onClick={()=>setTest(p=>!p)}/>
+         <SpotifyBtn onClick={() => setTest(p => !p)} />
          <div id='box-card' className="box bg-amber-300 h-24 w-24"></div>
       </div>
    )

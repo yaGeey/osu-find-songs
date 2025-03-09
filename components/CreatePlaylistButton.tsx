@@ -1,20 +1,23 @@
 import { Track } from "@/types/Spotify";
-import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from "@/utils/Spotify";
+import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from "@/lib/Spotify";
 import { useMutation, type UseQueryResult } from "@tanstack/react-query";
 import React, { useState } from "react";
 import Modal from "./Modal";
 import { Button } from "./Buttons";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpotify } from "@fortawesome/free-brands-svg-icons";
+import { twMerge as tw } from "tailwind-merge";
 
-export default function CreatePlaylistButton({ songQueries }: { songQueries: UseQueryResult<Track[] | null, Error>[] }) {
+export default function CreatePlaylistButton({ songQueries, className }: { songQueries: UseQueryResult<Track[] | null, Error>[], className?: string }) {
    const [isModalOpen, setIsModalOpen] = useState(false);
    const [state, setState] = useState<'error' | 'success' | 'warning' | 'info' | 'loading'>('info');
    const [modalContent, setModalContent] = useState<React.ReactNode | null>(null);
    const [onOkayFn, setOnOkayFn] = useState<() => void>(() => { });
-   const [onOkayText, setOnOkayText] = useState<string|undefined>('Okay');
+   const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay');
    const router = useRouter();
-   
+
    const mutation = useMutation({
       mutationFn: ({ playlistId, uris }: { playlistId: string, uris: string[] }) => AddItemsToPlaylist(playlistId, uris),
    })
@@ -35,10 +38,10 @@ export default function CreatePlaylistButton({ songQueries }: { songQueries: Use
    ) {
       setModalContent(content);
       setState(state);
-      setOnOkayFn(()=>onOkayFn);
+      setOnOkayFn(() => onOkayFn);
       setOnOkayText(onOkayText);
    }
-   
+
    async function handleCreatePlaylist() {
       setIsModalOpen(true);
       if (!Cookies.get('spotify_oauth_access_token')) {
@@ -98,8 +101,11 @@ export default function CreatePlaylistButton({ songQueries }: { songQueries: Use
             onClick={() => handleCreatePlaylist()}
             data-tooltip-id="tooltip-1"
             data-tooltip-content="Create playlist on your Spotify account and populate it with tracks with filter 'Exact Spotify match'"
-            className="bg-main-border/50 text-white py-0.5 md:py-1.5 md:whitespace-nowrap min-w-[135px] text-sm md:text-base"
-         >Create Spotify playlist</Button>
+            className={tw("bg-main-border/50 text-white py-1.5 md:whitespace-nowrap min-w-[135px]", className)}
+         >
+            Create Spotify playlist
+            <FontAwesomeIcon icon={faSpotify} className="ml-1.5 text-lg mt-0.5" />
+         </Button>
 
          <Modal
             isOpen={isModalOpen}

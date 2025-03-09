@@ -8,10 +8,10 @@ import { twMerge as tw } from "tailwind-merge";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import OsuCard from "@/components/cards/OsuCard";
 import { useInfiniteQuery, useQueries, useQuery } from "@tanstack/react-query";
-import { fetchWithToken } from "@/utils/Spotify";
+import { fetchWithToken } from "@/lib/Spotify";
 import { PlaylistPage } from "@/types/Spotify";
 import { Button } from "@/components/Buttons";
-import { beatmapsSearch } from "@/utils/osu";
+import { beatmapsSearch } from "@/lib/osu";
 import HomeBtn from "@/components/buttons/HomeBtn";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faDownload } from '@fortawesome/free-solid-svg-icons'
@@ -55,7 +55,7 @@ export default function TestUIPage() {
    useEffect(() => {
       if (hasNextPage && !isFetchingNextPage) fetchNextPage();
    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-   
+
    const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || [];
 
    // beatmapset search
@@ -137,7 +137,7 @@ export default function TestUIPage() {
             value={beatmapsetQueries.filter(q => !q.isLoading).length}
             max={tracks.length}
          ></progress>}
-         
+
          <header className={tw(
             "bg-main fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",
             (isLoading) && '-mt-3.5 border-t-4'
@@ -246,12 +246,12 @@ export default function TestUIPage() {
 
                   </div>}
                </div>
-               
+
                {/* content */}
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
                   {beatmapsetQueries.filter(q => q.data && q.data.beatmapsets.length).map((q, i) => {
-                     if (q.data.beatmapsets.length > 1) return <OsuCardSet key={i} beatmapsets={q.data.beatmapsets} sortQuery={sortQuery||'sort=relevance_asc'} className="flex-grow animate-in fade-in shadow-sm" />
-                     else return <OsuCard key={i} beatmapset={q.data.beatmapsets[0]} className="flex-grow animate-in fade-in shadow-sm"/>
+                     if (q.data.beatmapsets.length > 1) return <OsuCardSet key={i} beatmapsets={q.data.beatmapsets} sortQuery={sortQuery || 'sort=relevance_asc'} className="flex-grow animate-in fade-in shadow-sm" />
+                     else return <OsuCard key={i} beatmapset={q.data.beatmapsets[0]} className="flex-grow animate-in fade-in shadow-sm" />
                   })}
                </div>
             </div>

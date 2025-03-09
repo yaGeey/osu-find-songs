@@ -1,6 +1,6 @@
 'use client'
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { fetchWithToken } from "@/utils/Spotify";
+import { fetchWithToken } from "@/lib/Spotify";
 import { PlaylistPage, Track } from "@/types/Spotify";
 import { useEffect } from "react";
 
@@ -29,7 +29,7 @@ export default function FromSpotifyPage() {
             onClick={() => fetchNextPage()}
             disabled={!hasNextPage || isFetchingNextPage}
          >
-            {isFetchingNextPage ? 'Loading more...' : hasNextPage ? `Load More ${data!.pages.length*100}` : 'No more tracks'}
+            {isFetchingNextPage ? 'Loading more...' : hasNextPage ? `Load More ${data!.pages.length * 100}` : 'No more tracks'}
          </button>
 
          <div className="flex flex-col gap-2 h-[500px] bg-amber-200 overflow-y-auto">

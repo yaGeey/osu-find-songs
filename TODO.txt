@@ -2,6 +2,7 @@
 from-spotify SEARCH!!!!!!
 share beatmaps as link. Типу .../[slug]/ З вами поділилися картами? хочете скачати всі lenght з відео чи без?
 xhr requests download progress add # https://github.com/eligrey/FileSaver.js/issues/796
+next edge config - https://www.youtube.com/watch?v=V0IQoW1TzNM&t=20s
 
 SEO
 
@@ -18,14 +19,3 @@ warning when connecting with phone
 ## bugs
 toolptip in osucardset popup brokes styles
 with videos error fetching donwload
-
-/* Line 11 */
-
-position: absolute;
-width: 44px;
-height: 0px;
-left: 1010px;
-top: 6px;
-
-border: 2px solid #733F3F;
-transform: rotate(90deg);
