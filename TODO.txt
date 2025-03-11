@@ -1,21 +1,20 @@
 ## features
-from-spotify SEARCH!!!!!!
-share beatmaps as link. Типу .../[slug]/ З вами поділилися картами? хочете скачати всі lenght з відео чи без?
-xhr requests download progress add # https://github.com/eligrey/FileSaver.js/issues/796
+мб убрать хз!! share beatmaps as link. Типу .../[slug]/ З вами поділилися картами? хочете скачати всі lenght з відео чи без?
+xhr requests download progress add # https://github.com/eligrey/FileSaver.js/issues/796 (ПОЧТІ! тепер хоч тост є)
 next edge config - https://www.youtube.com/watch?v=V0IQoW1TzNM&t=20s
-
-SEO
-
-апішка осу повільішне спотіая
-варнінг коли нема коректниг файлів засунув на сайт юзер йоу 
+react toast 
+to OsuCard add difficulties
 
 ## less important
 rewrite beatmapsets popup to parallel routes
+SEO доробить
+апішка осу повільішне спотіая
+варнінг коли нема коректниг файлів засунув на сайт юзер йоу 
 
 animations
 more appealing colors, design (not plain)
 warning when connecting with phone 
 
 ## bugs
-toolptip in osucardset popup brokes styles
+toolptip in osucardset popup brokes styles (Temp fixed - disable popup)
 with videos error fetching donwload

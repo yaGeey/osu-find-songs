@@ -3,6 +3,12 @@ import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
 
+// This ensures that the icon CSS is loaded immediately before attempting to render icons
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+// Prevent fontawesome from dynamically adding its css since we did it manually above
+config.autoAddCss = false;
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"]
@@ -25,6 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+      </head>
       <body
         className={`${inter.variable} ${interTight.variable} antialiased`}
       >

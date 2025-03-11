@@ -18,6 +18,7 @@ import YtVideo from "./embeds/YtVideo";
 import SpotifyEmbed from "./embeds/Spotify";
 import SVG from "./SVG";
 import { twMerge as tw } from "tailwind-merge";
+import Loading from "./state/Loading";
 gsap.registerPlugin(useGSAP);
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -112,7 +113,7 @@ export default function Info({ data, onClose, className }: Props) {
          </div> 
 
          {selection === 'spotify' &&
-            <li className="scrollbar-none scrollbar-thumb-gray-400/50 scrollbar-thumb-rounded flex flex-col gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-[#159A44] overflow-auto">
+            <li className="relative scrollbar flex flex-col gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-[#159A44] overflow-auto">
                {spotify?.length == 20 &&
                   <div className="flex gap-2">
                      <span className="text-5xl text-red-500 font-bold">!</span>
@@ -134,7 +135,8 @@ export default function Info({ data, onClose, className }: Props) {
             </li>
          }
          {selection === 'youtube' &&
-            <li className="flex flex-wrap gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-light">
+            <li className="relative flex flex-wrap gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-light">
+               {yt.isLoading && <Loading />}
                {yt.data?.map((media: Media, i: number) => {
                   if (Cookies.get('showYouTubeEmbeds') == 'true') {
                      if (media.type === 'VIDEO') {

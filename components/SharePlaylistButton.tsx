@@ -38,10 +38,11 @@ export default function SharePlaylistButton({ data, className }: { data: SongDat
    
    return (
       <>
-         <Button className={tw("bg-main-border/50", className)} onClick={handleClick} disabled={searchParams.has('id')}>Share
+         <Button className={tw("bg-main-border/50", className)} onClick={handleClick} disabled>Share
             <FontAwesomeIcon icon={faShareFromSquare} className="ml-1.5 text-md mt-0.5" />
          </Button>
          <ToastContainer />
       </>
    )
 }
+// disabled = { searchParams.has('id')}

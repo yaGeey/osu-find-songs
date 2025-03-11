@@ -19,11 +19,10 @@ const getSortValue = (sortFn: string, data: SongDataQueried) => {
    }
 } 
 
-function Card({ data, sortFn, selected, onClick, isLocal = false, className }: {
+function Card({ data, sortFn, selected, onClick, className }: {
    data: SongDataQueried,
    sortFn?: string;
    selected: boolean;
-   isLocal?: boolean;
    onClick?: ({ beatmapset, spotify, local }: SongData) => void,
    className?: string
 }) {
@@ -46,9 +45,9 @@ function Card({ data, sortFn, selected, onClick, isLocal = false, className }: {
          onClick={handleClick}
       >
          {(beatmapsetQuery.isLoading || spotifyQuery.isLoading) && <Loading />}
-         <div className="relative w-[150px] h-[81px] rounded-l-sm overflow-hidden">
-            <Image src={local.image || beatmapsetQuery.data?.covers.card} alt={local.title || 'alt'} fill style={{ objectFit: 'cover' }} />
-         </div>
+         {(local.image || beatmapsetQuery.data?.covers.card) && <div className="relative w-[150px] h-[81px] rounded-l-sm overflow-hidden">
+            <Image src={local.image || beatmapsetQuery.data?.covers.card || ''} alt={local.title || 'alt'} fill style={{ objectFit: 'cover' }} />
+         </div>}
          <div className="flex justify-between items-center w-full py-2 px-4">
             <div>
                <h1 className="text-xl">{local.title || beatmapsetQuery.data?.title}</h1>

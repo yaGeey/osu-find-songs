@@ -6,7 +6,7 @@ const links = ['https://i.imgur.com/puys3Ds.jpeg', 'https://i.imgur.com/dtQYupf.
 
 export default function BgImage({ image }: { image?: string }) {
    const [isLoaded, setIsLoaded] = useState(false);
-   const number = useMemo(() => Math.floor(Math.random() * links.length), []) 
+   const [number] = useState(() => Math.floor(Math.random() * links.length));
    return (
       <div className="fixed -z-10 brightness-[.4] top-0 left-0 w-full h-full">
          <Image
