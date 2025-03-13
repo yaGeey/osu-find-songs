@@ -1,16 +1,18 @@
 'use client'
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
+import { twMerge as tw } from 'tailwind-merge';
 
 const links = ['https://i.imgur.com/puys3Ds.jpeg', 'https://i.imgur.com/dtQYupf.png', 'https://i.imgur.com/kA8hBvT.png', 'https://i.imgur.com/7Ya0zny.jpeg'];
 
-export default function BgImage({ image }: { image?: string }) {
+export default function BgImage({ image, brightness = 4 }: { image?: string, brightness?: number }) {
    const [isLoaded, setIsLoaded] = useState(false);
    const [number] = useState(() => Math.floor(Math.random() * links.length));
    return (
-      <div className="fixed -z-10 brightness-[.4] top-0 left-0 w-full h-full">
+      <div className={tw("fixed -z-10 top-0 left-0 w-full h-full brightness-[.4]", brightness && `brightness-[.${brightness}]`)}>
          <Image
-            src={image || links[number]}
+            // src={image || links[number]}
+            src={image || '/bg.svg'}
             alt="bg"
             width={0} height={0}
             sizes="100vw"

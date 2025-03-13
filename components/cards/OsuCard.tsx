@@ -22,8 +22,8 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
             <div className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full bg-main rounded-2xl z-1"></div>
             <a href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`} className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white">
                <div>
-                  <h2 className="font-semibold text-[17px] truncate">{beatmapset.title}</h2>
-                  <h3 className="font-medium text-sm -mt-1">from {beatmapset.artist}</h3>
+                  <h2 className="font-semibold text-[17px] truncate font-outline-sm">{beatmapset.title}</h2>
+                  <h3 className="font-medium text-sm -mt-1 font-outline-sm">from {beatmapset.artist}</h3>
                </div>
                <h4 className="font-inter-tight text-xs">created by <span className="text-highlight">{beatmapset.creator}</span></h4>
                <div className="flex gap-2.5 text-main-gray text-[11px] items-center">
@@ -34,12 +34,24 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
                   <FontAwesomeIcon icon={faCircleCheck}/>
                   <span className="-ml-1.75 -mb-0.25">{new Date(beatmapset.submitted_date).toLocaleDateString()}</span>
                </div>
-               <h4 className={tw("text-xs text-main-gray w-fit px-1 rounded-full font-medium",
-                  beatmapset.status === 'ranked' && 'bg-[#B3FF66]',
-                  beatmapset.status === 'approved' && 'bg-[#B3FF66',
-                  beatmapset.status === 'qualified' && 'bg-[#FFD966]',
-                  beatmapset.status === 'loved' && 'bg-[#FF66AB]')}
-               >{beatmapset.status.toUpperCase()}</h4>
+               <div className="flex gap-1 items-center">
+                  <h4 className={tw("text-xs text-main-gray w-fit px-1 rounded-full font-medium",
+                     beatmapset.status === 'ranked' && 'bg-[#B3FF66]',
+                     beatmapset.status === 'approved' && 'bg-[#B3FF66',
+                     beatmapset.status === 'qualified' && 'bg-[#FFD966]',
+                     beatmapset.status === 'loved' && 'bg-[#FF66AB]')}
+                  >{beatmapset.status.toUpperCase()}</h4>
+                  <section className="flex text-[11px] text-main-gray font-inter-tight gap-0.25">
+                     {beatmapset.beatmaps.length < 15 ?
+                        beatmapset.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating).map((beatmap, i) => (
+                           // <div style={getColor(beatmap.difficulty_rating)} className="rounded-full px-0.5">{beatmap.difficulty_rating}</div>
+                           <div style={getColor(beatmap.difficulty_rating)} className="h-[15px] w-[8px] rounded-full"></div>
+                        ))
+                        :
+                        <span className="font-semibold text-xs">{beatmapset.beatmaps.length}</span>
+                     }
+                  </section>
+               </div>
             </a>
 
             {/* download buttons */}
@@ -67,4 +79,10 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
          </div>
       </>
    )
+}
+
+function getColor(diff: number) {
+   const clamped = Math.max(0, Math.min(diff, 9));
+   const hue = 250 - (250 * clamped) / 6;
+   return { backgroundColor: `hsl(${hue}, 70%, 50%)`, color: diff > 5.8 ? '#FFD700' : 'black', fontWeight: 600 };
 }

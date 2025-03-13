@@ -20,12 +20,16 @@ import OsuCardSet from "@/components/cards/OsuCardSet";
 import { ToastContainer, toast } from 'react-toastify';
 import Filters from "./Filters";
 import Search from "./Search";
+import { LinearProgress } from '@mui/material';
+import Progress from "@/components/state/Progress";
+import BgImage from "@/components/BgImage";
 
 export default function TestUIPage() {
    const params = useParams();
    const searchParams = useSearchParams();
    const { playlistId } = params;
 
+   const [hasQueryChanged, setHasQueryChanged] = useState(false);
    const [sortQuery, setSortQuery] = useState<string>('');
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([]);
@@ -34,11 +38,6 @@ export default function TestUIPage() {
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false);
    const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false);
-
-   // useEffect(() => {
-   //    const queryString = localStorage.getItem('searchParams');
-   //    if (!queryString) return;
-   // }, []);
 
    // fetching playlist
    const { data: tracksData, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
@@ -69,6 +68,7 @@ export default function TestUIPage() {
             return await beatmapsSearch(`artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`, sortQuery);
          },
          enabled: !!tracks,
+         staleTime: Infinity
       })),
    });
    const isLoading = useMemo(() => beatmapsetQueries.some(q => q.isLoading), [beatmapsetQueries]);
@@ -81,12 +81,9 @@ export default function TestUIPage() {
    }, [beatmapsetQueries.filter(q => !q.isLoading).length, beatmapsetQueries.filter(q => !q.isFetching).length]);
 
    // search
-   const isFirstRender = useRef(true);
    useEffect(() => {
-      if (isFirstRender.current) { //? prevent on first render
-         isFirstRender.current = false;
-         return;
-      }
+      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('sort')) return;
+      else setHasQueryChanged(true);
 
       if (searchType == 'api') {
          const timer = setTimeout(() => {
@@ -135,27 +132,10 @@ export default function TestUIPage() {
 
    return (
       <div className="max-h-screen min-w-[600px] min-h-[670px] font-inter overflow-y-auto overflow-x-hidden scrollbar">
-         <div className="fixed -z-10 brightness-[.8] top-0 left-0 w-full h-full">
-            <Image
-               src='/bg.svg'
-               alt="bg"
-               width={0} height={0}
-               sizes="100vw"
-               quality={100}
-               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-         </div>
+         <BgImage brightness={8} image='/bg.svg'/>
+         <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length}/>
 
-         {isLoading && <progress
-            className="w-screen h-2 mb-2"
-            value={beatmapsetQueries.filter(q => !q.isLoading).length}
-            max={tracks.length}
-         ></progress>}
-
-         <header className={tw(
-            "bg-main fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",
-            (isLoading) && '-mt-3.5 border-t-4'
-         )}>
+         <header className={tw("bg-main fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
             <section className="absolute left-4">
                <HomeBtn />
             </section>
@@ -179,17 +159,18 @@ export default function TestUIPage() {
                />
                
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
-                  {/* {beatmapsetQueries.filter(q => q.data && q.data.beatmapsets.length).map((q, i) => {
-                     if (q.data.beatmapsets.length > 1) return <OsuCardSet key={i} beatmapsets={q.data.beatmapsets} sortQuery={sortQuery || 'sort=relevance_asc'} className="flex-grow animate-in fade-in shadow-sm" />
-                     else return <OsuCard key={i} beatmapset={q.data.beatmapsets[0]} className="flex-grow animate-in fade-in shadow-sm" />
-                  })} */}
                   {filteredBeatmapsets.filter(data => data && data.length).map((data, i) => {
                      if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={sortQuery || 'sort=relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
                      else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
                   })}
+                  {!filteredBeatmapsets.filter(data => data && data.length).length &&
+                     <div className="text-black/40 text-2xl h-full w-full text-center mt-10 ">No results found</div>
+                  }
                </div>
             </div>
          </main>
+
+         
 
          {/* modals */}
          <Modal
@@ -209,8 +190,8 @@ export default function TestUIPage() {
             closeBtn='Yes'
             state='info'
          >
-            <p className="text-balance text-center">If there is more than one beatmapset for a song, it will download the first one based on the <span className="text-highlight">filters</span> you searched with.</p>
-            <p className=" text-center">Download with <span className="text-highlight">video</span>? It will take up more space.</p>
+            <p className="text-balance text-center">If there is more than one beatmapset for a song, it will download the first one based on the <span className="text-highlight font-outline">filters</span> you searched with.</p>
+            <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p>
          </Modal>
          <Modal
             isOpen={isModalDownloadingVisible}

@@ -8,7 +8,6 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
-import { useQueryState } from 'nuqs'
 
 export default function Filters({ onChangeSort, beatmapsetQueries, beatmapsetLocal }: {
    onChangeSort: (query: string, searchType:'local'|'api') => void,

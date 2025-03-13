@@ -54,8 +54,8 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
    // Sort each group
    const sortedGroupedArray = Object.entries(groupedArray).reduce((acc, [key, value]) => {
       const sortedArray = value.sort((a, b) => {
-         const aData = sortOrder == 'desc' ? a.beatmapsetQuery.data : b.beatmapsetQuery.data;
-         const bData = sortOrder == 'desc' ? b.beatmapsetQuery.data : a.beatmapsetQuery.data;
+         const aData = sortOrder == 'asc' ? a.beatmapsetQuery.data : b.beatmapsetQuery.data;
+         const bData = sortOrder == 'asc' ? b.beatmapsetQuery.data : a.beatmapsetQuery.data;
          if (!aData || !bData) return 0;
 
          switch (sortFn) {
@@ -64,6 +64,7 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
             case 'sort-creator': return aData.creator.localeCompare(bData.creator);
             case 'sort-date': return 0;
             case 'sort-date-mapped': return new Date(aData.submitted_date).getTime() - new Date(bData.submitted_date).getTime();
+            case 'sort-date-updated': return new Date(aData.last_updated).getTime() - new Date(bData.last_updated).getTime();
             // case 'sort-dif': return aData.difficulty - bData.difficulty;
             case 'sort-length': return aData.beatmaps[0].total_length - bData.beatmaps[0].total_length;
             case 'sort-title': return aData.title.localeCompare(bData.title);

@@ -18,10 +18,10 @@ export default function Modal({ children, isOpen, onClose, onOkay, state, okBtn,
       ReactDom.createPortal(
          <div className={`fixed top-0 left-0 w-screen h-screen bg-black/30 z-10000`}>
             <div className={tw(
-               "bg-main border-4 rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3.5 transition-all shadow-2xl flex flex-col",
+               "bg-main-lighter border-4 rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3.5 transition-all shadow-2xl flex flex-col",
                state === 'error' && 'border-invalid',
                state === 'success' && 'border-success',
-               state === 'warning' && 'border-yellow-500',
+               state === 'warning' && 'border-yellow-400',
                state === 'info' && 'border-main-border',
                state === 'loading' && 'border-main-border',
             )}>
@@ -29,8 +29,8 @@ export default function Modal({ children, isOpen, onClose, onOkay, state, okBtn,
                   {children}
                </div>
                <div className='flex gap-2 justify-center mt-3 '>
-                  {state !== 'loading' && okBtn && <Button onClick={onOkay} className={tw('h-[35px]', dialog ? 'bg-darker' : 'bg-success text-main-gray font-medium')}>{okBtn}</Button>}
-                  {state !== 'loading' && closeBtn && <Button onClick={onClose} className={tw('h-[35px]', dialog ? 'bg-darker' : 'bg-invalid text-main-gray font-medium')} >{closeBtn}</Button>}
+                  {state !== 'loading' && okBtn && <Button onClick={onOkay} className={tw('h-[35px]', dialog ? 'bg-main-darker' : 'bg-success font-medium shadow-none')} textClassName='font-outline'>{okBtn}</Button>}
+                  {state !== 'loading' && closeBtn && <Button onClick={onClose} className={tw('h-[35px]', dialog ? 'bg-main-darker' : 'bg-invalid font-medium shadow-none')} textClassName='font-outline'>{closeBtn}</Button>}
                </div>
             </div>
          </div>,

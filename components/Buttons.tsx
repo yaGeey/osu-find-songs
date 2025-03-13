@@ -7,6 +7,7 @@ interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    onClick?: () => void;
    ref?: Ref<HTMLButtonElement>
    className?: string;
+   textClassName?: string;
 }
 
 export function SpotifyBtn({ onClick, ref, className, ...props }: BtnProps) {
@@ -46,11 +47,19 @@ export function OsuBtn({ onClick, ref, className, ...props }: BtnProps) {
    )
 }
 
-export function Button({ onClick, ref, className, children, ...props }: BtnProps) {
+export function Button({ onClick, ref, className, textClassName, children, ...props }: BtnProps) {
    return (
       <button onClick={onClick} ref={ref} {...props}
          className={tw("button text-white px-4 py-1.5 rounded-md bg-darker border-main-border box-border flex justify-center items-center", className)}>
-         {children}
+         <span className={textClassName}>{children}</span>
+      </button>
+   )
+}
+export function SuccessBtn({ onClick, ref, className, children, ...props }: BtnProps) {
+   return (
+      <button onClick={onClick} ref={ref} {...props}
+         className={tw("button bg-success font-medium  text-white px-4 py-1.5 rounded-md border-main-border box-border flex justify-center items-center", className)}>
+         <span className='font-outline'>{children}</span>
       </button>
    )
 }

@@ -3,6 +3,11 @@
   overflow: hidden;
   transition-behavior: allow-discrete;
   interpolate-size: allow-keywords;
+  --color-main: #cf7a7a;
+  --color-main-darker-0: #c37272;
+  --color-main-lighter: #eb9090
+  /* #E98484 */
+  /* C07272 */
 }
 
 /* :root {
@@ -33,7 +38,9 @@ body {
   --color-song-select: hsla(347, 36%, 55%, 0.8);
   --color-song-border: hsla(347, 36%, 35%, 1);
 
-  --color-main: #C07272;
+  --color-main: var(--color-main);
+  --color-main-lighter: var(--color-main-lighter);
+  --color-main-darker-0: var(--color-main-darker-0);
   --color-main-darker: #AD6666;
   --color-darker: #905959;
   --color-main-border: #733F3F;
@@ -89,6 +96,15 @@ body {
   }
   .shadow-tight {
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.20);
+  }
+
+}
+@layer base {
+  .font-outline {
+    @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)]
+  }
+  .font-outline-sm {
+    @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)]
   }
 }
 

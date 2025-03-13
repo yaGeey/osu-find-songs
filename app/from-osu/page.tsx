@@ -28,6 +28,7 @@ import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from "@fortawesome
 import SharePlaylistButton from "@/components/SharePlaylistButton";
 import { ToastContainer, toast } from 'react-toastify';
 import { filterFn, searchFilterFn, groupArray } from "@/utils/arrayManaging";
+import Progress from "@/components/state/Progress";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 // gsap.registerPlugin(useGSAP);
 
@@ -41,7 +42,7 @@ export default function FromOsu() {
    const [info, setInfo] = useState<SongData | null>(null);
    const [filters, setFilters] = useState<string[]>([]);
    const [groupFn, setGroupFn] = useState<string>('no');
-   const [sortFn, setSortFn] = useState('sort-title');
+   const [sortFn, setSortFn] = useState('sort-date');
    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
    const [groupedDict, setGroupedDict] = useState<any>(undefined);
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -103,17 +104,9 @@ export default function FromOsu() {
    return (
       <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
          <BgImage image={info?.local.image} />
+         <Progress isLoading={isLoading} value={((combinedArray.filter(q => !q.beatmapsetQuery.isLoading).length + combinedArray.filter(q => !q.spotifyQuery.isLoading).length) * 100) / (combinedArray.length*2)} />
 
-         {isLoading && <progress
-            className="w-screen h-2 mb-2"
-            value={combinedArray.filter(q => !q.beatmapsetQuery.isLoading && !q.spotifyQuery.isLoading).length}
-            max={combinedArray.length}
-         ></progress>}
-
-         <header className={tw(
-            "bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3",
-            isLoading && '-mt-3.5 border-t-4'
-         )}>
+         <header className="bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
                <HomeBtn />
                <Image src="/icons/settings.svg" width={30} height={30} alt="settings" onClick={() => setIsSettingsVisible(p => !p)}
@@ -135,7 +128,7 @@ export default function FromOsu() {
             </div>
             <div className="flex gap-3 justify-center items-center ">
                <label className="text-md font-semibold tracking-wider hidden xl:block" htmlFor="group-select">Group</label>
-               <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
+               <Select className='lg:w-[200px] min-w-[75px] w-fit z-1'
                   onChange={(e: any) => setGroupFn(e.value)}
                   id="group-select"
                   defaultValue={groupOptions[0]}
@@ -147,10 +140,9 @@ export default function FromOsu() {
             <hr className="border-2 border-main-border h-3/4"></hr>
             <div className="flex gap-3 items-center justify-end">
                <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="sort-select">Sort</label>
-               <Select className='lg:w-[200px] min-w-[75px] w-fit z-10'
+               <Select className='lg:w-[200px] min-w-[75px] w-fit z-1'
                   onChange={(e: any) => setSortFn(e.value)}
                   id="sort-select"
-                  defaultValue={sortOptions[4]}
                   options={sortOptions}
                   isDisabled={isLoading}
                   styles={selectStyles}
@@ -158,12 +150,12 @@ export default function FromOsu() {
                <TextSwitch
                   options={[
                      {
-                        value: 'desc',
-                        label: <FontAwesomeIcon icon={faArrowDownWideShort} />
+                        value: 'asc',
+                        label: <FontAwesomeIcon icon={faArrowUpShortWide} /> 
                      },
                      {
-                        value: 'asc',
-                        label: <FontAwesomeIcon icon={faArrowUpShortWide} />
+                        value: 'desc',
+                        label: <FontAwesomeIcon icon={faArrowDownWideShort} />
                      },
                   ]}
                   selected={sortOrder}
@@ -179,12 +171,12 @@ export default function FromOsu() {
          </header>
 
          {/* content */}
-         <main className="max-h-[calc(100dvh-56px)] flex justify-center sm:justify-end">
-            <div className="h-[calc(100dvh-56px)] absolute top-0 left-0 flex justify-center items-center mt-[56px] z-1">
+         <main className="max-h-[calc(100dvh-108px)] flex justify-center sm:justify-end">
+            <div className="h-[calc(100dvh-108px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-[56px]">
                {info && <Info data={info} onClose={() => setInfo(null)} />}
             </div>
 
-            <ul className="flex flex-col pt-3 overflow-y-auto scrollbar-none">
+            <ul className="flex flex-col pt-3 overflow-y-auto scrollbar">
                {groupedDict && Object.keys(groupedDict).map((group, i) => (
                   <div key={i} className="w-full flex flex-col items-end">
                      {group !== '' &&
@@ -195,7 +187,7 @@ export default function FromOsu() {
                         >{group}</GroupSeparator>
                      }
                      {(group == selectedGroup || group === '') &&
-                        <ul className="flex flex-col gap-2 items-end">
+                        <ul className="flex flex-col gap-2 items-end ">
                            {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) => (
                               <Card
                                  data={songData}
@@ -215,7 +207,7 @@ export default function FromOsu() {
 
          <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-13 flex justify-center items-center px-8 gap-8 z-100">
             <CreatePlaylistButton songQueries={songQueries} className="w-[215px] py-1" />
-            <SharePlaylistButton data={combinedArray} className="w-[215px] py-1" />
+            {/* <SharePlaylistButton data={combinedArray} className="w-[215px] py-1" /> */}
          </footer>
          <ToastContainer />
       </div>
