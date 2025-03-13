@@ -1,6 +1,13 @@
 @import 'tailwindcss';
 :root {
   overflow: hidden;
+  transition-behavior: allow-discrete;
+  interpolate-size: allow-keywords;
+  --color-main: #cf7a7a;
+  --color-main-darker-0: #c37272;
+  --color-main-lighter: #eb9090
+  /* #E98484 */
+  /* C07272 */
 }
 
 /* :root {
@@ -20,6 +27,9 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 } */
+body {
+  /* font-family: var(--font-inter); */
+}
 
 @theme {
   --color-background: var(--background);
@@ -27,32 +37,76 @@ body {
   --color-song: hsla(347, 36%, 55%, 1);
   --color-song-select: hsla(347, 36%, 55%, 0.8);
   --color-song-border: hsla(347, 36%, 35%, 1);
-  --color-main: #C07272;
+
+  --color-main: var(--color-main);
+  --color-main-lighter: var(--color-main-lighter);
+  --color-main-darker-0: var(--color-main-darker-0);
+  --color-main-darker: #AD6666;
+  --color-darker: #905959;
   --color-main-border: #733F3F;
   --color-light: #FFA3A3;
-  
-}
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+  --color-main-gray: #282828;
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-/* @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+  --color-success: #3CA554;
+  --color-invalid: #ff4a4a;
+  --color-highlight: #4CD2FF;
+  --color-white-50: #D9D9D9;
+
+  --breakpoint-lgx: 75rem; 
+
+  --font-inter: 'Inter', sans-serif;
+  --font-inter-tight: 'Inter Tight', sans-serif;
+
+  --text-xs: 0.75rem;
+
+}
+.writing-mode-vertical-lr {
+  writing-mode: vertical-lr;
+}
+.writing-mode-vertical-rl {
+  writing-mode: vertical-rl;
+}
+.text-shadow {
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
   }
-} */
-.popup {
-  @apply border-4 border-main-border bg-main rounded-xl
-}
 
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #f6f7ed;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #e0cbcb; 
+    border-radius: 100vh;
+    border: 3px solid #f6f7ed;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c0a0b9;
+  }
+
+  .selected {
+    @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)]
+  }
+  .shadow-tight {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.20);
+  }
+
+}
+@layer base {
+  .font-outline {
+    @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)]
+  }
+  .font-outline-sm {
+    @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)]
+  }
+}
 
 @plugin 'tailwind-scrollbar';
 @plugin 'tailwindcss-animate';

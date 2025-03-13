@@ -1,10 +1,19 @@
 {
    "cSpell.words": [
       "beatmapsets",
+      "favourite",
+      "notsubmitted",
+      "nuqs",
       "PKCE",
+      "playcount",
+      "Sotarks",
       "Soundcloud",
       "sptbtn",
       "анімашку"
    ],
-   
+   "workbench.colorCustomizations": {
+      "editorGutter.addedBackground": "#0000",
+      "editorGutter.deletedBackground": "#0000",
+      "editorGutter.modifiedBackground": "#0000",
+   }
 }

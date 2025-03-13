@@ -1,8 +1,8 @@
 import { MusicBrainzApi } from 'musicbrainz-api';
-import { revalidateOsuToken, getBeatmap } from "@/utils/osu";
+import { revalidateOsuToken, getBeatmap } from "@/lib/osu";
 import axios from "axios";
 import { Song } from '@/types/types';
-import { searchSongWithConditions } from './Spotify';
+import { searchSongWithConditions } from '../lib/Spotify';
 
 export const findSongsSpotify = async (songs: Song[]) => {
       let finded = 0;

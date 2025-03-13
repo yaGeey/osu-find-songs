@@ -35,6 +35,12 @@ export type Beatmap = {
 export type BeatmapSet = {
    artist: string;
    artist_unicode: string;
+   covers: {
+      cover: string;
+      card: string;
+      list: string;
+      slimcover: string;
+   };
    availability: {
       download_disabled: boolean;
       more_information: string | null;
@@ -48,7 +54,7 @@ export type BeatmapSet = {
    discussion_enabled: boolean;
    discussion_locked: boolean;
    favourite_count: number;
-   genre_id: {
+   genre: {
       id: number;
       name: string;
    };
@@ -61,7 +67,7 @@ export type BeatmapSet = {
    last_updated: string;
    legacy_thread_url: string | null;
    nsfw: boolean;
-   playcount: number;
+   play_count: number;
    preview_url: string;
    source: string | null;
    spotlight: boolean;

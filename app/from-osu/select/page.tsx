@@ -3,10 +3,17 @@ import BgImage from "@/components/BgImage";
 import { Song } from "@/types/types";
 import { useSongContext } from "@/contexts/SongContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Cookies from "js-cookie";
 
 export default function SelectPage() {
    const { setSongs } = useSongContext();
    const router = useRouter();
+
+   useEffect(() => {
+      if (Cookies.get('showSpotifyEmbeds') === undefined) Cookies.set('showSpotifyEmbeds', 'true');
+      if (Cookies.get('showYouTubeEmbeds') === undefined) Cookies.set('showYouTubeEmbeds', 'true');
+   }, []);
 
    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
       const files = e.target.files;
@@ -39,7 +46,7 @@ export default function SelectPage() {
             });
          });
          setSongs(Array.from(songsMap.values()));
-         router.push('/playlist');
+         router.push('/from-osu');
       } else {
          alert('Please select a valid osu! beatmaps directory');
       }
@@ -48,12 +55,12 @@ export default function SelectPage() {
    return (
       <>
          <BgImage />
-         <div className="absolute mx-auto top-1/2 -translate-y-1/2 left-0 right-0 w-fit">
-            <div className="animate-pulse-size duration-8000 delay-3000 absolute top-0 left-0 w-full h-full bg-main rounded-xl"></div>
-            <div className="bg-linear-to-br from-main-border to-main px-10 py-6 hover:px-12 hover:py-8 text-lg border-main-border border-4 p-3 rounded-xl select-none cursor-pointer brightness-115 shadow-md hover:shadow-lg hover:brightness-130 font-semibold transition-all duration-300 flex flex-col justify-center items-center">
-               <h1>Choose your <span className="font-bold">osu!</span> beatmaps directory</h1>
-               <h3 className="text-base text-black/60">.../osu!/Songs</h3>
-               <h3 className="text-base mt-2">❗ This can take a lot of time depending on amount of maps ❗</h3>
+         <div className="absolute mx-auto top-1/2 -translate-y-1/2 left-0 right-0 w-fit font-inter">
+            {/* <div className="animate-pulse-size duration-8000 delay-3000 absolute top-0 left-0 w-full h-full bg-main rounded-xl"></div> */}
+            <div className="bg-main-lighter px-10 py-6 hover:px-12 hover:py-8 border-main-border border-4 p-3 rounded-xl select-none cursor-pointer shadow-md hover:shadow-lg hover:brightness-110 transition-all duration-300 flex flex-col justify-center items-center">
+               <h1 className="font-semibold text-lg">Choose your <span className="font-bold">osu!</span> beatmaps directory</h1>
+               <em className="text-black/60 ">C:/Users/.../AppData/Local/osu!/Songs</em>
+               <h3 className="text-sm mt-2">❗ This can take a while depending on the amount of maps ❗</h3>
                {/* @ts-ignore */}
                <input directory="" webkitdirectory="" type="file" onChange={handleFileChange} className="opacity-0 absolute top-0 left-0 w-full h-full" />
             </div>
