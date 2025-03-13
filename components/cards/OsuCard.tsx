@@ -45,7 +45,7 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
                      {beatmapset.beatmaps.length < 15 ?
                         beatmapset.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating).map((beatmap, i) => (
                            // <div style={getColor(beatmap.difficulty_rating)} className="rounded-full px-0.5">{beatmap.difficulty_rating}</div>
-                           <div style={getColor(beatmap.difficulty_rating)} className="h-[15px] w-[8px] rounded-full"></div>
+                           <div style={getColor(beatmap.difficulty_rating)} key={i} className="h-[15px] w-[8px] rounded-full"></div>
                         ))
                         :
                         <span className="font-semibold text-xs">{beatmapset.beatmaps.length}</span>
@@ -57,7 +57,7 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
             {/* download buttons */}
             <div className={tw("absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden", onHover && 'group-hover:flex')}>
                <FontAwesomeIcon
-                  icon={faDownload}
+                  icon={beatmapset.video ? faFileVideo : faDownload}
                   onClick={() => downloadNoVideo(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)}
                   className="cursor-pointer"
                   data-tooltip-id='tooltip'
@@ -65,7 +65,7 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
                   data-tooltip-delay-show={400}
                />
                
-               {beatmapset.video &&
+               {/* {beatmapset.video &&
                   <FontAwesomeIcon icon={faFileVideo}
                      onClick={() => downloadVideo(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title} [VIDEO].osz`)}
                      className="cursor-pointer"
@@ -73,7 +73,7 @@ export default function OsuCard({ beatmapset, onHover=true, className }: { beatm
                      data-tooltip-content='Download with video'
                      data-tooltip-delay-show={400}
                   />
-               }
+               } */}
             </div>
             {/* <Tooltip id='tooltip' place="top" style={{fontSize: '11px', padding: '0 0.25rem', zIndex:100000}}/> */}
          </div>

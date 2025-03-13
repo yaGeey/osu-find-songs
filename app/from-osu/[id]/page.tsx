@@ -8,24 +8,19 @@ import Info from "@/components/Info";
 import { twMerge as tw } from "tailwind-merge";
 import dynamic from "next/dynamic";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import DebugButtons from "@/components/Debug";
 import { Track } from "@/types/Spotify";
 import { getBeatmap } from "@/lib/osu";
 import { BeatmapSet } from "@/types/Osu";
 import { filterOptions, groupOptions, languageOptions, selectStyles, sortOptions } from "@/utils/selectOptions";
 // import gsap from "gsap";
 // import { useGSAP } from "@gsap/react";
-import './page.css';
 import BgImage from "@/components/BgImage";
 import { useSongContext } from "@/contexts/SongContext";
 import SettingsPopup from "@/components/SettingsPopup";
 import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import CreatePlaylistButton from "@/components/CreatePlaylistButton";
 import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
-import Modal from "@/components/Modal";
-import Head from "next/head";
 import HomeBtn from "@/components/buttons/HomeBtn";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -218,7 +213,7 @@ export default function Home() {
                />
             </section>
             <hr className="border-2 border-main-border h-3/4"></hr>
-            {isSettingsVisible && <SettingsPopup isOpen={isSettingsVisible} />}
+            {isSettingsVisible && <SettingsPopup />}
 
             <div className="flex 2xl:gap-3 gap-1.5 items-center justify-center ">
                <label className="font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>

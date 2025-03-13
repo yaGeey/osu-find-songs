@@ -20,7 +20,6 @@ import OsuCardSet from "@/components/cards/OsuCardSet";
 import { ToastContainer, toast } from 'react-toastify';
 import Filters from "./Filters";
 import Search from "./Search";
-import { LinearProgress } from '@mui/material';
 import Progress from "@/components/state/Progress";
 import BgImage from "@/components/BgImage";
 
@@ -154,8 +153,6 @@ export default function TestUIPage() {
                      setSortQuery(val)
                      setSearchType(searchTypeRes)
                   }}
-                  beatmapsetQueries={beatmapsetQueries}
-                  beatmapsetLocal={beatmapsets}
                />
                
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
@@ -163,7 +160,7 @@ export default function TestUIPage() {
                      if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={sortQuery || 'sort=relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
                      else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
                   })}
-                  {!filteredBeatmapsets.filter(data => data && data.length).length &&
+                  {!filteredBeatmapsets.filter(data => data && data.length).length && !isLoading &&
                      <div className="text-black/40 text-2xl h-full w-full text-center mt-10 ">No results found</div>
                   }
                </div>
@@ -175,23 +172,22 @@ export default function TestUIPage() {
          {/* modals */}
          <Modal
             isOpen={isModalVisible}
-            dialog
             onOkay={() => {
                setIsModalVisible(false);
                setIsModalDownloadingVisible(true);
                handleDownloadAll(false);
             }}
-            okBtn='No'
+            okBtn='Download'
             onClose={() => {
                setIsModalVisible(false);
-               setIsModalDownloadingVisible(true);
-               handleDownloadAll(true);
+               // setIsModalDownloadingVisible(true);
+               // handleDownloadAll(true);
             }}
-            closeBtn='Yes'
+            closeBtn='Close'
             state='info'
          >
             <p className="text-balance text-center">If there is more than one beatmapset for a song, it will download the first one based on the <span className="text-highlight font-outline">filters</span> you searched with.</p>
-            <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p>
+            {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
          </Modal>
          <Modal
             isOpen={isModalDownloadingVisible}

@@ -9,10 +9,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 
-export default function Filters({ onChangeSort, beatmapsetQueries, beatmapsetLocal }: {
+export default function Filters({ onChangeSort }: {
    onChangeSort: (query: string, searchType:'local'|'api') => void,
-   beatmapsetQueries: UseQueryResult<any, Error>[],
-   beatmapsetLocal: BeatmapSet[][]
 }) {
    const pathname = usePathname()
    const searchParams = useSearchParams()
@@ -76,7 +74,7 @@ export default function Filters({ onChangeSort, beatmapsetQueries, beatmapsetLoc
                   onChangeSort(query, searchType);
                }
             }} />
-            <SwitchFull required options={['local', 'osu! search']} defaultValue={0} onChange={(val) => setSearchType(val=='local' ? 'local' : 'api')} />
+            {/* <SwitchFull required options={['local', 'osu! search']} defaultValue={0} onChange={(val) => setSearchType(val=='local' ? 'local' : 'api')} /> */}
          </div>
 
          {/* Additional filters */}
