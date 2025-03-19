@@ -1,9 +1,13 @@
 ## features
+!!!!! FAVICON
 мб убрать хз!! share beatmaps as link. Типу .../[slug]/ З вами поділилися картами? хочете скачати всі lenght з відео чи без?
 xhr requests download progress add # https://github.com/eligrey/FileSaver.js/issues/796 (ПОЧТІ! тепер хоч тост є)
 next edge config - https://www.youtube.com/watch?v=V0IQoW1TzNM&t=20s
 react toast 
-to OsuCard add difficulties
+
+додати текстури до сайту тіпа точки там хз
+рожевий а білий тінь фіолетова текст
+фотошоп мб фігиа мб не ваще внструкція показ роботи на мейн пейдж і рекламу
 
 ## less important
 rewrite beatmapsets popup to parallel routes

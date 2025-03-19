@@ -23,7 +23,7 @@ import Search from "./Search";
 import Progress from "@/components/state/Progress";
 import BgImage from "@/components/BgImage";
 
-export default function TestUIPage() {
+export default function PLaylistPage() {
    const params = useParams();
    const searchParams = useSearchParams();
    const { playlistId } = params;

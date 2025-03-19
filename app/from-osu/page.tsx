@@ -29,6 +29,7 @@ import SharePlaylistButton from "@/components/SharePlaylistButton";
 import { ToastContainer, toast } from 'react-toastify';
 import { filterFn, searchFilterFn, groupArray } from "@/utils/arrayManaging";
 import Progress from "@/components/state/Progress";
+import { Metadata } from "next";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 // gsap.registerPlugin(useGSAP);
 
