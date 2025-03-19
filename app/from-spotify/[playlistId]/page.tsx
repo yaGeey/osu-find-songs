@@ -1,6 +1,5 @@
 'use client'
-import Image from "next/image";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 import { useParams, useSearchParams } from "next/navigation";
 import OsuCard from "@/components/cards/OsuCard";
@@ -23,7 +22,7 @@ import Search from "./Search";
 import Progress from "@/components/state/Progress";
 import BgImage from "@/components/BgImage";
 
-export default function TestUIPage() {
+export default function PLaylistPage() {
    const params = useParams();
    const searchParams = useSearchParams();
    const { playlistId } = params;

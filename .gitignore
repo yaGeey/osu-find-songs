@@ -42,3 +42,4 @@ next-env.d.ts
 app/**/*test.*
 app/**/test/*
 TODO.txt
+/.vscode/

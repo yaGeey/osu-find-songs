@@ -19,9 +19,21 @@ const interTight = Inter_Tight({
 })
 
 export const metadata: Metadata = {
-  title: "osu! find songs",
-  description: "Find songs from your osu! on Spotify and Youtube",
+  title: "osu! find songs – Search & Convert 🎵",
+  description: "Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.",
   icons: { icon: '/icon.png', },
+  openGraph: {
+    title: "osu! find songs – Search & Convert 🎵",
+    description: "Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.",
+    images: [{ url: '/icon.png' }],
+    locale: "en_US",
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'osu! find songs – Search & Convert 🎵',
+    description: 'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.',
+    images: ['https://osu-find-songs.vercel.app/icon.png'],
+  },
 };
 
 export default function RootLayout({

@@ -1,7 +1,6 @@
 'use client'
 import BgImage from "@/components/BgImage";
-import { Button, SuccessBtn } from "@/components/Buttons";
-import Image from "next/image";
+import { Button } from "@/components/Buttons";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

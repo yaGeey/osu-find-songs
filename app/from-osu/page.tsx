@@ -1,36 +1,31 @@
 'use client'
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Song, SongData, SongDataQueried } from "@/types/types";
-import { AddItemsToPlaylist, createPlaylist, findSong, revalidateSpotifyToken, searchSongWithConditions } from "@/lib/Spotify";
+import { useEffect, useMemo, useState } from "react";
+import { SongData, SongDataQueried } from "@/types/types";
+import { searchSongWithConditions } from "@/lib/Spotify";
 import Image from "next/image";
 import Card from "@/components/cards/Card";
 import Info from "@/components/Info";
 import { twMerge as tw } from "tailwind-merge";
 import dynamic from "next/dynamic";
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { Track } from "@/types/Spotify";
 import { getBeatmap } from "@/lib/osu";
 import { BeatmapSet } from "@/types/Osu";
-import { filterOptions, groupOptions, languageOptions, sortOptions, selectStyles } from "@/utils/selectOptions";
-// import gsap from "gsap";
-// import { useGSAP } from "@gsap/react";
+import { groupOptions, sortOptions, selectStyles } from "@/utils/selectOptions";
 import './page.css';
 import BgImage from "@/components/BgImage";
 import { useSongContext } from "@/contexts/SongContext";
 import SettingsPopup from "@/components/SettingsPopup";
-import { redirect, usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import CreatePlaylistButton from "@/components/CreatePlaylistButton";
 import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
 import HomeBtn from "@/components/buttons/HomeBtn";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from "@fortawesome/free-solid-svg-icons";
-import SharePlaylistButton from "@/components/SharePlaylistButton";
-import { ToastContainer, toast } from 'react-toastify';
 import { filterFn, searchFilterFn, groupArray } from "@/utils/arrayManaging";
 import Progress from "@/components/state/Progress";
 const Select = dynamic(() => import('react-select'), { ssr: false });
-// gsap.registerPlugin(useGSAP);
 
 export default function FromOsu() {
    const router = useRouter();
@@ -58,7 +53,6 @@ export default function FromOsu() {
       queries: songs.map((song) => ({
          queryKey: ['spotify', song.id],
          queryFn: async (): Promise<Track[] | null> => {
-            console.log('searching', song.id)
             const tracks = await searchSongWithConditions(song);
             if (!tracks?.length) return null;
             return tracks;
@@ -77,7 +71,6 @@ export default function FromOsu() {
    
    // Combine the arrays
    const combinedArray = useMemo(() => {
-      console.log('updated')
       return songs.map((song, i) => ({
          local: song,
          spotifyQuery: songQueries[i],
@@ -209,7 +202,6 @@ export default function FromOsu() {
             <CreatePlaylistButton songQueries={songQueries} className="w-[215px] py-1" />
             {/* <SharePlaylistButton data={combinedArray} className="w-[215px] py-1" /> */}
          </footer>
-         <ToastContainer />
       </div>
    );
 }
