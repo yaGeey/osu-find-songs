@@ -2,15 +2,10 @@ import Link from "next/link";
 import { Button } from "@/components/Buttons";
 import BgImage from "@/components/BgImage";
 import Image from 'next/image'
-import CustomHead from "../components/CustomHead";
 
 export default function LandingPage() {
    return (
       <div className="flex flex-col justify-center items-center h-screen">
-         {/* <CustomHead 
-            title='Find songs from your osu! game and vice versa🎵'
-            desc="Find songs on Spotify and YouTube. Create a Spotify playlist with all your songs in one click. Find beatmaps from any Spotify playlist."
-         /> */}
          <BgImage />
          <div className="relative flex flex-col justify-center items-center bg-main-lighter rounded-2xl p-10 shadow-lg border-4 border-main-border">
             <Image src='/icon.png' width={75} height={75} alt='logo' />

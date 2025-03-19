@@ -1,6 +1,5 @@
 'use client'
-import Image from "next/image";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 import { useParams, useSearchParams } from "next/navigation";
 import OsuCard from "@/components/cards/OsuCard";
