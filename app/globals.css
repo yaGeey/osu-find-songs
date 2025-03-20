@@ -5,31 +5,18 @@
   interpolate-size: allow-keywords;
   --color-main: #cf7a7a;
   --color-main-darker-0: #c37272;
-  --color-main-lighter: #eb9090
-  /* #E98484 */
-  /* C07272 */
+  --color-main-lighter: #eb9090;
+  --color-main-border: #733F3F;
+  --color-highlight: #4CD2FF;
 }
 
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-} */
-body {
-  /* font-family: var(--font-inter); */
-}
+}*/
 
 @theme {
   --color-background: var(--background);
@@ -38,8 +25,8 @@ body {
   --color-song-select: hsla(347, 36%, 55%, 0.8);
   --color-song-border: hsla(347, 36%, 35%, 1);
 
-  --color-main: var(--color-main);
-  --color-main-lighter: var(--color-main-lighter);
+  --color-main: #cf7a7a;
+  --color-main-lighter: #eb9090;
   --color-main-darker-0: var(--color-main-darker-0);
   --color-main-darker: #AD6666;
   --color-darker: #905959;
@@ -60,17 +47,32 @@ body {
   --text-xs: 0.75rem;
 
 }
-.writing-mode-vertical-lr {
-  writing-mode: vertical-lr;
-}
-.writing-mode-vertical-rl {
-  writing-mode: vertical-rl;
-}
-.text-shadow {
-  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-}
 
 @layer utilities {
+  .animate-border {
+    border: 3px solid #0000;
+    background: linear-gradient(var(--color-main-lighter), var(--color-main-lighter)) padding-box,
+      linear-gradient(var(--angle), var(--color-main-border), #ae44ab) border-box;
+    animation: 7s rotate linear infinite;
+    transition: all 0.3s ease;
+  }
+  .animate-border:hover {
+    animation: none;
+    border-color: #ae44ab;
+  }
+
+  @keyframes rotate {
+    to {
+      --angle: 360deg;
+    }
+  }
+
+  @property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
   .scrollbar::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -94,17 +96,26 @@ body {
   .selected {
     @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)]
   }
+
   .shadow-tight {
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.20);
   }
 
-}
-@layer base {
   .font-outline {
     @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)]
   }
   .font-outline-sm {
     @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)]
+  }
+
+  .writing-mode-vertical-lr {
+    writing-mode: vertical-lr;
+  }
+  .writing-mode-vertical-rl {
+    writing-mode: vertical-rl;
+  }
+  .text-shadow {
+    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   }
 }
 

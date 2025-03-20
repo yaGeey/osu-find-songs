@@ -21,9 +21,9 @@ export default function SelectPage() {
       <div className="flex flex-col justify-center items-center h-screen font-inter">
          <BgImage />
          <div className="flex flex-col justify-center items-center bg-main-lighter rounded-2xl px-10 py-7 shadow-lg border-4 border-main-border">
-            <div className="flex flex-col gap-7 justify-center items-center">
+            <div className="flex flex-col gap-4 justify-center items-center">
                <h1 className="text-2xl text-black font-medium">Select Spotify playlist</h1>
-               <em className="text-black/80 -mb-3">Right-click the playlist → Share → Copy link to playlist</em>
+               <em className="text-black/80 ">Right-click the playlist → Share → Copy link to playlist</em>
                <div className="relative w-full">
                   <input
                      placeholder='Spotify playlist link'

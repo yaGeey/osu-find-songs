@@ -28,7 +28,7 @@ export default function OsuCardSet({ beatmapsets, sortQuery, className }: { beat
 
    return (
       <>
-         <div className={tw('relative h-[120px] group min-w-[386px] w-[464px]', className)} onClick={() => setIsDialogOpen(true)}>
+         <div className={tw('relative h-[120px] group min-w-[386px] w-[464px] cursor-pointer', className)} onClick={() => setIsDialogOpen(true)}>
             {beatmapsets.slice(0, 3).map((beatmapset, i) => (
                <OsuCard key={i} beatmapset={beatmapset} onHover={false} className={tw(
                   'first:z-99 w-full not-first:absolute even:top-[10px] last:top-[20px] even:opacity-35 last:opacity-10 pointer-events-none group-hover:even:top-[15px] group-hover:last:top-[30px]'

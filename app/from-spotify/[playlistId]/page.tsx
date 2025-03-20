@@ -185,7 +185,7 @@ export default function PLaylistPage() {
             closeBtn='Close'
             state='info'
          >
-            <p className="text-balance text-center">If there is more than one beatmapset for a song, it will download the first one based on the <span className="text-highlight font-outline">filters</span> you searched with.</p>
+            <p className="text-balance text-center">If there is more than one beatmap set for a song, the first one based on your search <span className="text-highlight font-outline">filters</span>  will be downloaded</p>
             {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
          </Modal>
          <Modal
@@ -193,7 +193,7 @@ export default function PLaylistPage() {
             onOkay={() => setIsModalDownloadingVisible(false)}
             okBtn='Got it'
             state='info'
-         >This can take some time, don't close this page</Modal>
+         >Please wait, this may take some time. Don't close this page</Modal>
          <Modal
             isOpen={isModalDownloadedVisible}
             onOkay={() => setIsModalDownloadedVisible(false)}
