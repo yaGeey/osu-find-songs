@@ -4,6 +4,7 @@
   transition-behavior: allow-discrete;
   interpolate-size: allow-keywords;
   --color-main: #cf7a7a;
+  --color-main-darker: #AD6666;
   --color-main-darker-0: #c37272;
   --color-main-lighter: #eb9090;
   --color-main-border: #733F3F;
@@ -106,6 +107,35 @@
   }
   .font-outline-sm {
     @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)]
+  }
+  .bg-triangles {
+    background:url(/osu/tris.png) no-repeat, url(/osu/tris2.png) no-repeat top right, var(--color-main)
+  }
+  .bg-dialog {
+    background:
+      linear-gradient(transparent, var(--color-main-lighter) 60px,var(--color-main-lighter) 100%),
+      url(/osu/tris.png) no-repeat, url(/osu/tris2.png) no-repeat top right, var(--color-main-lighter)
+  }
+  .bg-dialog-darker {
+    background:
+      linear-gradient(transparent, var(--color-main-darker) 60px,var(--color-main-darker) 100%),
+      url(/osu/tris.png) no-repeat, url(/osu/tris2.png) no-repeat top right, var(--color-main-darker)
+  }
+  .bg-dialog-after {
+    position: relative;
+    z-index: 1;
+  }
+  .bg-dialog-after::before {
+    content: "";
+    position: absolute;
+    inset: 0; /* або top: 0; left: 0; right: 0; bottom: 0; */
+    @apply rounded-xl;
+    background: 
+      linear-gradient(transparent, var(--color-main-lighter) 60px, var(--color-main-lighter) 100%),
+      url(/osu/tris.png) no-repeat,
+      url(/osu/tris2.png) no-repeat top right,
+      var(--color-main-lighter);
+    z-index: -1;
   }
 
   .writing-mode-vertical-lr {

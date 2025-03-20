@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import SwitchSort from "../buttons/SwitchSort";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+// TODO tooltip when in osu card set popup broke styles (Temp fixed - disable popup)
 
 const sortFn = (sortQuery: string) => (a: BeatmapSet, b: BeatmapSet) => {
    if (!sortQuery) return 0;

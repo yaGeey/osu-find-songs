@@ -99,7 +99,7 @@ export default function FromOsu() {
          <BgImage image={info?.local.image} />
          <Progress isLoading={isLoading} value={((combinedArray.filter(q => !q.beatmapsetQuery.isLoading).length + combinedArray.filter(q => !q.spotifyQuery.isLoading).length) * 100) / (combinedArray.length*2)} />
 
-         <header className="bg-main border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
+         <header className="bg-triangles border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
                <HomeBtn />
                <Image src="/icons/settings.svg" width={30} height={30} alt="settings" onClick={() => setIsSettingsVisible(p => !p)}

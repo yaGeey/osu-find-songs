@@ -8,10 +8,12 @@ import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 
 export default function SelectPage() {
    const [value, setValue] = useState('')
+   const [isLoading, setIsLoading] = useState(false)
    const inputRef = useRef<HTMLInputElement>(null)
    const router = useRouter();
 
    function handleClick() {
+      setIsLoading(true)
       const parts = value.split('/')
       const id = parts[parts.length - 1].split('?')[0]
       router.push('/from-spotify/' + id)
@@ -20,7 +22,7 @@ export default function SelectPage() {
    return (
       <div className="flex flex-col justify-center items-center h-screen font-inter">
          <BgImage />
-         <div className="flex flex-col justify-center items-center bg-main-lighter rounded-2xl px-10 py-7 shadow-lg border-4 border-main-border">
+         <div className="bg-dialog flex flex-col justify-center items-center bg-main-lighter rounded-2xl px-10 py-7 shadow-lg border-4 border-main-border">
             <div className="flex flex-col gap-4 justify-center items-center">
                <h1 className="text-2xl text-black font-medium">Select Spotify playlist</h1>
                <em className="text-black/80 ">Right-click the playlist → Share → Copy link to playlist</em>
@@ -35,7 +37,11 @@ export default function SelectPage() {
                   <FontAwesomeIcon icon={faSpotify} className="absolute top-1/2 transform -translate-y-1/2 right-2 text-lg text-black/80"/>
                </div>
             </div>
-            <Button className="bg-success font-medium mt-8" disabled={!value || !inputRef.current?.validity.valid} onClick={handleClick} textClassName="font-outline">Find beatmaps</Button>
+            <Button
+               className="bg-success font-medium mt-8"
+               disabled={!value || !inputRef.current?.validity.valid || isLoading} onClick={handleClick}
+               textClassName="font-outline"
+            >Find beatmaps</Button>
          </div>
       </div>
    )

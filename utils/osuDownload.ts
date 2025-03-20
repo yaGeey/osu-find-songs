@@ -1,4 +1,6 @@
 // https://github.com/eligrey/FileSaver.js/issues/796 - xhr download progress
+// TODO: xhr requests download progress add
+// TODO with videos error fetching download
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob);

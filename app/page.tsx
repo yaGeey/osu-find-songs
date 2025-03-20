@@ -7,7 +7,7 @@ export default function LandingPage() {
    return (
       <div className="flex flex-col justify-center items-center h-screen">
          <BgImage />
-         <div className="relative flex flex-col justify-center items-center bg-main-lighter rounded-2xl p-10 shadow-lg border-4 border-main-border">
+         <div className="bg-dialog relative flex flex-col justify-center items-center bg-main-lighter rounded-2xl p-10 shadow-lg border-4 border-main-border">
             <Image src='/icon.png' width={75} height={75} alt='logo' />
             <h1 className="text-3xl  mt-3">Welcome to osu! find songs</h1>
             <h2 className="text-2xl ">Choose one of the options</h2>

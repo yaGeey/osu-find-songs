@@ -39,8 +39,8 @@ function Card({ data, sortFn, selected, onClick, className }: {
       <div className={tw('last:rounded-b-lg first:hover:pt-0 hover:py-2 transition-all duration-300 ease-in-out', selected && 'first:pt-0 py-2')}>
          <div
             className={tw(
-               "select-none relative justify-center items-center bg-main-darker  text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:bg-main-darker/80",
-               selected && 'bg-main-darker/85 sm:mr-20 rounded-lg',
+               "bg-dialog-darker select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:opacity-85",
+               selected && 'opacity-85 sm:mr-20 rounded-lg',
                className,
             )}
             onClick={handleClick}

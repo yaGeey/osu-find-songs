@@ -47,7 +47,7 @@ export default function RootLayout({
         <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
       </head> */}
       <body
-        className={`${inter.variable} ${interTight.variable} antialiased font-inter`}
+        className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-fuchsia-300 selection:text-fuchsia-900`}
       >
         <Providers>
           {children}

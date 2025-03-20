@@ -70,9 +70,11 @@ export default function Info({ data, onClose, className }: Props) {
 
    return (
       <div ref={container} id='info-card' className={tw(
-         "relative animate-in slide-in-from-left flex flex-col bg-main/90 border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[600px]",
-         className,
-      )}>
+            "relative opacity-90 animate-in slide-in-from-left flex flex-col border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[600px]",
+            "[background:linear-gradient(transparent,_var(--color-main)_75px,var(--color-main)_100%),url(/osu/tris2.png)_no-repeat_top_right,var(--color-main)]",
+            className,
+         )}
+      >
          <div className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all" onClick={onClose}>
             <Image src='/icons/close.svg' layout="fill" alt="close"/>
          </div>

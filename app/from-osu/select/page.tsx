@@ -3,8 +3,9 @@ import BgImage from "@/components/BgImage";
 import { Song } from "@/types/types";
 import { useSongContext } from "@/contexts/SongContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function SelectPage() {
    const { setSongs } = useSongContext();
@@ -16,6 +17,7 @@ export default function SelectPage() {
    }, []);
 
    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+      toast.loading('Loading beatmaps...', { delay: 1000 });
       const files = e.target.files;
       if (files && files?.length != 0) {
          const songsMap = new Map<string, Song>();
@@ -56,7 +58,7 @@ export default function SelectPage() {
       <>
          <BgImage />
          <div className="absolute mx-auto top-1/2 -translate-y-1/2 left-0 right-0 w-fit font-inter">
-            <div className="animate-border bg-main-lighter px-10 py-6  p-3 rounded-xl select-none cursor-pointer shadow-md hover:shadow-lg hover:brightness-110 transition-all duration-300 flex flex-col justify-center items-center">
+            <div className="bg-dialog-after animate-border bg-main-lighter px-10 py-6  p-3 rounded-xl select-none cursor-pointer shadow-md hover:shadow-lg hover:brightness-110 transition-all duration-300 flex flex-col justify-center items-center">
                <h1 className="font-medium text-xl">Click to browse your <span className="font-bold">osu!</span> beatmaps folder</h1>
                <em className="text-black/80 ">C:/Users/.../AppData/Local/osu!/Songs</em>
                <h3 className="text-sm mt-2">⚠️ This may take some time depending on the number of beatmaps ⚠️</h3>
@@ -64,6 +66,7 @@ export default function SelectPage() {
                <input directory="" webkitdirectory="" type="file" onChange={handleFileChange} className="opacity-0 absolute top-0 left-0 w-full h-full" />
             </div>
          </div>
+         <ToastContainer />
       </>
    )
 }

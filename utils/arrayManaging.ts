@@ -17,6 +17,17 @@ export const searchFilterFn = (search:string) => (a: SongDataQueried) => {
    return a.local.title.toLowerCase().includes(str) || a.local.author.toLowerCase().includes(str) || a.beatmapsetQuery.data?.creator.toLowerCase().includes(str);
 }
 
+// simple group
+export function groupBy<T extends Record<string, any>>(array: Array<T>, key: string) {
+   return array.reduce((acc: Record<string, T[]>, item) => {
+      if (!acc[item[key]]) {
+         acc[item[key]] = [];
+      }
+      acc[item[key]].push(item);
+      return acc;
+   }, {});
+};
+
 // group
 export function groupArray(groupFn: string, sortOrder: string, sortFn: string, combinedArray: SongDataQueried[]) {
    let groupedArray;

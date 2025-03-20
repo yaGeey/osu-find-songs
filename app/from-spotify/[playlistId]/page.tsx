@@ -133,7 +133,7 @@ export default function PLaylistPage() {
          <BgImage brightness={8} image='/bg.svg'/>
          <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length}/>
 
-         <header className={tw("bg-main fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
+         <header className={tw("bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
             <section className="absolute left-4">
                <HomeBtn />
             </section>
