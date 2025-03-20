@@ -61,7 +61,7 @@ export default function SelectPage() {
                <h1 className="font-semibold text-lg">Choose your <span className="font-bold">osu!</span> beatmaps directory</h1>
                <em className="text-black/60 ">C:/Users/.../AppData/Local/osu!/Songs</em>
                <h3 className="text-sm mt-2">❗ This can take a while depending on the amount of maps ❗</h3>
-               {/* @ts-ignore */}
+               {/* @ts-expect-error */}
                <input directory="" webkitdirectory="" type="file" onChange={handleFileChange} className="opacity-0 absolute top-0 left-0 w-full h-full" />
             </div>
          </div>

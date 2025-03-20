@@ -3,8 +3,6 @@ import FilterSelector from "@/components/buttons/FilterSelector";
 import Switch from "@/components/buttons/Switch";
 import SwitchFull from "@/components/buttons/SwitchFull";
 import SwitchSort from "@/components/buttons/SwitchSort";
-import { BeatmapSet } from "@/types/Osu";
-import { UseQueryResult } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
@@ -13,7 +11,6 @@ export default function Filters({ onChangeSort }: {
    onChangeSort: (query: string, searchType:'local'|'api') => void,
 }) {
    const pathname = usePathname()
-   const searchParams = useSearchParams()
    const router = useRouter()
 
    const [query, setQuery] = useState('')
