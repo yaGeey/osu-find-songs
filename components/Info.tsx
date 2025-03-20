@@ -50,20 +50,18 @@ export default function Info({ data, onClose, className }: Props) {
       queryFn: async (): Promise<Media[]> => {
          let song = applyAlwaysConditions(local);
          const { data } = await axios.get((`/api?query=${encodeURIComponent(song.author + ' ' + song.title)}`));
-         console.log(data);
          return data;
       },
       enabled: selection == 'youtube',
    })
 
    const wikiQuery = useQuery({
-      queryKey: ['wiki', beatmapset.artist],
+      queryKey: ['wiki', local.author],
       queryFn: async () => {
-         const { title, url } = await wikiSearchMusicianTitle(beatmapset.artist);
+         const { title, url } = await wikiSearchMusicianTitle(local.author);
          if (!title || !url) return null;
          const content = await wikiSearchExact(title);
          if (!content) return null;
-         console.log(content)
          return {title, url, content};
       },
    }) 
@@ -92,19 +90,20 @@ export default function Info({ data, onClose, className }: Props) {
             <div className="flex flex-col justify-between text-ellipsis">
                <div>
                   <h1 className="flex items-end gap-1.5 font-outline-sm">
-                     <span className="text-2xl font-semibold">{beatmapset.title}</span>
+                     <span className="text-2xl font-semibold">{local.title}</span>
                      {spotify && spotify?.length != 20 && <span className="text-sm font-medium mb-0.5">{spotify[0].album.release_date.split('-')[0]}</span>}
                   </h1>
                   {/* //! add links to authors spotify && osu authors search */}
                   <h2 className="text-base font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]">
-                     {spotify?.length != 20 ?
+                     {spotify?.length != 20 && beatmapset ?
                         <AuthorString artists={spotify ? spotify[0].artists : []} beatmapset={beatmapset} /> :
-                        <span>{beatmapset.artist}</span>
+                        <span>{beatmapset?.artist}</span>
                      }
-                  </h2> 
+                     {!beatmapset && <span>{local.author}</span>}
+                  </h2>
                </div>
                <div className="flex justify-between items-end">
-                  {spotify && spotify?.length != 20 && (spotify[0].album.name != beatmapset.title) &&
+                  {spotify && spotify?.length != 20 && (spotify[0].album.name != local.title) &&
                      <h3 className="font-medium line-clamp-2 hover:underline font-outline-sm pr-8 text-[15px]">
                         <a href={spotify[0].album.external_urls.spotify}>
                            {spotify[0].album.name}
@@ -126,8 +125,8 @@ export default function Info({ data, onClose, className }: Props) {
          <div className="flex w-full items-end gap-4 mt-4">
             <SpotifyBtn onClick={() => setSelection('spotify')} disabled={spotify ? false : true} className={selection=='spotify'?'selection':''} />
             <YoutubeBtn onClick={() => setSelection('youtube')} className={selection == 'youtube' ? 'selection' : ''} />
-            <a target="_blank" href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}>
-               <OsuBtn />
+            <a target="_blank" href={`https://osu.ppy.sh/beatmapsets/${beatmapset?.id}`} className={tw(beatmapset ? '':'pointer-events-none')}>
+               <OsuBtn disabled={beatmapset?false:true} />
             </a>
          </div> 
 

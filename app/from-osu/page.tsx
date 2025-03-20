@@ -26,6 +26,7 @@ import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from "@fortawesome
 import { filterFn, searchFilterFn, groupArray } from "@/utils/arrayManaging";
 import Progress from "@/components/state/Progress";
 import DynamicBg from "@/components/DynamicBg";
+import { Tooltip } from "react-tooltip";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
 export default function FromOsu() {
@@ -111,16 +112,17 @@ export default function FromOsu() {
             <hr className="border-2 border-main-border h-3/4"></hr>
             {isSettingsVisible && <SettingsPopup />}
 
-            <div className="flex 2xl:gap-3 gap-1.5 items-center justify-center ">
+            <div className="flex 2xl:gap-3 gap-1.5 items-center justify-center " data-tooltip-id={isLoading ? 'tooltip' : undefined} data-tooltip-content='Wait for the beatmaps data to load'>
                <label className="font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>
                <input
                   type="checkbox"
                   id="filter-select"
                   onChange={(e) => setFilters(e.target.checked ? ['exact-spotify'] : [])}
                   className="mt-1 w-4 h-4 accent-main-border"
+                  disabled={isLoading}
                />
             </div>
-            <div className="flex gap-3 justify-center items-center ">
+            <div className="flex gap-3 justify-center items-center " data-tooltip-id={isLoading ? 'tooltip' : undefined} data-tooltip-content='Wait for the beatmaps data to load'>
                <label className="text-md font-semibold tracking-wider hidden xl:block" htmlFor="group-select">Group</label>
                <Select className='lg:w-[200px] min-w-[75px] w-fit z-1'
                   onChange={(e: any) => setGroupFn(e.value)}
@@ -129,10 +131,12 @@ export default function FromOsu() {
                   options={groupOptions}
                   isDisabled={isLoading}
                   styles={selectStyles}
+                  data-tooltip-id={isLoading ? 'tooltip' : undefined}
+                  data-tooltip-content='Wait for the beatmaps data to load'
                />
             </div>
             <hr className="border-2 border-main-border h-3/4"></hr>
-            <div className="flex gap-3 items-center justify-end">
+            <div className="flex gap-3 items-center justify-end" data-tooltip-id={isLoading ? 'tooltip' : undefined} data-tooltip-content='Wait for the beatmaps data to load'>
                <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="sort-select">Sort</label>
                <Select className='lg:w-[200px] min-w-[75px] w-fit z-1'
                   onChange={(e: any) => setSortFn(e.value)}
@@ -203,6 +207,7 @@ export default function FromOsu() {
             <CreatePlaylistButton songQueries={songQueries} className="w-[215px] py-1" />
             {/* <SharePlaylistButton data={combinedArray} className="w-[215px] py-1" /> */}
          </footer>
+         <Tooltip id='tooltip' place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
       </div>
    );
 }

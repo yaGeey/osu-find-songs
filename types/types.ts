@@ -11,8 +11,8 @@ export type Song = {
 }
 
 export type SongData = {
-  beatmapset: BeatmapSet;
-  spotify: Track[] | null;
+  beatmapset?: BeatmapSet;
+  spotify?: Track[] | null;
   local: Song;
 }
 
