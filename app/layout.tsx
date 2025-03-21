@@ -52,6 +52,7 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <Analytics />
         </Providers>
       </body>
     </html>
