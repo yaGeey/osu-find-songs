@@ -126,15 +126,15 @@ export default function Filters({ onChangeSort }: {
                </div>
                <section className="flex items-center justify-between">
                   <h4>Created at</h4>
-                  <FilterSelector type="date" onChange={(value) => console.log(value)} disabled />
+                  <FilterSelector type="date" onChange={(val, filter) => createQueryString('created', filter, val)} disabled />
                </section>
                <section className="flex items-center justify-between">
                   <h4>Updated size</h4>
-                  <FilterSelector type="date" onChange={(value) => console.log(value)} disabled />
+                  <FilterSelector type="date" onChange={(val, filter) => createQueryString('updated', filter, val)} disabled />
                </section>
                <section className="flex items-center justify-between">
                   <h4>Ranked at</h4>
-                  <FilterSelector type="date" onChange={(value) => console.log(value)} disabled />
+                  <FilterSelector type="date" onChange={(val, filter) => createQueryString('ranked', filter, val)} disabled />
                </section>
             </div>
 
