@@ -6,9 +6,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
-import {ErrorBoundary} from "react-error-boundary";
-import sendTgMessage from "@/utils/feedbackLog";
-
 function makeQueryClient() {
    return new QueryClient({
       defaultOptions: {
@@ -16,7 +13,7 @@ function makeQueryClient() {
             gcTime: 1000 * 60 * 60 * 24, // Garbage collection timer
             // With SSR, we usually want to set some default staleTime
             // above 0 to avoid refetching immediately on the client
-            staleTime: 60 * 1000 * 10,
+            staleTime: Infinity,
          },
       },
    })

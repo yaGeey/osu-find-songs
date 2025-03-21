@@ -110,7 +110,7 @@ export default function FromOsu() {
                />
             </section>
             <hr className="border-2 border-main-border h-3/4"></hr>
-            {isSettingsVisible && <SettingsPopup />}
+            <SettingsPopup className={!isSettingsVisible ?'-left-full':''} />
 
             <div className="flex 2xl:gap-3 gap-1.5 items-center justify-center " data-tooltip-id={isLoading ? 'tooltip' : undefined} data-tooltip-content='Wait for the beatmaps data to load'>
                <label className="font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>

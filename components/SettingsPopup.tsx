@@ -1,11 +1,12 @@
 import { languageOptions } from "@/utils/selectOptions";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
+import { twMerge as tw } from "tailwind-merge";
 const Select = dynamic(() => import('react-select'), { ssr: false });
 
-export default function SettingsPopup() {
+export default function SettingsPopup({className}: {className?: string}) {
    return (
-      <div className="z-100 absolute top-14 left-0 shadow-2xl animate-in slide-in-from-left bg-main border-4  border-main-border min-w-65 w-1/4 flex flex-col gap-4 p-4 rounded-xl rounded-t-none rounded-l-none border-t-0 border-l-0">
+      <div className={tw("transition-all z-100 absolute top-14 left-0 shadow-2xl animate-in slide-in-from-left bg-main border-4  border-main-border min-w-65 w-1/4 flex flex-col gap-4 p-4 rounded-xl rounded-t-none rounded-l-none border-t-0 border-l-0", className)}>
          {/* <section className="flex items-center gap-2">
             <Select isDisabled
                id="select-language"
