@@ -9,8 +9,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 
-export default function Filters({ onChange }: {
+export default function Filters({ onChange, foundString }: {
    onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void,
+   foundString?: string
 }) {
    const pathname = usePathname()
    const router = useRouter()
@@ -94,6 +95,8 @@ export default function Filters({ onChange }: {
                }
             }} />
          </section>
+         {foundString && <div className="absolute animate-in fade-in right-6 bottom-2 text-white/70 font-outline-sm tracking-wider text-base">{foundString} <span className="text-sm">found</span></div>}
+         
 
          {/* Additional filters */}
          {unfolded && <div className="flex items-start justify-evenly lgx:justify-between mt-6 text-[15px]">

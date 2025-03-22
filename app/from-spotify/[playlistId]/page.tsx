@@ -167,12 +167,13 @@ export default function PLaylistPage() {
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:950px)]:w-4/5 w-full ">
                
                <Filters
-                  onChange={(val, searchTypeRes, mode) => {
-                     setSortQuery(val)
-                     setModeQuery(mode)
-                     setSearchType(searchTypeRes)
-                  }}
-               />
+                  foundString={beatmapsets.length ? beatmapsets.filter(a => a ? a.length : false).length + '/' + beatmapsets.length : ''}
+                     onChange={(val, searchTypeRes, mode) => {
+                        setSortQuery(val)
+                        setModeQuery(mode)
+                        setSearchType(searchTypeRes)
+                     }}
+                  />
                
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
                   {filteredBeatmapsets.filter(data => data && data.length).map((data, i) => {
