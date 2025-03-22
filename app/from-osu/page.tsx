@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SongData, SongDataQueried } from "@/types/types";
 import { searchSongWithConditions } from "@/lib/Spotify";
 import Image from "next/image";
@@ -45,6 +45,7 @@ export default function FromOsu() {
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
    const [search, setSearch] = useState('');
+   const cardRef = useRef<HTMLDivElement>(null);
 
    useEffect(() => {
       setInfo(null);
@@ -186,16 +187,20 @@ export default function FromOsu() {
                      }
                      {(group == selectedGroup || group === '') &&
                         <ul className="flex flex-col gap-2 items-end ">
-                           {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) => (
-                              <Card
-                                 data={songData}
-                                 sortFn={sortFn}
-                                 key={i}
-                                 className='-mt-3'
-                                 selected={info?.local.id === songData.local.id}
-                                 onClick={handleCardClick}
-                              />
-                           ))}
+                           {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) => {
+                              // console.log(cardRef.current?.getBoundingClientRect().top, window.innerHeight);
+                              return (
+                                 <Card
+                                    data={songData}
+                                    sortFn={sortFn}
+                                    key={i}
+                                    // ref={cardRef}
+                                    className='-mt-3'
+                                    selected={info?.local.id === songData.local.id}
+                                    onClick={handleCardClick}
+                                 />
+                              );
+                           })}
                         </ul>
                      }
                   </div>
