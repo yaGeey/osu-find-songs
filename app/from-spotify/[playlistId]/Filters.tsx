@@ -150,7 +150,7 @@ export default function Filters({ onChange }: {
                   <FilterSelector type="date" onChange={(val, filter) => createQueryString('created', filter, val)} disabled />
                </section>
                <section className="flex items-center justify-between">
-                  <h4>Updated size</h4>
+                  <h4>Updated at</h4>
                   <FilterSelector type="date" onChange={(val, filter) => createQueryString('updated', filter, val)} disabled />
                </section>
                <section className="flex items-center justify-between">
