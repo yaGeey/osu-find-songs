@@ -29,6 +29,7 @@ export default function PLaylistPage() {
 
    const [hasQueryChanged, setHasQueryChanged] = useState(false);
    const [sortQuery, setSortQuery] = useState<string>('');
+   const [modeQuery, setModeQuery] = useState<string>('');
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([]);
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([]);
@@ -63,7 +64,7 @@ export default function PLaylistPage() {
       queries: tracks.map((track) => ({
          queryKey: ['beatmapset', track.track.artists[0].name, track.track.name],
          queryFn: async () => {
-            return await beatmapsSearch(`artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`, sortQuery);
+            return await beatmapsSearch(`artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`, sortQuery, modeQuery);
          },
          enabled: !!tracks,
          staleTime: Infinity
@@ -95,7 +96,7 @@ export default function PLaylistPage() {
          return () => clearTimeout(timer)
       }
       if (searchType == 'local') console.log('local search');
-   }, [searchParams.get('q'), searchParams.get('sort')]);
+   }, [searchParams.get('q'), searchParams.get('sort'), searchParams.get('m')]);
 
 
    // download maps
@@ -148,8 +149,9 @@ export default function PLaylistPage() {
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker md:w-4/5 w-full min-w-[750px]">
                
                <Filters
-                  onChangeSort={(val, searchTypeRes) => {
+                  onChange={(val, searchTypeRes, mode) => {
                      setSortQuery(val)
+                     setModeQuery(mode)
                      setSearchType(searchTypeRes)
                   }}
                />

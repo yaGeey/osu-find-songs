@@ -21,7 +21,7 @@ export default function SwitchFull({ options, onChange, disabled = false, requir
    return (
       <div
          className={tw("font-inter-tight border-2 border-[#733F3F] rounded-full flex items-center gap-1 h-[26px] cursor-pointer",
-            isDisabled && 'brightness-60', !required && 'pl-1.5 bg-white-50 ')}
+            isDisabled && 'brightness-60', !required && 'pl-1.5 bg-white-50 ', className)}
          onClick={() => isDisabled && setIsDisabled(false)}
       >
          {!required && <CursorBtn setIsDisabled={setIsDisabled} isDisabled={isDisabled} />}

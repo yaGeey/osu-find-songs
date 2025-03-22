@@ -7,21 +7,22 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 
-export default function Filters({ onChangeSort }: {
-   onChangeSort: (query: string, searchType:'local'|'api') => void,
+export default function Filters({ onChange }: {
+   onChange: (sortBy: string, searchType:'local'|'api', mode:string) => void,
 }) {
    const pathname = usePathname()
    const router = useRouter()
 
    const [query, setQuery] = useState('')
    const [sortQuery, setSortQuery] = useState('')
+   const [modeQuery, setModeQuery] = useState('')
    
    const [unfolded, setUnfolded] = useState(false);
    const [queryDict, setQueryDict] = useState<{ [key: string]: string }>({});
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
 
    // creating query 
-   const createQueryString = (name: string, filter: 'gt' | 'lt' | 'eq' | '', value: string) => {
+   const createQueryString = (name: string, filter: 'gt' | 'lt' | 'eq' | '', value: string, valueIsZero='') => {
       const filtersDict = { 'gt': '>', 'lt': '<', 'eq': '=' };
 
       const filterString = value && value != '0' && filter ? filtersDict[filter] : '';
@@ -44,6 +45,11 @@ export default function Filters({ onChangeSort }: {
       // window.history.replaceState(null, '', pathname + query + symbol + sortQuery);
       router.replace(pathname + query + symbol + sortQuery)
    }, [query, sortQuery]);
+   useEffect(() => {
+      let symbol = '';
+      if (modeQuery) symbol = query ? '&' : '?';
+      router.replace(pathname + query + symbol + modeQuery)
+   }, [query, modeQuery]);
 
    return (
       <div className={tw("bg-main-darker z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap", unfolded && 'pb-5')}>
@@ -62,16 +68,24 @@ export default function Filters({ onChangeSort }: {
                More filters {unfolded ? <span className="writing-mode-vertical-lr">&lt;</span> : <span className="writing-mode-vertical-rl">&gt;</span>}
             </button>
          </div>
-         <div className="flex items-center gap-4 mt-4 text-[15px]">
+         <div className="flex items-center gap-4 mt-3 text-[15px]">
+            <h4>Mode</h4>
+            <SwitchFull className="font-inter ml-2.75" options={['osu!', 'osu!taiko', 'osu!catch', 'osu!mania']} onChange={(val) => {
+               const temp = { 'osu!': '0', 'osu!taiko': '1', 'osu!catch': '2', 'osu!mania': '3' };
+               const query = val !='' ? 'm=' + temp[val as keyof typeof temp] : '';
+               setModeQuery(query);
+               onChange(sortQuery, searchType, query);
+            }} />
+         </div>
+         <div className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>Sort by</h4>
             <SwitchSort options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']} onChange={(val, sort) => {
                if (val) {
                   const query = `sort=${val}_${sort}`;
                   setSortQuery(query);
-                  onChangeSort(query, searchType);
+                  onChange(query, searchType, modeQuery);
                }
             }} />
-            {/* <SwitchFull required options={['local', 'osu! search']} defaultValue={0} onChange={(val) => setSearchType(val=='local' ? 'local' : 'api')} /> */}
          </div>
 
          {/* Additional filters */}
