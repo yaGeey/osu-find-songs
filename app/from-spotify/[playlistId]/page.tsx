@@ -167,7 +167,7 @@ export default function PLaylistPage() {
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:950px)]:w-4/5 w-full ">
                
                <Filters
-                  foundString={beatmapsets.length ? beatmapsets.filter(a => a ? a.length : false).length + '/' + beatmapsets.length : ''}
+                  foundString={beatmapsets.length ? beatmapsets.filter(a => !!a).length + '/' + beatmapsets.length : ''}
                      onChange={(val, searchTypeRes, mode) => {
                         setSortQuery(val)
                         setModeQuery(mode)

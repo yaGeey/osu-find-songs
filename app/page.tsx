@@ -1,7 +1,9 @@
+'use client'
 import Link from "next/link";
 import { Button } from "@/components/Buttons";
 import BgImage from "@/components/BgImage";
 import Image from 'next/image'
+import { useEffect } from "react";
 // import { useState } from "react";
 // import { twMerge as tw } from "tailwind-merge";
 
@@ -20,6 +22,11 @@ export default function LandingPage() {
    //       setSrc('/bg.svg')
    //    }, 700)
    // }
+   useEffect(() => {
+      if (localStorage.getItem('songs_context')) {
+         localStorage.removeItem('songs_context')
+      }
+   }, [])
    return (
       <div className="flex flex-col justify-center items-center h-screen">
          <BgImage />

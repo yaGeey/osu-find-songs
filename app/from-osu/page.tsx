@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo, useRef, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import { SongData, SongDataQueried } from "@/types/types";
 import { searchSongWithConditions } from "@/lib/Spotify";
 import Image from "next/image";
@@ -31,10 +31,16 @@ const Select = dynamic(() => import('react-select'), { ssr: false });
 
 export default function FromOsu() {
    const router = useRouter();
-   const { songs } = useSongContext();
+   const { songs, setSongs } = useSongContext();
    useEffect(() => {
-      if (!songs.length) router.push('from-osu/select');
-   }, [songs]);
+      if (!songs.length) {
+         if (localStorage.getItem('songs_context')) {
+            setSongs(JSON.parse(localStorage.getItem('songs_context')!));
+         } else {
+            router.push('/from-osu/select');
+         }
+      }
+   }, [songs, setSongs, router]);
 
    const [info, setInfo] = useState<SongData | null>(null);
    const [filters, setFilters] = useState<string[]>([]);
@@ -45,7 +51,6 @@ export default function FromOsu() {
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
    const [search, setSearch] = useState('');
-   const cardRef = useRef<HTMLDivElement>(null);
 
    useEffect(() => {
       setInfo(null);
@@ -194,7 +199,6 @@ export default function FromOsu() {
                                     data={songData}
                                     sortFn={sortFn}
                                     key={i}
-                                    // ref={cardRef}
                                     className='-mt-3'
                                     selected={info?.local.id === songData.local.id}
                                     onClick={handleCardClick}

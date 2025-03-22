@@ -1,7 +1,7 @@
 import { Track } from "@/types/Spotify";
 import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from "@/lib/Spotify";
 import { useMutation, type UseQueryResult } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Modal from "./Modal";
 import { Button } from "./Buttons";
 import Cookies from "js-cookie";
@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpotify } from "@fortawesome/free-brands-svg-icons";
 import { twMerge as tw } from "tailwind-merge";
+import { useSongContext } from "@/contexts/SongContext";
 
 export default function CreatePlaylistButton({ songQueries, className }: { songQueries: UseQueryResult<Track[] | null, Error>[], className?: string }) {
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,12 +18,14 @@ export default function CreatePlaylistButton({ songQueries, className }: { songQ
    const [onOkayFn, setOnOkayFn] = useState<() => void>(() => { });
    const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay');
    const router = useRouter();
+   const { songs } = useSongContext();
 
    const mutation = useMutation({
       mutationFn: ({ playlistId, uris }: { playlistId: string, uris: string[] }) => AddItemsToPlaylist(playlistId, uris),
    })
 
    function navigateToAuth() {
+      localStorage.setItem('songs_context', JSON.stringify(songs));
       const encodeRedirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!);
       const clientId = process.env.NEXT_PUBLIC_AUTH_SPOTIFY_ID;
       const scope = 'playlist-modify-public playlist-modify-private';

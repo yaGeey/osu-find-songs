@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/error', req.url));
    }
 
-   const nextResponse = NextResponse.redirect(new URL('/', req.url));
+   const nextResponse = NextResponse.redirect(new URL('/from-osu', req.url));
    nextResponse.cookies.set('spotify_oauth_access_token', data.access_token, {
       // httpOnly: true,
       // secure: process.env.NODE_ENV === 'production',
