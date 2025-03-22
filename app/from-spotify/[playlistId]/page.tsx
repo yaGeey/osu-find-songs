@@ -81,7 +81,7 @@ export default function PLaylistPage() {
 
    // search
    useEffect(() => {
-      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('sort')) return;
+      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('sort') && !searchParams.get('m')) return;
       else setHasQueryChanged(true);
 
       if (searchType == 'api') {
