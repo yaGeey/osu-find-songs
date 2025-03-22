@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 // This ensures that the icon CSS is loaded immediately before attempting to render icons
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import PhoneDialog from "@/components/state/PhoneDialog";
 // Prevent fontawesome from dynamically adding its css since we did it manually above
 config.autoAddCss = false;
 
@@ -51,6 +52,7 @@ export default function RootLayout({
         className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-fuchsia-300 selection:text-fuchsia-900`}
       >
         <Providers>
+          <PhoneDialog />
           {children}
           <Analytics />
         </Providers>
