@@ -2,6 +2,7 @@
 import FilterSelector from "@/components/buttons/FilterSelector";
 import Switch from "@/components/buttons/Switch";
 import SwitchFull from "@/components/buttons/SwitchFull";
+import SwitchFullDict from "@/components/buttons/SwitchFullDict";
 import SwitchSort from "@/components/buttons/SwitchSort";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -60,23 +61,29 @@ export default function Filters({ onChange }: {
                <h4>Star rating</h4>
                <FilterSelector min={0} max={10} type="number" onChange={(val, filter) => createQueryString('star', filter, val)} />
             </section>
-            <section className="flex items-center gap-4">
-               <h4 >State</h4>
-               <SwitchFull options={['ranked', 'loved', 'approved', 'pending']} onChange={(val) => createQueryString('status', 'eq', val)} />
-            </section>
+            <div className="flex items-center gap-4  text-[15px]">
+               <h4>Mode</h4>
+               <SwitchFullDict className="font-inter" options={{ 'osu!': '0', 'osu!taiko': '1', 'osu!catch': '2', 'osu!mania': '3' }} onChange={(val) => {
+                  const query = val ?'m=' + val : '';
+                  setModeQuery(query);
+                  onChange(sortQuery, searchType, query);
+               }} />
+            </div>
             <button className="selected bg-darker rounded-full px-4 py-1.5" onClick={() => setUnfolded(p => !p)}>
                More filters {unfolded ? <span className="writing-mode-vertical-lr">&lt;</span> : <span className="writing-mode-vertical-rl">&gt;</span>}
             </button>
          </div>
-         <div className="flex items-center gap-4 mt-3 text-[15px]">
-            <h4>Mode</h4>
-            <SwitchFull className="font-inter ml-2.75" options={['osu!', 'osu!taiko', 'osu!catch', 'osu!mania']} onChange={(val) => {
-               const temp = { 'osu!': '0', 'osu!taiko': '1', 'osu!catch': '2', 'osu!mania': '3' };
-               const query = val !='' ? 'm=' + temp[val as keyof typeof temp] : '';
-               setModeQuery(query);
-               onChange(sortQuery, searchType, query);
-            }} />
-         </div>
+         <section className="flex items-center gap-4 mt-3 text-[15px]">
+            <h4>State</h4>
+            <SwitchFullDict
+               className='ml-2.75 font-inter'
+               required
+               defaultValue='has leaderboard'
+               options={{ 'any': 'any', 'has leaderboard': '', 'ranked': 'ranked', 'loved': 'loved', 'approved': 'approved', 'pending': 'pending' }}
+               onChange={(val) => createQueryString('status', 'eq', val)}
+            />
+         </section>
+   
          <div className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>Sort by</h4>
             <SwitchSort options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']} onChange={(val, sort) => {
