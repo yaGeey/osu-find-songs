@@ -128,7 +128,6 @@ export default function PLaylistPage() {
          }
       })
    }
-
    return (
       <div className="max-h-screen min-w-[600px] min-h-[670px] font-inter overflow-y-auto overflow-x-hidden scrollbar">
          <BgImage brightness={8} image='/bg.svg'/>
@@ -162,7 +161,10 @@ export default function PLaylistPage() {
                      else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
                   })}
                   {!filteredBeatmapsets.filter(data => data && data.length).length && !isLoading &&
-                     <div className="text-black/40 text-2xl h-full w-full text-center mt-10 ">No results found</div>
+                     <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
+                        No results found
+                        <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
+                     </div>
                   }
                </div>
             </div>
