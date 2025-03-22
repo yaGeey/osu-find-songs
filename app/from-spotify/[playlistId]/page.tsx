@@ -21,6 +21,7 @@ import Filters from "./Filters";
 import Search from "./Search";
 import Progress from "@/components/state/Progress";
 import BgImage from "@/components/BgImage";
+import { LinearProgress } from "@mui/material";
 
 export default function PLaylistPage() {
    const params = useParams();
@@ -28,6 +29,7 @@ export default function PLaylistPage() {
    const { playlistId } = params;
 
    const [hasQueryChanged, setHasQueryChanged] = useState(false);
+   const [timeToSearch, setTimeToSearch] = useState<number|null>(null);
    const [sortQuery, setSortQuery] = useState<string>('');
    const [modeQuery, setModeQuery] = useState<string>('');
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
@@ -83,8 +85,16 @@ export default function PLaylistPage() {
    useEffect(() => {
       if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('sort') && !searchParams.get('m')) return;
       else setHasQueryChanged(true);
+      
+      let time = 0;
+      setTimeToSearch(time);
 
       if (searchType == 'api') {
+         const interval = setInterval(() => {
+            time += 100;
+            setTimeToSearch(Math.min(time, 2000));
+         }, 100);
+
          const timer = setTimeout(() => {
             queryClient.removeQueries({
                predicate: (query) => {
@@ -92,8 +102,14 @@ export default function PLaylistPage() {
                }
             });
             beatmapsetQueries.forEach((query) => query.refetch())
+
+            setTimeToSearch(null);
+            clearInterval(interval);
          }, 2000);
-         return () => clearTimeout(timer)
+         return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+         };
       }
       if (searchType == 'local') console.log('local search');
    }, [searchParams.get('q'), searchParams.get('sort'), searchParams.get('m')]);
@@ -131,7 +147,10 @@ export default function PLaylistPage() {
    return (
       <div className="max-h-screen min-w-[600px] min-h-[670px] font-inter overflow-y-auto overflow-x-hidden scrollbar">
          <BgImage brightness={8} image='/bg.svg'/>
-         <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length}/>
+         <div className={tw("fixed top-0 h-0.6 z-100000 w-screen text-main-lighter", timeToSearch ? 'block' : 'hidden')}>
+            <LinearProgress variant="determinate" value={timeToSearch!*100/2000} color="inherit"/>
+         </div>
+         <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
 
          <header className={tw("bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
             <section className="absolute left-4">

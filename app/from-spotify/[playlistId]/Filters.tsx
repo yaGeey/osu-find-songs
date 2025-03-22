@@ -4,12 +4,13 @@ import Switch from "@/components/buttons/Switch";
 import SwitchFull from "@/components/buttons/SwitchFull";
 import SwitchFullDict from "@/components/buttons/SwitchFullDict";
 import SwitchSort from "@/components/buttons/SwitchSort";
+import Loading from "@/components/state/Loading";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 
 export default function Filters({ onChange }: {
-   onChange: (sortBy: string, searchType:'local'|'api', mode:string) => void,
+   onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void,
 }) {
    const pathname = usePathname()
    const router = useRouter()
@@ -76,15 +77,14 @@ export default function Filters({ onChange }: {
          <section className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>State</h4>
             <SwitchFullDict
-               className='ml-2.75 font-inter'
+               className='ml-3.5 font-inter'
                required
                defaultValue='has leaderboard'
                options={{ 'any': 'any', 'has leaderboard': '', 'ranked': 'ranked', 'loved': 'loved', 'approved': 'approved', 'pending': 'pending' }}
                onChange={(val) => createQueryString('status', 'eq', val)}
             />
          </section>
-   
-         <div className="flex items-center gap-4 mt-3 text-[15px]">
+         <section className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>Sort by</h4>
             <SwitchSort options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']} onChange={(val, sort) => {
                if (val) {
@@ -93,7 +93,7 @@ export default function Filters({ onChange }: {
                   onChange(query, searchType, modeQuery);
                }
             }} />
-         </div>
+         </section>
 
          {/* Additional filters */}
          {unfolded && <div className="flex items-start justify-evenly lgx:justify-between mt-6 text-[15px]">
