@@ -145,14 +145,14 @@ export default function PLaylistPage() {
       })
    }
    return (
-      <div className="max-h-screen min-w-[600px] min-h-[670px] font-inter overflow-y-auto overflow-x-hidden scrollbar">
+      <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
          <BgImage brightness={8} image='/bg.svg'/>
          <div className={tw("fixed top-0 h-0.6 z-100000 w-screen text-main-lighter", timeToSearch ? 'block' : 'hidden')}>
             <LinearProgress variant="determinate" value={timeToSearch!*100/2000} color="inherit"/>
          </div>
          <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
 
-         <header className={tw("bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
+         <header className={tw("min-w-[800px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
             <section className="absolute left-4">
                <HomeBtn />
             </section>
@@ -164,7 +164,7 @@ export default function PLaylistPage() {
          </header>
 
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
-            <div className=" min-h-[calc(100vh-3.5rem)] bg-darker md:w-4/5 w-full min-w-[750px]">
+            <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:950px)]:w-4/5 w-full ">
                
                <Filters
                   onChange={(val, searchTypeRes, mode) => {
