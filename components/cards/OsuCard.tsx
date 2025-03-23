@@ -7,12 +7,16 @@ import { twMerge as tw } from "tailwind-merge"
 import { downloadNoVideo, downloadVideo } from "@/utils/osuDownload"
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from "@/utils/arrayManaging";
+import { useInView } from "motion/react";
+import { useRef } from "react";
 
 export default function OsuCard({ beatmapset, onHover = true, className }: { beatmapset: BeatmapSet, onHover?: boolean, className?: string }) {
+   const ref = useRef<HTMLDivElement>(null);
+   const isInView = useInView(ref);
    return (
       <>
-         <div className={tw("group/card select-none relative h-26 font-inter rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0", className)}>
-            <div className="relative w-[100px] h-full rounded-l-2xl overflow-hidden z-0">
+         <div ref={ref} className={tw("group/card select-none relative h-26 font-inter rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0", className)}>
+            {isInView && <><div className="relative w-[100px] h-full rounded-l-2xl overflow-hidden z-0">
                <Image src={beatmapset.covers.list} alt="list" fill style={{ objectFit: 'cover' }} sizes="100%" />
             </div>
             <div className="relative flex-grow flex justify-end rounded-r-2xl overflow-hidden">
@@ -97,7 +101,7 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                   />
                } */}
             </div>
-            <Tooltip id='tooltip' place="top" style={{fontSize: '11px', padding: '0 0.25rem', zIndex:100000}}/>
+            <Tooltip id='tooltip' place="top" style={{fontSize: '11px', padding: '0 0.25rem', zIndex:100000}}/></>}
          </div>
       </>
    )

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import SwitchSort from "../buttons/SwitchSort";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { useInView } from "motion/react";
 // TODO tooltip when in osu card set popup broke styles (Temp fixed - disable popup)
 
 const sortFn = (sortQuery: string) => (a: BeatmapSet, b: BeatmapSet) => {
@@ -26,17 +27,19 @@ const sortFn = (sortQuery: string) => (a: BeatmapSet, b: BeatmapSet) => {
 export default function OsuCardSet({ beatmapsets, sortQuery, className }: { beatmapsets: BeatmapSet[], sortQuery: string, className?: string }) {
    const [isDialogOpen, setIsDialogOpen] = useState(false);
    const [sortFnString, setSortFnString] = useState('');
+   const ref = useRef<HTMLDivElement>(null);
+   const isInView = useInView(ref);
 
    return (
       <>
-         <div className={tw('relative h-[120px] group min-w-[386px] w-[464px] cursor-pointer', className)} onClick={() => setIsDialogOpen(true)}>
-            {beatmapsets.slice(0, 3).map((beatmapset, i) => (
+         <div ref={ref} className={tw('relative h-[120px] group min-w-[386px] w-[464px] cursor-pointer', className)} onClick={() => setIsDialogOpen(true)}>
+            {isInView && beatmapsets.slice(0, 3).map((beatmapset, i) => (
                <OsuCard key={i} beatmapset={beatmapset} onHover={false} className={tw(
                   'first:z-99 w-full not-first:absolute even:top-[10px] last:top-[20px] even:opacity-35 last:opacity-10 pointer-events-none group-hover:even:top-[15px] group-hover:last:top-[30px]'
                )} />
             ))}
          </div>
-         {isDialogOpen && ReactDom.createPortal(
+         {isInView && isDialogOpen && ReactDom.createPortal(
             <div className={`fixed top-0 left-0 w-screen h-screen bg-black/40 z-1000`}>
                <div className={'overflow-hidden absolute w-2/3 min-w-[750px] min-h-[500px] h-4/5 bg-main rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'}>
                   <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-darker w-full border-b-2 border-main-border">
