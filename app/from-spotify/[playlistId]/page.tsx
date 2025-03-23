@@ -66,10 +66,11 @@ export default function PLaylistPage() {
    // beatmapset search
    const beatmapsetQueries = useQueries({
       queries: tracks.map((track) => ({
-         queryKey: ['beatmapset', track.track.artists[0].name, track.track.name],
+         queryKey: ['beatmapset', track.track ? track.track.artists[0].name : 'err', track.track ? track.track.name : 'err'],
          queryFn: async () => {
             const t0 = performance.now();
-            const res =  await beatmapsSearch({
+            if (!track.track) return [];
+            const res = await beatmapsSearch({
                q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
                sort: searchParams.get('sort'),
                m: searchParams.get('m'),
