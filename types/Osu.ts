@@ -73,11 +73,13 @@ export type BeatmapSet = {
    spotlight: boolean;
    status: string;
    storyboard: boolean;
-   submitted_date: string;
    tags: string;
    title: string;
    title_unicode: string;
    track_id: number | null;
    user_id: number;
    video: boolean;
+   ranked: number;
+   ranked_date: string | null;
+   submitted_date: string;
 }

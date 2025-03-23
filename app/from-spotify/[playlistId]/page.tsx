@@ -22,6 +22,7 @@ import Search from "./Search";
 import Progress from "@/components/state/Progress";
 import BgImage from "@/components/BgImage";
 import { LinearProgress } from "@mui/material";
+import { sortBeatmapsMatrix } from "@/utils/sortBeatmapsMatrix";
 
 export default function PLaylistPage() {
    const params = useParams();
@@ -69,10 +70,10 @@ export default function PLaylistPage() {
          queryKey: ['beatmapset', track.track ? track.track.artists[0].name : 'err', track.track ? track.track.name : 'err'],
          queryFn: async () => {
             const t0 = performance.now();
-            if (!track.track) return [];
+            if (!track.track) return []; //? odd error rarely occurs
             const res = await beatmapsSearch({
                q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
-               sort: searchParams.get('sort'),
+               // sort: searchParams.get('sort'),
                m: searchParams.get('m'),
                s: searchParams.get('s')
             });
@@ -124,7 +125,8 @@ export default function PLaylistPage() {
          };
       }
       if (searchType == 'local') console.log('local search');
-   }, [searchParams.toString()]);
+   // }, [searchParams.toString()]);
+   }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')]);
 
 
    // download maps
@@ -193,8 +195,8 @@ export default function PLaylistPage() {
                />
                
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
-                  {filteredBeatmapsets.filter(data => data && data.length).map((data, i) => {
-                     if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'sort=relevance_desc'} className="flex-grow animate-in fade-in duration-1000" />
+                  {filteredBeatmapsets.filter(data => data && data.length).sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_desc')).map((data, i) => {
+                     if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'relevance_desc'} className="flex-grow animate-in fade-in duration-1000" />
                      else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
                   })}
                   {!filteredBeatmapsets.filter(data => data && data.length).length && !isLoading &&

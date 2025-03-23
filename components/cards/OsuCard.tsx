@@ -37,7 +37,7 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                   <FontAwesomeIcon icon={faCirclePlay}/>
                   <span className="-ml-1.75 -mb-0.25">{beatmapset.play_count.toLocaleString(undefined)}</span>
                   <FontAwesomeIcon icon={faCircleCheck}/>
-                  <span className="-ml-1.75 -mb-0.25">{new Date(beatmapset.submitted_date).toLocaleDateString()}</span>
+                  <span className="-ml-1.75 -mb-0.25">{new Date(beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date).toLocaleDateString()}</span>
                </div>
                <div className="flex gap-1 items-center">
                   <h4 className={tw("text-xs text-main-gray w-fit px-1 rounded-full font-medium",
