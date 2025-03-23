@@ -25,7 +25,7 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
             </div>
 
             <div className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full bg-main rounded-2xl z-1"></div>
-            <a href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`} className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white">
+            <a target='_blank' href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`} className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white">
                <div>
                   <h2 className="font-semibold text-[17px] truncate font-outline-sm">{beatmapset.title}</h2>
                   <h3 className="font-medium text-sm -mt-1 font-outline-sm">from {beatmapset.artist}</h3>
