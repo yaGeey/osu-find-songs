@@ -31,6 +31,7 @@ export default function PLaylistPage() {
    const [queriesDict, setQueriesDict] = useState<{[key:string]:string}>({});
    const [hasQueryChanged, setHasQueryChanged] = useState(false);
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null);
+   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]);
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([]);
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([]);
@@ -38,6 +39,7 @@ export default function PLaylistPage() {
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false);
    const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false);
+
    
    // fetching playlist
    const { data: tracksData, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
@@ -51,12 +53,13 @@ export default function PLaylistPage() {
       if (hasNextPage && !isFetchingNextPage) fetchNextPage();
    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+   const queryClient = useQueryClient()
    useEffect(() => {
       //? ...we are cancelling the query on mount and the refetching it
-      queryClient.cancelQueries({ queryKey: ['spotify-playlist', playlistId] })
-      refetch();
+      // console.log('cancelling query', playlistId);
+      // queryClient.cancelQueries({ queryKey: ['spotify-playlist', playlistId] })
+      // refetch();
    }, [])
-   const queryClient = useQueryClient()
 
    const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || [];
 
@@ -65,12 +68,15 @@ export default function PLaylistPage() {
       queries: tracks.map((track) => ({
          queryKey: ['beatmapset', track.track.artists[0].name, track.track.name],
          queryFn: async () => {
-            return await beatmapsSearch({
+            const t0 = performance.now();
+            const res =  await beatmapsSearch({
                q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
                sort: searchParams.get('sort'),
                m: searchParams.get('m'),
                s: searchParams.get('s')
             });
+            setTimePerOneAcc(prev => [...prev, performance.now() - t0]);
+            return res;
          },
          enabled: !!tracks,
          staleTime: Infinity
@@ -89,6 +95,7 @@ export default function PLaylistPage() {
    useEffect(() => {
       if (!hasQueryChanged && !searchParams.toString()) return;
       else setHasQueryChanged(true);
+      setTimePerOneAcc([]);
       
       let time = 0;
       setTimeToSearch(time);
@@ -148,6 +155,9 @@ export default function PLaylistPage() {
          }
       })
    }
+   const msLeft = ((timePerOneAcc.map((item, i) => item - timePerOneAcc[i - 1]).slice(1).reduce((a, b) => a + b, 0) / timePerOneAcc.length) * (beatmapsetQueries.filter(q => !q.isFetched).length));
+   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : '';
+
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
          <BgImage brightness={8} image='/bg.svg'/>
@@ -155,7 +165,9 @@ export default function PLaylistPage() {
             <LinearProgress variant="determinate" value={timeToSearch!*100/2000} color="inherit"/>
          </div>
          <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
-         {/* {isLoading && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm">{beatmapsetQueries.filter(q => !q.isLoading).length}/{tracks.length}</div>} */}
+         {isLoading && msLeft > 5000 && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
+            {beatmapsetQueries.filter(q => !q.isLoading).length}/{tracks.length} | {timeLeft} left
+         </div>}
 
          <header className={tw("min-w-[800px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
             <section className="absolute left-4">
