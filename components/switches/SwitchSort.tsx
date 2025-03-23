@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown, faSortUp } from "@fortawesome/free-solid-svg-icons";
 
-// const options = ['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']
-// default - Relevance desc
-export default function SwitchSort({ options, onChange, defaultOption=null, defaultSort='desc' }: {
+export default function SwitchSort({ options, onChange, defaultOption=null, defaultSort='desc', ...props }: {
    onChange: (value: string|null, sort: 'asc' | 'desc') => void,
    options: string[],
    defaultOption?: string | null
@@ -19,7 +17,12 @@ export default function SwitchSort({ options, onChange, defaultOption=null, defa
    }, [selection, sort]);
    
    return (
-      <div className="bg-darker/80 font-inter border-2 border-[#733F3F] text white h-[26px] p-1 pl-7 rounded-full flex items-center gap-5 px-2.5 select-none">
+      <div {...props}
+         data-tooltip-id='sort-tooltip'
+         data-tooltip-content='Will result in a refetch'
+         data-tooltip-delay-show={500}
+         className="bg-darker/80 font-inter border-2 border-[#733F3F] text white h-[26px] p-1 pl-7 rounded-full flex items-center gap-5 px-2.5 select-none"
+      >
          {options.map((option, i) => (
             <button
                key={i}

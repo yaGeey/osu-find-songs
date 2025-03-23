@@ -35,7 +35,7 @@ export default function SharePlaylistButton({ data, className }: { data: SongDat
          hideProgressBar: true,
       });
    }
-   
+
    return (
       <>
          <Button className={tw("bg-main-border/50", className)} onClick={handleClick} disabled>Share

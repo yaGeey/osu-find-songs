@@ -1,6 +1,6 @@
 import ReactDom from 'react-dom';
 import { twMerge as tw } from 'tailwind-merge';
-import { Button } from './Buttons';
+import { Button } from './buttons/Buttons';
 
 export default function Modal({ children, isOpen, onClose, onOkay, state, okBtn, closeBtn, dialog }: {
    children: React.ReactNode,

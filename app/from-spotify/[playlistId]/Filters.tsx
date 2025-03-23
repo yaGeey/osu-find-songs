@@ -1,25 +1,24 @@
 'use client'
-import FilterSelector from "@/components/buttons/FilterSelector";
-import Switch from "@/components/buttons/Switch";
-import SwitchFull from "@/components/buttons/SwitchFull";
-import SwitchFullDict from "@/components/buttons/SwitchFullDict";
-import SwitchSort from "@/components/buttons/SwitchSort";
-import Loading from "@/components/state/Loading";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import FilterSelector from "@/components/switches/FilterSelector";
+import Switch from "@/components/switches/Switch";
+import SwitchFullDict from "@/components/switches/SwitchFullDict";
+import SwitchSort from "@/components/switches/SwitchSort";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
 import { parseAsInteger, useQueryState } from "nuqs";
+import { Tooltip } from "react-tooltip";
 // TODO If =1 then res: 1 - 1.99 
 
-export default function Filters({ onChange, foundString }: {
+export default function Filters({ onChange, foundString, onSortButtonClick }: {
    onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void,
-   foundString?: string
+   foundString?: string,
+   onSortButtonClick?: () => void,
 }) {
    const [q, setQ] = useQueryState('q', { defaultValue: '' })
    const [m, setM] = useQueryState('m', { defaultValue: '' })
    const [s, setS] = useQueryState('s', { defaultValue: '' })
    const [sort, setSort] = useQueryState('sort', { defaultValue: '' })
-   useEffect(() => { if(sort) setSort('')}, []) //? don't work, don't know why it's not clearing
+   // useEffect(() => { if (sort) setSort('') }, []) //? don't work, don't know why it's not clearing
 
    const [unfolded, setUnfolded] = useState(false);
    const [queryDict, setQueryDict] = useState<{ [key: string]: string }>({});
@@ -67,10 +66,16 @@ export default function Filters({ onChange, foundString }: {
          </section>
          <section className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>Sort by</h4>
-            <SwitchSort options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']} onChange={(val, sort) => {if (val) setSort(`${val}_${sort}`)}} />
+            <SwitchSort
+               options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']}
+               onChange={(val, sort) => { if (val) setSort(`${val}_${sort}`) }}
+               defaultOption={sort.split('_')[0]}
+               defaultSort={sort.split('_')[1] as 'asc' | 'desc'}
+            />
+            {/* <button onClick={onSortButtonClick}>Sort locally</button> */}
          </section>
          {foundString && <div className="absolute animate-in fade-in right-6 bottom-2 text-white/70 font-outline-sm tracking-wider text-base">{foundString} <span className="text-sm">found</span></div>}
-         
+
 
          {/* Additional filters */}
          {unfolded && <div className="flex items-start justify-evenly lgx:justify-between mt-6 text-[15px]">

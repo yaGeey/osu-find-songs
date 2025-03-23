@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image"
 import { SongData, Song } from "@/types/types"
-import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn } from "./Buttons";
+import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn } from "./buttons/Buttons";
 import { Spotify } from "react-spotify-embed";
 import axios from "axios";
 import Link from "next/link";
@@ -34,12 +34,12 @@ export default function Info({ data, onClose, className }: Props) {
    const { spotify, beatmapset, local } = data;
    const [selection, setSelection] = useState<'spotify' | 'youtube' | 'other'>('spotify');
    const container = useRef<HTMLDivElement>(null);
-   
+
    useEffect(() => {
-      if (spotify && spotify?.length !== 20 ) setSelection('spotify');
+      if (spotify && spotify?.length !== 20) setSelection('spotify');
       else setSelection('youtube');
    }, [spotify || null, beatmapset || null])
-   
+
    useEffect(() => {
       if (!Cookies.get('showSpotifyEmbeds')) Cookies.set('showSpotifyEmbeds', 'true');
       if (!Cookies.get('showYouTubeEmbeds')) Cookies.set('showYouTubeEmbeds', 'true');
@@ -62,19 +62,19 @@ export default function Info({ data, onClose, className }: Props) {
          if (!title || !url) return null;
          const content = await wikiSearchExact(title);
          if (!content) return null;
-         return {title, url, content};
+         return { title, url, content };
       },
-   }) 
+   })
 
    return (
       <div ref={container} id='info-card' className={tw(
-            "relative opacity-90 animate-in slide-in-from-left flex flex-col border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[600px]",
-            "[background:linear-gradient(transparent,_var(--color-main)_75px,var(--color-main)_100%),url(/osu/tris2.png)_no-repeat_top_right,var(--color-main)]",
-            className,
-         )}
+         "relative opacity-90 animate-in slide-in-from-left flex flex-col border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[600px]",
+         "[background:linear-gradient(transparent,_var(--color-main)_75px,var(--color-main)_100%),url(/osu/tris2.png)_no-repeat_top_right,var(--color-main)]",
+         className,
+      )}
       >
          <div className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all" onClick={onClose}>
-            <Image src='/icons/close.svg' layout="fill" alt="close"/>
+            <Image src='/icons/close.svg' layout="fill" alt="close" />
          </div>
          <div className="flex gap-4 h-[120px]">
             <div className="min-w-[120px] max-w-[120px] h-[120px]">
@@ -110,11 +110,11 @@ export default function Info({ data, onClose, className }: Props) {
                         </a>
                      </h3>
                   }
-                  {wikiQuery.data?.content  && <div className="relative font-outline-sm overflow-hidden h-8 w-4/5 px-1 bg-white/20 rounded-lg flex-grow">
+                  {wikiQuery.data?.content && <div className="relative font-outline-sm overflow-hidden h-8 w-4/5 px-1 bg-white/20 rounded-lg flex-grow">
                      <p className="text-xs pr-24 text-justify">{wikiQuery.data?.content}</p>
                      <div className="w-7 h-full absolute bg-gradient-to-r from-transparent to-white top-1/2 -translate-y-1/2 right-26"></div>
                      <a className="absolute top-1/2 -translate-y-1/2 right-0 bg-white text-black text-sm rounded-r-lg p-1.5" href={wikiQuery.data?.url} target="_blank">
-                        <FontAwesomeIcon icon={faWikipediaW} className="mr-1"/>
+                        <FontAwesomeIcon icon={faWikipediaW} className="mr-1" />
                         Read more
                      </a>
                   </div>}
@@ -123,12 +123,12 @@ export default function Info({ data, onClose, className }: Props) {
          </div>
 
          <div className="flex w-full items-end gap-4 mt-4">
-            <SpotifyBtn onClick={() => setSelection('spotify')} disabled={spotify ? false : true} className={selection=='spotify'?'selection':''} />
+            <SpotifyBtn onClick={() => setSelection('spotify')} disabled={spotify ? false : true} className={selection == 'spotify' ? 'selection' : ''} />
             <YoutubeBtn onClick={() => setSelection('youtube')} className={selection == 'youtube' ? 'selection' : ''} />
-            <a target="_blank" href={`https://osu.ppy.sh/beatmapsets/${beatmapset?.id}`} className={tw(beatmapset ? '':'pointer-events-none')}>
-               <OsuBtn disabled={beatmapset?false:true} />
+            <a target="_blank" href={`https://osu.ppy.sh/beatmapsets/${beatmapset?.id}`} className={tw(beatmapset ? '' : 'pointer-events-none')}>
+               <OsuBtn disabled={beatmapset ? false : true} />
             </a>
-         </div> 
+         </div>
 
          {selection === 'spotify' &&
             <li className="relative scrollbar flex flex-col gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-[#159A44] overflow-auto">
@@ -138,18 +138,11 @@ export default function Info({ data, onClose, className }: Props) {
                      <span className="text-lg font-semibold">The song wasn't found through a normal search query, so there could be a ton of useless results</span>
                   </div>
                }
-               {spotify?.map((track, i: number) => {
-                  if (Cookies.get('showSpotifyEmbeds') == 'true') {
-                     return <Spotify wide link={track.external_urls.spotify} key={i} />
-                  } else {
-                     return (
-                        <SpotifyEmbed track={track} key={i} />
-                        // <a href={track.external_urls.spotify} key={i} className="text-lg">
-                        //    {track.artists.map((artist) => artist.name).join(' ')} - {track.name} <small>on {track.album.name}</small>
-                        // </a>
-                     )
-                  }
-               })}
+               {spotify?.map((track, i: number) => (
+                  Cookies.get('showSpotifyEmbeds') == 'true' ?
+                     <Spotify wide link={track.external_urls.spotify} key={i} /> :
+                     <SpotifyEmbed track={track} key={i} />
+               ))}
             </li>
          }
          {selection === 'youtube' &&
@@ -157,12 +150,7 @@ export default function Info({ data, onClose, className }: Props) {
                {yt.isLoading && <Loading />}
                {yt.data?.map((media: Media, i: number) => {
                   if (Cookies.get('showYouTubeEmbeds') == 'true') {
-                     if (media.type === 'VIDEO') {
-                        return <iframe key={i} src={`https://www.youtube.com/embed/${media.videoId}`} width="49%" height="140px" allowFullScreen></iframe>
-                     }
-                     // if (media.type === 'PLAYLIST') {
-                     //    return <iframe key={i} src={`https://www.youtube.com/embed?listType=playlist&list=${media.playlistId}`} width="60%" height="100%" allowFullScreen></iframe>
-                     // }
+                     if (media.type === 'VIDEO') return <iframe key={i} src={`https://www.youtube.com/embed/${media.videoId}`} width="49%" height="140px" allowFullScreen></iframe>
                   } else {
                      if (media.type === 'VIDEO') return <YtVideo key={i} data={media} />
                      if (media.type === 'SONG') return <YtSongEmbed key={i} song={media} />
@@ -173,37 +161,3 @@ export default function Info({ data, onClose, className }: Props) {
       </div>
    )
 }
-
-/* 
-<div>
-   <span className="text-2xl">{detailedInfo.beatmap.title}</span>
-
-   {detailedInfo.spotify && <>
-      {detailedInfo.spotify.album.album_type == 'album' && <>
-         <span>On album {detailedInfo.spotify.album.name}
-            <Link href={detailedInfo.spotify.album.external_urls.spotify} passHref>
-               <Image
-                  src={detailedInfo.spotify.album.images[0].url}
-                  width={20} height={20} alt="album"
-               />
-            </Link>
-         </span>
-         <span>along with {detailedInfo.spotify.album.total_tracks - 1} tracks</span>
-      </>}
-
-      <span>{detailedInfo.spotify.album.release_date}</span>
-
-   </>}
-   {detailedInfo.beatmap.creator}
-</div>
-<div>
-   <button className="bg-green-100 text-green-500 font-bold flex justify-center items-center gap-1.5 py-1 px-2 rounded-lg">
-      <Image src='/icons/Spotify.svg' width={20} height={20} alt="spotify" />
-      Spotify
-   </button>
-   <button className="bg-red-100 text-red-500 font-bold flex justify-center items-center gap-1.5 py-1 px-2 rounded-lg">
-      <Image src='/icons/YouTube.svg' width={20} height={20} alt="spotify" />
-      YouTube
-   </button>
-</div>
-*/

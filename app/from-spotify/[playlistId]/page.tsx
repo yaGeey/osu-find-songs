@@ -6,7 +6,7 @@ import OsuCard from "@/components/cards/OsuCard";
 import { useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { fetchWithToken } from "@/lib/Spotify";
 import { PlaylistPage } from "@/types/Spotify";
-import { Button } from "@/components/Buttons";
+import { Button } from "@/components/buttons/Buttons";
 import { beatmapsSearch } from "@/lib/osu";
 import HomeBtn from "@/components/buttons/HomeBtn";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -29,19 +29,19 @@ export default function PLaylistPage() {
    const searchParams = useSearchParams();
    const { playlistId } = params;
 
-   const [queriesDict, setQueriesDict] = useState<{[key:string]:string}>({});
+   const [queriesDict, setQueriesDict] = useState<{ [key: string]: string }>({});
    const [hasQueryChanged, setHasQueryChanged] = useState(false);
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null);
    const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]);
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([]);
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([]);
-   
+
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false);
    const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false);
 
-   
+
    // fetching playlist
    const { data: tracksData, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
@@ -85,7 +85,7 @@ export default function PLaylistPage() {
       })),
    });
    const isLoading = useMemo(() => beatmapsetQueries.some(q => q.isLoading), [beatmapsetQueries]);
-   
+
    // setting data for display
    useEffect(() => {
       const data = beatmapsetQueries.map(q => q.data?.beatmapsets);
@@ -98,7 +98,7 @@ export default function PLaylistPage() {
       if (!hasQueryChanged && !searchParams.toString()) return;
       else setHasQueryChanged(true);
       setTimePerOneAcc([]);
-      
+
       let time = 0;
       setTimeToSearch(time);
 
@@ -125,7 +125,7 @@ export default function PLaylistPage() {
          };
       }
       if (searchType == 'local') console.log('local search');
-   // }, [searchParams.toString()]);
+      // }, [searchParams.toString()]);
    }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')]);
 
 
@@ -145,7 +145,7 @@ export default function PLaylistPage() {
          }
       });
       const promise = zip.generateAsync({ type: 'blob' }).then((blob) => download(blob, 'beatmaps.zip'))
-      
+
       toast.promise(promise, {
          pending: 'Downloading...',
          success: 'Downloaded successfully',
@@ -163,9 +163,9 @@ export default function PLaylistPage() {
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
-         <BgImage brightness={8} image='/bg.svg'/>
+         <BgImage brightness={8} image='/bg.svg' />
          <div className={tw("fixed top-0 h-0.6 z-100000 w-screen text-main-lighter", timeToSearch ? 'block' : 'hidden')}>
-            <LinearProgress variant="determinate" value={timeToSearch!*100/2000} color="inherit"/>
+            <LinearProgress variant="determinate" value={timeToSearch! * 100 / 2000} color="inherit" />
          </div>
          <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
          {isLoading && msLeft > 5000 && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
@@ -185,15 +185,15 @@ export default function PLaylistPage() {
 
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:950px)]:w-4/5 w-full ">
-               
+
                <Filters
                   foundString={beatmapsets.length ? beatmapsets.filter(a => !!a && a.length).length + '/' + beatmapsets.length : ''}
                   onChange={(val, searchTypeRes, mode) => {
-                     setQueriesDict({'sort': val, 'm': mode});
+                     setQueriesDict({ 'sort': val, 'm': mode });
                      setSearchType(searchTypeRes)
                   }}
                />
-               
+
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
                   {filteredBeatmapsets.filter(data => data && data.length).sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_desc')).map((data, i) => {
                      if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'relevance_desc'} className="flex-grow animate-in fade-in duration-1000" />
@@ -209,7 +209,7 @@ export default function PLaylistPage() {
             </div>
          </main>
 
-         
+
 
          {/* modals */}
          <Modal

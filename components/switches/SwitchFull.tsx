@@ -25,7 +25,7 @@ export default function SwitchFull({ options, onChange, disabled = false, requir
          onClick={() => isDisabled && setIsDisabled(false)}
       >
          {!required && <CursorBtn setIsDisabled={setIsDisabled} isDisabled={isDisabled} />}
-         
+
          <div className="bg-darker/80 text white h-full p-1 rounded-full flex items-center gap-2.5 px-2.5 select-none">
             {options.map((option, index) => (
                <button

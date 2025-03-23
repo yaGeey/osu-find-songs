@@ -1,6 +1,6 @@
 'use client'
 import BgImage from "@/components/BgImage";
-import { Button } from "@/components/Buttons";
+import { Button } from "@/components/buttons/Buttons";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -34,7 +34,7 @@ export default function SelectPage() {
                      ref={inputRef}
                      className="bg-white/50 border-3 w-full border-main-border rounded-md pl-2 py-1 pr-8 [&:not(:placeholder-shown)]:bg-white/80 valid:[&:not(:placeholder-shown)]:border-success invalid:[&:not(:placeholder-shown)]:border-invalid transition-all outline-0"
                   ></input>
-                  <FontAwesomeIcon icon={faSpotify} className="absolute top-1/2 transform -translate-y-1/2 right-2 text-lg text-black/80"/>
+                  <FontAwesomeIcon icon={faSpotify} className="absolute top-1/2 transform -translate-y-1/2 right-2 text-lg text-black/80" />
                </div>
             </div>
             <Button

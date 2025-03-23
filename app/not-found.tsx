@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import BgImage from '@/components/BgImage'
-import { Button } from '@/components/Buttons'
+import { Button } from '@/components/buttons/Buttons'
 
 export default function NotFound() {
    return (

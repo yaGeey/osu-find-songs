@@ -4,7 +4,7 @@ import OsuCard from "./OsuCard";
 import { twMerge as tw } from "tailwind-merge";
 import ReactDom from 'react-dom';
 import { useEffect, useRef, useState } from "react";
-import SwitchSort from "../buttons/SwitchSort";
+import SwitchSort from "../switches/SwitchSort";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useInView } from "motion/react";

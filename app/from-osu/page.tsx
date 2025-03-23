@@ -17,7 +17,7 @@ import BgImage from "@/components/BgImage";
 import { useSongContext } from "@/contexts/SongContext";
 import SettingsPopup from "@/components/SettingsPopup";
 import { useRouter } from "next/navigation";
-import CreatePlaylistButton from "@/components/CreatePlaylistButton";
+import CreatePlaylistButton from "@/components/buttons/CreatePlaylistButton";
 import GroupSeparator from "@/components/GroupSeparator";
 import TextSwitch from "@/components/TextSwitch";
 import HomeBtn from "@/components/buttons/HomeBtn";

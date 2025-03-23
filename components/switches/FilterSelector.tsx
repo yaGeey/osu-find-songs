@@ -25,7 +25,7 @@ type Props = Number | Date;
 
 export default function FilterSelector({ onChange, disabled = false, max, min, step = 1, type }: Props) {
    const [filter, setFilter] = useState<Filter>('>');
-   const [value, setValue] = useState<string|null>(null);
+   const [value, setValue] = useState<string | null>(null);
    const [isDisabled, setIsDisabled] = useState(disabled);
    useEffect(() => {
       if (isDisabled) {
@@ -36,7 +36,7 @@ export default function FilterSelector({ onChange, disabled = false, max, min, s
    }, [filter, value, isDisabled]);
 
    return (
-      <div 
+      <div
          className={tw("bg-white-50 border-2 border-[#733F3F] rounded-full flex items-center gap-1 h-[26px] px-1.5", isDisabled && 'brightness-60 cursor-pointer')}
          onClick={() => isDisabled && setIsDisabled(false)}
       >

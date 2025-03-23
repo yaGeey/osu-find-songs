@@ -1,6 +1,6 @@
 'use client'
 import Link from "next/link";
-import { Button } from "@/components/Buttons";
+import { Button } from "@/components/buttons/Buttons";
 import BgImage from "@/components/BgImage";
 import Image from 'next/image'
 import { useEffect } from "react";
@@ -40,7 +40,7 @@ export default function LandingPage() {
             <div className="flex gap-4 mt-10 w-full">
                <Link href="/from-osu/select">
                   {/* onMouseEnter={() => handleMouseEnter('/from-osu.png')} onMouseLeave={handleMouseLeave} */}
-                  <Button className="text-black bg-gradient-to-l from-[#1DB954] to-[#FF66AA] font-medium" >Beatmaps to Spotify</Button> 
+                  <Button className="text-black bg-gradient-to-l from-[#1DB954] to-[#FF66AA] font-medium" >Beatmaps to Spotify</Button>
                </Link>
                <Link href="/from-spotify/select">
                   {/* onMouseEnter={() => handleMouseEnter('/from-spotify.png')} onMouseLeave={handleMouseLeave} */}

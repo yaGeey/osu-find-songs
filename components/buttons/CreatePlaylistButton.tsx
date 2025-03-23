@@ -2,7 +2,7 @@ import { Track } from "@/types/Spotify";
 import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from "@/lib/Spotify";
 import { useMutation, type UseQueryResult } from "@tanstack/react-query";
 import React, { useContext, useState } from "react";
-import Modal from "./Modal";
+import Modal from "@/components/Modal";
 import { Button } from "./Buttons";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
