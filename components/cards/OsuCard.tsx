@@ -16,7 +16,7 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                <Image src={beatmapset.covers.list} alt="list" fill style={{ objectFit: 'cover' }} sizes="100%" />
             </div>
             <div className="relative flex-grow flex justify-end rounded-r-2xl overflow-hidden">
-               <Image src={beatmapset.covers.card} alt="cover" width={286} height={100} className="z-10 w-auto h-auto" />
+               <Image src={beatmapset.covers.card} alt="cover" width={286} height={100} className="z-10 w-max-[286px] h-auto" />
                <div className="absolute top-0 right-0 w-[289px] h-full bg-gradient-to-r from-main to-main/70 rounded-r-2xl z-15"></div>
             </div>
 
@@ -36,7 +36,6 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                   <span className="-ml-1.75 -mb-0.25">{new Date(beatmapset.submitted_date).toLocaleDateString()}</span>
                </div>
                <div className="flex gap-1 items-center">
-                  {/*TODO:  difficulties tooltip or on hover card like osu */}
                   <h4 className={tw("text-xs text-main-gray w-fit px-1 rounded-full font-medium",
                      beatmapset.status === 'ranked' && 'bg-[#B3FF66]',
                      beatmapset.status === 'approved' && 'bg-[#B3FF66',

@@ -192,19 +192,16 @@ export default function FromOsu() {
                      }
                      {(group == selectedGroup || group === '') &&
                         <ul className="flex flex-col gap-2 items-end ">
-                           {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) => {
-                              // console.log(cardRef.current?.getBoundingClientRect().top, window.innerHeight);
-                              return (
-                                 <Card
-                                    data={songData}
-                                    sortFn={sortFn}
-                                    key={i}
-                                    className='-mt-3'
-                                    selected={info?.local.id === songData.local.id}
-                                    onClick={handleCardClick}
-                                 />
-                              );
-                           })}
+                           {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) => 
+                              <Card
+                                 key={i}
+                                 data={songData}
+                                 sortFn={sortFn}
+                                 className='-mt-3'
+                                 selected={info?.local.id === songData.local.id}
+                                 onClick={handleCardClick}
+                              />
+                           )}
                         </ul>
                      }
                   </div>

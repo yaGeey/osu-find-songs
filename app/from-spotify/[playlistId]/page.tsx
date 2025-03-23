@@ -28,18 +28,17 @@ export default function PLaylistPage() {
    const searchParams = useSearchParams();
    const { playlistId } = params;
 
+   const [queriesDict, setQueriesDict] = useState<{[key:string]:string}>({});
    const [hasQueryChanged, setHasQueryChanged] = useState(false);
-   const [timeToSearch, setTimeToSearch] = useState<number|null>(null);
-   const [sortQuery, setSortQuery] = useState<string>('');
-   const [modeQuery, setModeQuery] = useState<string>('');
+   const [timeToSearch, setTimeToSearch] = useState<number | null>(null);
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([]);
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([]);
-
+   
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false);
    const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false);
-
+   
    // fetching playlist
    const { data: tracksData, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
@@ -66,7 +65,12 @@ export default function PLaylistPage() {
       queries: tracks.map((track) => ({
          queryKey: ['beatmapset', track.track.artists[0].name, track.track.name],
          queryFn: async () => {
-            return await beatmapsSearch(`artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`, sortQuery, modeQuery);
+            return await beatmapsSearch({
+               q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
+               sort: searchParams.get('sort'),
+               m: searchParams.get('m'),
+               s: searchParams.get('s')
+            });
          },
          enabled: !!tracks,
          staleTime: Infinity
@@ -83,7 +87,7 @@ export default function PLaylistPage() {
 
    // search
    useEffect(() => {
-      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('sort') && !searchParams.get('m')) return;
+      if (!hasQueryChanged && !searchParams.toString()) return;
       else setHasQueryChanged(true);
       
       let time = 0;
@@ -112,7 +116,7 @@ export default function PLaylistPage() {
          };
       }
       if (searchType == 'local') console.log('local search');
-   }, [searchParams.get('q'), searchParams.get('sort'), searchParams.get('m')]);
+   }, [searchParams.toString()]);
 
 
    // download maps
@@ -151,6 +155,7 @@ export default function PLaylistPage() {
             <LinearProgress variant="determinate" value={timeToSearch!*100/2000} color="inherit"/>
          </div>
          <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
+         {/* {isLoading && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm">{beatmapsetQueries.filter(q => !q.isLoading).length}/{tracks.length}</div>} */}
 
          <header className={tw("min-w-[800px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
             <section className="absolute left-4">
@@ -167,17 +172,16 @@ export default function PLaylistPage() {
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:950px)]:w-4/5 w-full ">
                
                <Filters
-                  foundString={beatmapsets.length ? beatmapsets.filter(a => !!a).length + '/' + beatmapsets.length : ''}
-                     onChange={(val, searchTypeRes, mode) => {
-                        setSortQuery(val)
-                        setModeQuery(mode)
-                        setSearchType(searchTypeRes)
-                     }}
-                  />
+                  foundString={beatmapsets.length ? beatmapsets.filter(a => !!a && a.length).length + '/' + beatmapsets.length : ''}
+                  onChange={(val, searchTypeRes, mode) => {
+                     setQueriesDict({'sort': val, 'm': mode});
+                     setSearchType(searchTypeRes)
+                  }}
+               />
                
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
                   {filteredBeatmapsets.filter(data => data && data.length).map((data, i) => {
-                     if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={sortQuery || 'sort=relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
+                     if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'sort=relevance_desc'} className="flex-grow animate-in fade-in duration-1000" />
                      else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
                   })}
                   {!filteredBeatmapsets.filter(data => data && data.length).length && !isLoading &&

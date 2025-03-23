@@ -8,51 +8,35 @@ import Loading from "@/components/state/Loading";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { twMerge as tw } from "tailwind-merge";
+import { parseAsInteger, useQueryState } from "nuqs";
+// TODO If =1 then res: 1 - 1.99 
 
 export default function Filters({ onChange, foundString }: {
    onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void,
    foundString?: string
 }) {
-   const pathname = usePathname()
-   const router = useRouter()
+   const [q, setQ] = useQueryState('q', { defaultValue: '' })
+   const [m, setM] = useQueryState('m', { defaultValue: '' })
+   const [s, setS] = useQueryState('s', { defaultValue: '' })
+   const [sort, setSort] = useQueryState('sort', { defaultValue: '' })
+   useEffect(() => { if(sort) setSort('')}, []) //? don't work, don't know why it's not clearing
 
-   const [query, setQuery] = useState('')
-   const [sortQuery, setSortQuery] = useState('')
-   const [modeQuery, setModeQuery] = useState('')
-   
    const [unfolded, setUnfolded] = useState(false);
    const [queryDict, setQueryDict] = useState<{ [key: string]: string }>({});
    const [searchType, setSearchType] = useState<'local' | 'api'>('api');
 
    // creating query 
-   const createQueryString = (name: string, filter: 'gt' | 'lt' | 'eq' | '', value: string, valueIsZero='') => {
-      const filtersDict = { 'gt': '>', 'lt': '<', 'eq': '=' };
-
-      const filterString = value && value != '0' && filter ? filtersDict[filter] : '';
-      const newQuery = { ...queryDict, [name]: filterString + value };
+   const createQueryString = (name: string, operator: '<' | '=' | '>' | '', value: string) => {
+      const operatorRes = value && value != '0' && operator ? operator : '';
+      const newQuery = { ...queryDict, [name]: operatorRes + value };
       setQueryDict(newQuery);
 
-      let queryString = '';
-      Object.entries(newQuery).forEach(([key, value]) => {
-         if (!value || value == '0') return;
-         if (!queryString) queryString += '?q=';
-         queryString += `${key}${encodeURIComponent(value)}+`;
-      });
-      queryString = queryString.slice(0, -1);
-
-      setQuery(queryString);
+      const queryString = Object.entries(newQuery).flatMap(([key, value]) => {
+         if (!value || value == '0' || value == '') return [];
+         return `${key}${value}`;
+      }).join(' ');
+      setQ(queryString);
    };
-   useEffect(() => {
-      let symbol = '';
-      if (sortQuery) symbol = query ? '&' : '?';
-      // window.history.replaceState(null, '', pathname + query + symbol + sortQuery);
-      router.replace(pathname + query + symbol + sortQuery)
-   }, [query, sortQuery]);
-   useEffect(() => {
-      let symbol = '';
-      if (modeQuery) symbol = query ? '&' : '?';
-      router.replace(pathname + query + symbol + modeQuery)
-   }, [query, modeQuery]);
 
    return (
       <div className={tw("bg-main-darker z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap", unfolded && 'pb-5')}>
@@ -65,11 +49,7 @@ export default function Filters({ onChange, foundString }: {
             </section>
             <div className="flex items-center gap-4  text-[15px]">
                <h4>Mode</h4>
-               <SwitchFullDict className="font-inter" options={{ 'osu!': '0', 'osu!taiko': '1', 'osu!catch': '2', 'osu!mania': '3' }} onChange={(val) => {
-                  const query = val ?'m=' + val : '';
-                  setModeQuery(query);
-                  onChange(sortQuery, searchType, query);
-               }} />
+               <SwitchFullDict className="font-inter" options={{ 'osu!': '0', 'osu!taiko': '1', 'osu!catch': '2', 'osu!mania': '3' }} onChange={(val) => setM(val)} />
             </div>
             <button className="selected bg-darker rounded-full px-4 py-1.5" onClick={() => setUnfolded(p => !p)}>
                More filters {unfolded ? <span className="writing-mode-vertical-lr">&lt;</span> : <span className="writing-mode-vertical-rl">&gt;</span>}
@@ -82,18 +62,12 @@ export default function Filters({ onChange, foundString }: {
                required
                defaultValue='has leaderboard'
                options={{ 'any': 'any', 'has leaderboard': '', 'ranked': 'ranked', 'loved': 'loved', 'approved': 'approved', 'pending': 'pending' }}
-               onChange={(val) => createQueryString('status', 'eq', val)}
+               onChange={(val) => setS(val)}
             />
          </section>
          <section className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>Sort by</h4>
-            <SwitchSort options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']} onChange={(val, sort) => {
-               if (val) {
-                  const query = `sort=${val}_${sort}`;
-                  setSortQuery(query);
-                  onChange(query, searchType, modeQuery);
-               }
-            }} />
+            <SwitchSort options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']} onChange={(val, sort) => {if (val) setSort(`${val}_${sort}`)}} />
          </section>
          {foundString && <div className="absolute animate-in fade-in right-6 bottom-2 text-white/70 font-outline-sm tracking-wider text-base">{foundString} <span className="text-sm">found</span></div>}
          
@@ -116,7 +90,7 @@ export default function Filters({ onChange, foundString }: {
                </section>
                <section className="flex items-center justify-between">
                   <h4>Source</h4>
-                  <Switch options={['movie', 'video game', 'series', 'event']} onChange={(val) => createQueryString('source', 'eq', val)} disabled />
+                  <Switch options={['movie', 'video game', 'series', 'event']} onChange={(val) => createQueryString('source', '=', val)} disabled />
                </section>
             </div>
 
