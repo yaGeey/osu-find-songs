@@ -51,6 +51,7 @@ export default function FromOsu() {
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
    const [search, setSearch] = useState('');
+   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]);
 
    useEffect(() => {
       setInfo(null);
@@ -72,7 +73,12 @@ export default function FromOsu() {
    const beatmapsetQueries = useQueries({
       queries: songs.map((song) => ({
          queryKey: ['beatmap', song.id],
-         queryFn: (): Promise<BeatmapSet> => getBeatmap(song.id),
+         queryFn: async (): Promise<BeatmapSet> => {
+            const t0 = performance.now();
+            const res = await getBeatmap(song.id);
+            setTimePerOneAcc(prev => [...prev, performance.now() - t0]);
+            return res;
+         },
          cacheTime: 1000 * 60 * 60 * 24,
       }))
    });
@@ -102,10 +108,16 @@ export default function FromOsu() {
       else setInfo({ ...props });
    }
 
+   const msLeft = ((timePerOneAcc.map((item, i) => item - timePerOneAcc[i - 1]).slice(1).reduce((a, b) => a + b, 0) / timePerOneAcc.length) * (beatmapsetQueries.filter(q => !q.isFetched).length));
+   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : '';
+
    return (
       <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
          <DynamicBg src={info?.local.image} />
-         <Progress isLoading={isLoading} value={((combinedArray.filter(q => !q.beatmapsetQuery.isLoading).length + combinedArray.filter(q => !q.spotifyQuery.isLoading).length) * 100) / (combinedArray.length*2)} />
+         <Progress isLoading={isLoading} value={((combinedArray.filter(q => !q.beatmapsetQuery.isLoading).length + combinedArray.filter(q => !q.spotifyQuery.isLoading).length) * 100) / (combinedArray.length * 2)} />
+         {isLoading && msLeft > 5000 && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
+            {beatmapsetQueries.filter(q => !q.isLoading).length}/{songs.length} | {timeLeft} left
+         </div>}
 
          <header className="bg-triangles border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
