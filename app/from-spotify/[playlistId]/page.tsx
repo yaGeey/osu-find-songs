@@ -95,7 +95,7 @@ export default function PLaylistPage() {
 
    // search
    useEffect(() => {
-      if (!hasQueryChanged && !searchParams.toString()) return;
+      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('m') && !searchParams.get('s')) return
       else setHasQueryChanged(true);
       setTimePerOneAcc([]);
 
@@ -184,7 +184,7 @@ export default function PLaylistPage() {
          </header>
 
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
-            <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:950px)]:w-4/5 w-full ">
+            <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:980px)]:w-4/5 w-full ">
 
                <Filters
                   foundString={beatmapsets.length ? beatmapsets.filter(a => !!a && a.length).length + '/' + beatmapsets.length : ''}
