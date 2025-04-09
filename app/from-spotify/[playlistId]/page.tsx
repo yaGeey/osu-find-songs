@@ -23,6 +23,7 @@ import Progress from "@/components/state/Progress";
 import BgImage from "@/components/BgImage";
 import { LinearProgress } from "@mui/material";
 import { sortBeatmapsMatrix } from "@/utils/sortBeatmapsMatrix";
+import { uniqueArray, uniqueBeatmapsetMatrix } from "@/utils/arrayManaging";
 
 export default function PLaylistPage() {
    const params = useParams();
@@ -195,10 +196,13 @@ export default function PLaylistPage() {
                />
 
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
-                  {filteredBeatmapsets.filter(data => data && data.length).sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc')).map((data, i) => {
-                     if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
-                     else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
-                  })}
+                  {uniqueBeatmapsetMatrix(filteredBeatmapsets.filter(data => data && data.length))
+                     .sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'))
+                     .map((data, i) => {
+                        if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
+                        else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
+                     })
+                  }
                   {!filteredBeatmapsets.filter(data => data && data.length).length && !isLoading &&
                      <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
                         No results found

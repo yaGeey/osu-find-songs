@@ -1,4 +1,3 @@
-'use client'
 import { SongData } from "@/types/types";
 import Image from "next/image";
 import Loading from "../state/Loading";
@@ -6,8 +5,6 @@ import { twMerge as tw } from "tailwind-merge";
 import { SongDataQueried } from "@/types/types";
 import React from "react";
 import Spinner from "react-spinner-material";
-import { useRef, useState, useEffect } from 'react';
-import { useInView } from "motion/react";
 
 const getSortValue = (sortFn: string, data: SongDataQueried) => {
    switch (sortFn) {
@@ -33,9 +30,6 @@ function Card({ data, sortFn, selected, onClick, className }: {
 }) {
    const { local, beatmapsetQuery, spotifyQuery } = data;
 
-   const ref = useRef<HTMLDivElement>(null);
-   const isInView = useInView(ref);
-
    const handleClick = () => {
       if (onClick && (beatmapsetQuery.data || spotifyQuery.data)) {
          onClick({ beatmapset: beatmapsetQuery.data, spotify: spotifyQuery.data, local });
@@ -43,12 +37,12 @@ function Card({ data, sortFn, selected, onClick, className }: {
    }
 
    return (
-      <div ref={ref} className={tw(
+      <div className={tw(
          'last:rounded-b-lg first:hover:pt-0 hover:py-2 transition-all duration-300 ease-in-out',
          selected && 'first:pt-0 py-2',
          spotifyQuery.isLoading && 'pointer-events-none',
       )}>
-         {isInView && <div
+         <div
             className={tw(
                "bg-dialog-darker select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:opacity-85",
                selected && 'opacity-85 sm:mr-20 rounded-lg',
@@ -94,7 +88,7 @@ function Card({ data, sortFn, selected, onClick, className }: {
                   }
                </div>
             </div>
-         </div>}
+         </div>
       </div>
    )
 }

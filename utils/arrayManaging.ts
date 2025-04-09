@@ -1,3 +1,4 @@
+import { BeatmapSet } from "@/types/Osu";
 import { SongDataQueried } from "@/types/types";
 
 // filters
@@ -26,6 +27,32 @@ export function groupBy<T extends Record<string, any>>(array: Array<T>, key: str
       acc[item[key]].push(item);
       return acc;
    }, {});
+};
+
+// unique beatmapset
+export function uniqueBeatmapsetMatrix(m: BeatmapSet[][]) {
+   const seen = new Set();
+   const unique: BeatmapSet[][] = [];
+
+   for (const arr of m) {
+      const filteredArr = arr.filter((item) => {
+         if (seen.has(item.id)) return false;
+         seen.add(item.id);
+         return true;
+      });
+      if (filteredArr.length) unique.push(filteredArr);
+   }
+   return unique;
+}
+
+// unique
+export function uniqueArray<T>(arr: T[], key: keyof T) {
+   const seen = new Set();
+   return arr.filter((item) => {
+      const duplicate = seen.has(item[key]);
+      seen.add(item[key]);
+      return !duplicate;
+   });
 };
 
 // group

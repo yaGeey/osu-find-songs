@@ -74,7 +74,7 @@ export default function Filters({ onChange, foundString, onSortButtonClick }: {
             />
             {/* <button onClick={onSortButtonClick}>Sort locally</button> */}
          </section>
-         {foundString && <div className="absolute animate-in fade-in right-6 bottom-2 text-white/70 font-outline-sm tracking-wider text-base hidden lg:block">{foundString} <span className="text-sm">found</span></div>}
+         {foundString && <div className="absolute animate-in fade-in right-4 bottom-2 text-white/70 font-outline-sm tracking-wider text-sm hidden lg:block">{foundString} <span className="text-sm">found</span></div>}
 
 
          {/* Additional filters */}

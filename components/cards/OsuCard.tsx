@@ -7,20 +7,19 @@ import { twMerge as tw } from "tailwind-merge"
 import { downloadNoVideo, downloadVideo } from "@/utils/osuDownload"
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from "@/utils/arrayManaging";
-import { useInView } from "motion/react";
 import { useRef } from "react";
+import ImageFallback from "../ImageFallback";
 
 export default function OsuCard({ beatmapset, onHover = true, className }: { beatmapset: BeatmapSet, onHover?: boolean, className?: string }) {
    const ref = useRef<HTMLDivElement>(null);
-   const isInView = useInView(ref);
    return (
       <>
          <div ref={ref} className={tw("group/card select-none relative h-26 font-inter rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0", className)}>
-            {isInView && <><div className="relative w-[100px] h-full rounded-l-2xl overflow-hidden z-0">
-               <Image src={beatmapset.covers.list} alt="list" fill style={{ objectFit: 'cover' }} sizes="100%" />
+            {<><div className="relative w-[100px] h-full rounded-l-2xl overflow-hidden z-0">
+               <ImageFallback src={beatmapset.covers.list} alt="list" fill style={{ objectFit: 'cover' }} sizes="100%" loading="lazy"/>
             </div>
             <div className="relative flex-grow flex justify-end rounded-r-2xl overflow-hidden">
-               <Image src={beatmapset.covers.card} alt="cover" width={286} height={100} className="z-10 w-max-[286px] h-auto" />
+               <ImageFallback src={beatmapset.covers.card} alt="cover" width={286} height={100} className="z-10 w-max-[286px] h-auto" loading="lazy" />
                <div className="absolute top-0 right-0 w-[289px] h-full bg-gradient-to-r from-main to-main/70 rounded-r-2xl z-15"></div>
             </div>
 
@@ -44,7 +43,8 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                      beatmapset.status === 'ranked' && 'bg-[#B3FF66]',
                      beatmapset.status === 'approved' && 'bg-[#B3FF66',
                      beatmapset.status === 'qualified' && 'bg-[#FFD966]',
-                     beatmapset.status === 'loved' && 'bg-[#FF66AB]')}
+                     beatmapset.status === 'loved' && 'bg-[#FF66AB]',
+                     beatmapset.status === 'graveyard' && 'bg-main-gray text-main-lighter',)}
                   >{beatmapset.status.toUpperCase()}</h4>
 
                   <section className="peer group/diff flex text-[11px] text-main-gray font-inter-tight gap-1">
@@ -67,16 +67,6 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                         <span className="font-semibold text-xs">{beatmapset.beatmaps.length}</span>
                      }
                   </section>
-                  {/* <div className="absolute top-full bg-amber-700 z-10000 rounded-lg p-1.5 hidden peer-hover:block">
-                     {
-                        beatmapset.beatmaps.sort((a, b) => a.difficulty_rating - b.difficulty_rating).map((beatmap, i) => (
-                           <div className="flex gap-1.5 text-[11px] font-inter-tight" key={i}>
-                              <div style={getColor(beatmap.difficulty_rating)} className="h-[15px] rounded-full text-center w-[30px]">{beatmap.difficulty_rating}</div>
-                              <div className="text-xs font-medium">{beatmap.version}</div>
-                           </div>
-                        ))
-                     }
-                  </div> */}
                </div>
             </a>
 
@@ -90,16 +80,6 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
                   data-tooltip-content='Download without video'
                   data-tooltip-delay-show={400}
                />
-               
-               {/* {beatmapset.video &&
-                  <FontAwesomeIcon icon={faFileVideo}
-                     onClick={() => downloadVideo(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title} [VIDEO].osz`)}
-                     className="cursor-pointer"
-                     data-tooltip-id='tooltip'
-                     data-tooltip-content='Download with video'
-                     data-tooltip-delay-show={400}
-                  />
-               } */}
             </div>
             <Tooltip id='tooltip' place="top" style={{fontSize: '11px', padding: '0 0.25rem', zIndex:100000}}/></>}
          </div>
