@@ -1,7 +1,7 @@
 import { Metadata } from "next";
-import SelectPage from './page';
+import SelectPage from "./page";
 
 export const metadata: Metadata = {
-   title: "Select your osu! beatmaps directory",
+  title: "Select your osu! beatmaps directory",
 };
 export default SelectPage;
