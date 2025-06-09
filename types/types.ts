@@ -9,6 +9,11 @@ export type Song = {
   id: string;
   image: string;
 }
+export type SongMin = {
+   title: string
+   author: string
+   text: string
+}
 
 export type SongData = {
   beatmapset?: BeatmapSet;

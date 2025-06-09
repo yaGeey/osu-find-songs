@@ -1,24 +1,25 @@
 'use server'
+import { BeatmapSet } from '@/types/Osu'
 import { cookies } from 'next/headers'
 
-export async function getBeatmap(id: string): Promise<any> {
-   let token = (await cookies()).get('osuToken')?.value;
-   if (!token) token = await revalidateOsuToken();
-
-   const response = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`,
-      {
-         headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-         }
-      }
-   )
-   if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
+export async function getBeatmap(id: string, token: string | undefined = undefined): Promise<BeatmapSet> {
+   if (!token) {
+      token = (await cookies()).get('osuToken')?.value
+      if (!token) token = await revalidateOsuToken()
    }
-   return await response.json();
+
+   const response = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
+      headers: {
+         Authorization: `Bearer ${token}`,
+         'Content-Type': 'application/json',
+         Accept: 'application/json',
+      },
+   })
+   if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(errorText)
+   }
+   return await response.json()
 }
 
 export async function beatmapsSearch(queries:{[key:string]:string|null}): Promise<any> {

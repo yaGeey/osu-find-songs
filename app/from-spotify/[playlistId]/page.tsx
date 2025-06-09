@@ -24,6 +24,7 @@ import BgImage from "@/components/BgImage";
 import { LinearProgress } from "@mui/material";
 import { sortBeatmapsMatrix } from "@/utils/sortBeatmapsMatrix";
 import { uniqueArray, uniqueBeatmapsetMatrix } from "@/utils/arrayManaging";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
 export default function PLaylistPage() {
    const params = useParams();
@@ -174,8 +175,11 @@ export default function PLaylistPage() {
          </div>}
 
          <header className={tw("min-w-[800px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
-            <section className="absolute left-4">
+            <section className="absolute left-4 flex items-center gap-4">
                <HomeBtn />
+               <a href="https://github.com/yaGeey/osu-find-songs" target="_blank" rel="noopener noreferrer">
+                  <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
+               </a>
             </section>
             <Button onClick={() => setIsModalVisible(true)} className="text-white py-1 w-45">
                Download all
@@ -199,7 +203,7 @@ export default function PLaylistPage() {
                   {uniqueBeatmapsetMatrix(filteredBeatmapsets.filter(data => data && data.length))
                      .sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'))
                      .map((data, i) => {
-                        if (data.length > 1) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
+                        if (data.length > 1 && data.length < 18) return <OsuCardSet key={i} beatmapsets={data} sortQuery={searchParams.get('sort') || 'relevance_asc'} className="flex-grow animate-in fade-in duration-1000" />
                         else return <OsuCard key={i} beatmapset={data[0]} className="flex-grow animate-in fade-in duration-1000 shadow-sm" />
                      })
                   }

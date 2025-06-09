@@ -82,4 +82,5 @@ export type BeatmapSet = {
    ranked: number;
    ranked_date: string | null;
    submitted_date: string;
+   rating: number;
 }

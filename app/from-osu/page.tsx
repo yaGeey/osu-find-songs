@@ -82,7 +82,7 @@ export default function FromOsu() {
          cacheTime: 1000 * 60 * 60 * 24,
       }))
    });
-   
+
    // Combine the arrays
    const combinedArray = useMemo(() => {
       return songs.map((song, i) => ({
@@ -128,7 +128,7 @@ export default function FromOsu() {
                />
             </section>
             <hr className="border-2 border-main-border h-3/4"></hr>
-            <SettingsPopup className={!isSettingsVisible ?'-left-full':''} />
+            <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />
 
             <div className="flex 2xl:gap-3 gap-1.5 items-center justify-center " data-tooltip-id={isLoading ? 'tooltip' : undefined} data-tooltip-content='Wait for the beatmaps data to load'>
                <label className="font-semibold hidden lgx:block" htmlFor="filter-select">Exact Spotify match</label>
@@ -167,7 +167,7 @@ export default function FromOsu() {
                   options={[
                      {
                         value: 'asc',
-                        label: <FontAwesomeIcon icon={faArrowUpShortWide} /> 
+                        label: <FontAwesomeIcon icon={faArrowUpShortWide} />
                      },
                      {
                         value: 'desc',
@@ -181,7 +181,7 @@ export default function FromOsu() {
             </div>
             <hr className="border-2 border-main-border h-3/4"></hr>
             <div className="relative">
-               <input type="text" className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]" placeholder="Search" onChange={(e)=>setSearch(e.target.value)}/>
+               <input type="text" className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]" placeholder="Search" onChange={(e) => setSearch(e.target.value)} />
                <FontAwesomeIcon icon={faSearch} className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-400 text-lg" />
             </div>
          </header>
@@ -204,7 +204,7 @@ export default function FromOsu() {
                      }
                      {(group == selectedGroup || group === '') &&
                         <ul className="flex flex-col gap-2 items-end ">
-                           {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) => 
+                           {groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search)).map((songData: SongDataQueried, i: number) =>
                               <Card
                                  key={i}
                                  data={songData}
