@@ -1,10 +1,10 @@
-import { Artist } from '@/types/Spotify';
-import { BeatmapSet } from '@/types/Osu';
+import { Artist } from '@/types/Spotify'
+import { BeatmapSet } from '@/types/Osu'
 
 //! add styling to link to determine if it's a link or not
 
 export default function AuthorString({ artists, beatmapset }: { artists: Artist[]; beatmapset: BeatmapSet }) {
-   if (!artists || (!artists.length && beatmapset)) return <span>{beatmapset.artist}</span>;
+   if (!artists || (!artists.length && beatmapset)) return <span>{beatmapset.artist}</span>
    return (
       <div>
          {artists.map((artist, i) => (
@@ -19,5 +19,5 @@ export default function AuthorString({ artists, beatmapset }: { artists: Artist[
             <span> // {beatmapset.artist}</span>
          )}
       </div>
-   );
+   )
 }

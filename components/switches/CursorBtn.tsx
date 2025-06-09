@@ -1,16 +1,16 @@
-import { twMerge as tw } from 'tailwind-merge';
+import { twMerge as tw } from 'tailwind-merge'
 
 export default function CursorBtn({
    setIsDisabled,
    isDisabled,
 }: {
-   setIsDisabled: (value: boolean) => void;
-   isDisabled: boolean;
+   setIsDisabled: (value: boolean) => void
+   isDisabled: boolean
 }) {
    return (
       <button
          onClick={() => {
-            setIsDisabled(!isDisabled);
+            setIsDisabled(!isDisabled)
          }}
          className={tw('cursor-pointer stroke-success', isDisabled && 'pointer-events-none stroke-black/50')}
       >
@@ -29,5 +29,5 @@ export default function CursorBtn({
             />
          </svg>
       </button>
-   );
+   )
 }

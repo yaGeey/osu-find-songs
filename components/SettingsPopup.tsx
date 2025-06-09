@@ -1,8 +1,8 @@
-import { languageOptions } from '@/utils/selectOptions';
-import Cookies from 'js-cookie';
-import dynamic from 'next/dynamic';
-import { twMerge as tw } from 'tailwind-merge';
-const Select = dynamic(() => import('react-select'), { ssr: false });
+import { languageOptions } from '@/utils/selectOptions'
+import Cookies from 'js-cookie'
+import dynamic from 'next/dynamic'
+import { twMerge as tw } from 'tailwind-merge'
+const Select = dynamic(() => import('react-select'), { ssr: false })
 
 export default function SettingsPopup({ className }: { className?: string }) {
    return (
@@ -49,5 +49,5 @@ export default function SettingsPopup({ className }: { className?: string }) {
             </section>
          </section>
       </div>
-   );
+   )
 }

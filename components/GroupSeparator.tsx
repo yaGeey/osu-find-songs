@@ -1,4 +1,4 @@
-import { twMerge as tw } from 'tailwind-merge';
+import { twMerge as tw } from 'tailwind-merge'
 
 export default function GroupSeparator({
    children,
@@ -7,11 +7,11 @@ export default function GroupSeparator({
    onClick,
    className,
 }: {
-   children: React.ReactNode;
-   ref?: React.Ref<HTMLDivElement>;
-   selected?: boolean;
-   onClick?: () => void;
-   className?: string;
+   children: React.ReactNode
+   ref?: React.Ref<HTMLDivElement>
+   selected?: boolean
+   onClick?: () => void
+   className?: string
 }) {
    return (
       <div
@@ -25,5 +25,5 @@ export default function GroupSeparator({
       >
          {children}
       </div>
-   );
+   )
 }

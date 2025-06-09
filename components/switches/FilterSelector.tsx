@@ -1,39 +1,39 @@
-'use client';
-import { twMerge as tw } from 'tailwind-merge';
-import { useEffect, useState } from 'react';
-import CursorBtn from './CursorBtn';
+'use client'
+import { twMerge as tw } from 'tailwind-merge'
+import { useEffect, useState } from 'react'
+import CursorBtn from './CursorBtn'
 
-type Filter = '<' | '=' | '>' | '';
+type Filter = '<' | '=' | '>' | ''
 interface BaseProps {
-   type: 'number' | 'date';
-   onChange: (value: string, filter: Filter) => void;
-   disabled?: boolean;
+   type: 'number' | 'date'
+   onChange: (value: string, filter: Filter) => void
+   disabled?: boolean
 }
 interface Number extends BaseProps {
-   type: 'number';
-   min: number;
-   max: number;
-   step?: number;
+   type: 'number'
+   min: number
+   max: number
+   step?: number
 }
 interface Date extends BaseProps {
-   type: 'date';
-   min?: never;
-   max?: never;
-   step?: never;
+   type: 'date'
+   min?: never
+   max?: never
+   step?: never
 }
-type Props = Number | Date;
+type Props = Number | Date
 
 export default function FilterSelector({ onChange, disabled = false, max, min, step = 1, type }: Props) {
-   const [filter, setFilter] = useState<Filter>('>');
-   const [value, setValue] = useState<string | null>(null);
-   const [isDisabled, setIsDisabled] = useState(disabled);
+   const [filter, setFilter] = useState<Filter>('>')
+   const [value, setValue] = useState<string | null>(null)
+   const [isDisabled, setIsDisabled] = useState(disabled)
    useEffect(() => {
       if (isDisabled) {
-         onChange('', '');
-         return;
+         onChange('', '')
+         return
       }
-      if (value) onChange(value, filter);
-   }, [filter, value, isDisabled]);
+      if (value) onChange(value, filter)
+   }, [filter, value, isDisabled])
 
    return (
       <div
@@ -103,5 +103,5 @@ export default function FilterSelector({ onChange, disabled = false, max, min, s
             />
          )}
       </div>
-   );
+   )
 }

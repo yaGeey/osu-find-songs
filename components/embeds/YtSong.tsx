@@ -1,8 +1,8 @@
-import { Song } from '@/types/yt';
-import Image from 'next/image';
+import { Song } from '@/types/yt'
+import Image from 'next/image'
 
 export default function YtSongEmbed({ song }: { song: Song }) {
-   console.log(song);
+   console.log(song)
    return (
       <a
          className="bg-main border-4 w-full overflow-hidden border-main-darker rounded-lg flex items-center hover:brightness-110 transition-all"
@@ -27,5 +27,5 @@ export default function YtSongEmbed({ song }: { song: Song }) {
             </p>
          </div>
       </a>
-   );
+   )
 }

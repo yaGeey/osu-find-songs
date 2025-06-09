@@ -1,5 +1,5 @@
-import { Track } from '@/types/Spotify';
-import Image from 'next/image';
+import { Track } from '@/types/Spotify'
+import Image from 'next/image'
 
 export default function SpotifyEmbed({ track }: { track: Track }) {
    return (
@@ -28,5 +28,5 @@ export default function SpotifyEmbed({ track }: { track: Track }) {
             </p>
          </div>
       </a>
-   );
+   )
 }

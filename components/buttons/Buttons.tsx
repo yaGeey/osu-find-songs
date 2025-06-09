@@ -1,13 +1,13 @@
-import Image from 'next/image';
-import './Button.css';
-import { ButtonHTMLAttributes, Ref } from 'react';
-import { twMerge as tw } from 'tailwind-merge';
+import Image from 'next/image'
+import './Button.css'
+import { ButtonHTMLAttributes, Ref } from 'react'
+import { twMerge as tw } from 'tailwind-merge'
 
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-   onClick?: () => void;
-   ref?: Ref<HTMLButtonElement>;
-   className?: string;
-   textClassName?: string;
+   onClick?: () => void
+   ref?: Ref<HTMLButtonElement>
+   className?: string
+   textClassName?: string
 }
 
 export function SpotifyBtn({ onClick, ref, className, ...props }: BtnProps) {
@@ -20,7 +20,7 @@ export function SpotifyBtn({ onClick, ref, className, ...props }: BtnProps) {
       >
          <Image src="/SpotifyFull.svg" width={83} height={23} alt="spotify" />
       </button>
-   );
+   )
 }
 
 export function YoutubeBtn({ onClick, ref, className, ...props }: BtnProps) {
@@ -36,7 +36,7 @@ export function YoutubeBtn({ onClick, ref, className, ...props }: BtnProps) {
       >
          <Image src="/youtubeFull.svg" width={78} height={17} alt="youtube" />
       </button>
-   );
+   )
 }
 
 export function OtherBtn({ onClick, ref, className, ...props }: BtnProps) {
@@ -52,7 +52,7 @@ export function OtherBtn({ onClick, ref, className, ...props }: BtnProps) {
       >
          Other
       </button>
-   );
+   )
 }
 
 export function OsuBtn({ onClick, ref, className, ...props }: BtnProps) {
@@ -69,7 +69,7 @@ export function OsuBtn({ onClick, ref, className, ...props }: BtnProps) {
          <Image src="icons/osu.svg" width={20} height={20} alt="osu" className="mt-[1px]" />
          Beatmap
       </button>
-   );
+   )
 }
 
 export function Button({ onClick, ref, className, textClassName, children, ...props }: BtnProps) {
@@ -85,7 +85,7 @@ export function Button({ onClick, ref, className, textClassName, children, ...pr
       >
          <span className={textClassName}>{children}</span>
       </button>
-   );
+   )
 }
 export function SuccessBtn({ onClick, ref, className, children, ...props }: BtnProps) {
    return (
@@ -100,5 +100,5 @@ export function SuccessBtn({ onClick, ref, className, children, ...props }: BtnP
       >
          <span className="font-outline">{children}</span>
       </button>
-   );
+   )
 }

@@ -1,6 +1,6 @@
-import ReactDom from 'react-dom';
-import { twMerge as tw } from 'tailwind-merge';
-import { Button } from './buttons/Buttons';
+import ReactDom from 'react-dom'
+import { twMerge as tw } from 'tailwind-merge'
+import { Button } from './buttons/Buttons'
 
 export default function Modal({
    children,
@@ -12,16 +12,16 @@ export default function Modal({
    closeBtn,
    dialog,
 }: {
-   children: React.ReactNode;
-   isOpen: boolean;
-   onClose?: () => void;
-   onOkay?: () => void;
-   state: 'error' | 'success' | 'warning' | 'info' | 'loading';
-   okBtn?: string;
-   closeBtn?: string;
-   dialog?: boolean;
+   children: React.ReactNode
+   isOpen: boolean
+   onClose?: () => void
+   onOkay?: () => void
+   state: 'error' | 'success' | 'warning' | 'info' | 'loading'
+   okBtn?: string
+   closeBtn?: string
+   dialog?: boolean
 }) {
-   if (!isOpen) return null;
+   if (!isOpen) return null
 
    return ReactDom.createPortal(
       <div className={`fixed top-0 left-0 w-screen h-screen bg-black/30 z-10000 text-center`}>
@@ -59,5 +59,5 @@ export default function Modal({
          </div>
       </div>,
       document.body,
-   );
+   )
 }

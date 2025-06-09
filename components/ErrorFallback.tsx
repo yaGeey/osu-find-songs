@@ -1,6 +1,6 @@
-import BgImage from './BgImage';
-import { Button } from './buttons/Buttons';
-import Image from 'next/image';
+import BgImage from './BgImage'
+import { Button } from './buttons/Buttons'
+import Image from 'next/image'
 
 export default function ErrorCallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
    return (
@@ -18,5 +18,5 @@ export default function ErrorCallback({ error, resetErrorBoundary }: { error: Er
             </div>
          </div>
       </div>
-   );
+   )
 }

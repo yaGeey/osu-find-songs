@@ -1,8 +1,8 @@
-import { Song } from '@/types/types';
-import { findSong, revalidateSpotifyToken } from '@/lib/Spotify';
-import { revalidateOsuToken, getBeatmap } from '@/lib/osu';
-import { findBeatmaps, findDetailedInfo, findSongsSpotify, findSongsYoutube } from '@/utils/findCommands';
-import CreatePlaylistButton from '@/components/buttons/CreatePlaylistButton';
+import { Song } from '@/types/types'
+import { findSong, revalidateSpotifyToken } from '@/lib/Spotify'
+import { revalidateOsuToken, getBeatmap } from '@/lib/osu'
+import { findBeatmaps, findDetailedInfo, findSongsSpotify, findSongsYoutube } from '@/utils/findCommands'
+import CreatePlaylistButton from '@/components/buttons/CreatePlaylistButton'
 
 export default function DebugButtons({ songs }: { songs: Song[] }) {
    return (
@@ -30,5 +30,5 @@ export default function DebugButtons({ songs }: { songs: Song[] }) {
             findDetailedInfo
          </button>
       </div>
-   );
+   )
 }

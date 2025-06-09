@@ -1,42 +1,42 @@
-import { Track } from '@/types/Spotify';
-import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from '@/lib/Spotify';
-import { useMutation, type UseQueryResult } from '@tanstack/react-query';
-import React, { useContext, useState } from 'react';
-import Modal from '@/components/Modal';
-import { Button } from './Buttons';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons';
-import { twMerge as tw } from 'tailwind-merge';
-import { useSongContext } from '@/contexts/SongContext';
+import { Track } from '@/types/Spotify'
+import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from '@/lib/Spotify'
+import { useMutation, type UseQueryResult } from '@tanstack/react-query'
+import React, { useContext, useState } from 'react'
+import Modal from '@/components/Modal'
+import { Button } from './Buttons'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpotify } from '@fortawesome/free-brands-svg-icons'
+import { twMerge as tw } from 'tailwind-merge'
+import { useSongContext } from '@/contexts/SongContext'
 
 export default function CreatePlaylistButton({
    songQueries,
    className,
 }: {
-   songQueries: UseQueryResult<Track[] | null, Error>[];
-   className?: string;
+   songQueries: UseQueryResult<Track[] | null, Error>[]
+   className?: string
 }) {
-   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [state, setState] = useState<'error' | 'success' | 'warning' | 'info' | 'loading'>('info');
-   const [modalContent, setModalContent] = useState<React.ReactNode | null>(null);
-   const [onOkayFn, setOnOkayFn] = useState<() => void>(() => {});
-   const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay');
-   const router = useRouter();
-   const { songs } = useSongContext();
+   const [isModalOpen, setIsModalOpen] = useState(false)
+   const [state, setState] = useState<'error' | 'success' | 'warning' | 'info' | 'loading'>('info')
+   const [modalContent, setModalContent] = useState<React.ReactNode | null>(null)
+   const [onOkayFn, setOnOkayFn] = useState<() => void>(() => {})
+   const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay')
+   const router = useRouter()
+   const { songs } = useSongContext()
 
    const mutation = useMutation({
       mutationFn: ({ playlistId, uris }: { playlistId: string; uris: string[] }) => AddItemsToPlaylist(playlistId, uris),
-   });
+   })
 
    function navigateToAuth() {
-      localStorage.setItem('songs_context', JSON.stringify(songs));
-      const encodeRedirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!);
-      const clientId = process.env.NEXT_PUBLIC_AUTH_SPOTIFY_ID;
-      const scope = 'playlist-modify-public playlist-modify-private';
-      const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeRedirectUri}&scope=${scope}`;
-      router.push(url);
+      localStorage.setItem('songs_context', JSON.stringify(songs))
+      const encodeRedirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!)
+      const clientId = process.env.NEXT_PUBLIC_AUTH_SPOTIFY_ID
+      const scope = 'playlist-modify-public playlist-modify-private'
+      const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeRedirectUri}&scope=${scope}`
+      router.push(url)
    }
 
    function handleModal(
@@ -45,58 +45,58 @@ export default function CreatePlaylistButton({
       onOkayFn: () => void = () => {},
       onOkayText?: string,
    ) {
-      setModalContent(content);
-      setState(state);
-      setOnOkayFn(() => onOkayFn);
-      setOnOkayText(onOkayText);
+      setModalContent(content)
+      setState(state)
+      setOnOkayFn(() => onOkayFn)
+      setOnOkayText(onOkayText)
    }
 
    async function handleCreatePlaylist() {
-      setIsModalOpen(true);
+      setIsModalOpen(true)
       if (!Cookies.get('spotify_oauth_access_token')) {
-         handleModal(<h1>You must be logged in your Spotify account to continue!</h1>, 'warning', navigateToAuth, 'Login');
-         return;
+         handleModal(<h1>You must be logged in your Spotify account to continue!</h1>, 'warning', navigateToAuth, 'Login')
+         return
       }
 
       if (songQueries.filter((q) => q.data).length !== songQueries.length) {
-         handleModal(<h1>Some songs are still loading, try again later</h1>, 'warning');
-         return;
+         handleModal(<h1>Some songs are still loading, try again later</h1>, 'warning')
+         return
       }
 
-      handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading');
-      const profile = await fetchMyProfile();
+      handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading')
+      const profile = await fetchMyProfile()
       if (!profile) {
-         handleModal(<h1>Failed to get profile data</h1>, 'error');
-         return;
+         handleModal(<h1>Failed to get profile data</h1>, 'error')
+         return
       }
 
-      handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading');
+      handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading')
       const playlist = await createPlaylist({
          userId: profile.id,
          name: 'osu! to Spotify',
          description: `Generated playlist by ${process.env.NEXT_PUBLIC_URL} at ${new Date().toLocaleString()}`,
-      });
+      })
       if (!playlist) {
-         handleModal(<h1>Failed to create playlist</h1>, 'error');
-         return;
+         handleModal(<h1>Failed to create playlist</h1>, 'error')
+         return
       }
 
-      handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading');
+      handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading')
 
-      const allTracks = songQueries.map((q) => q.data).filter((data) => !!data);
-      const spotifyStrict = allTracks.filter((tracks) => tracks.length !== 20);
-      const tracks = spotifyStrict.map((tracks) => tracks[0]);
+      const allTracks = songQueries.map((q) => q.data).filter((data) => !!data)
+      const spotifyStrict = allTracks.filter((tracks) => tracks.length !== 20)
+      const tracks = spotifyStrict.map((tracks) => tracks[0])
 
-      const promises = [];
-      const chunkSize = 100;
+      const promises = []
+      const chunkSize = 100
       for (let i = 0; i < tracks.length; i += chunkSize) {
-         const chunk = tracks.slice(i, i + chunkSize);
+         const chunk = tracks.slice(i, i + chunkSize)
          promises.push(
             mutation.mutateAsync({
                playlistId: playlist?.id,
                uris: chunk.map((track) => track.uri),
             }),
-         );
+         )
       }
 
       Promise.all(promises)
@@ -109,11 +109,11 @@ export default function CreatePlaylistButton({
                   </a>
                </>,
                'success',
-            );
+            )
          })
          .catch(() => {
-            handleModal(<h1>Failed to add tracks to playlist</h1>, 'error');
-         });
+            handleModal(<h1>Failed to add tracks to playlist</h1>, 'error')
+         })
    }
 
    return (
@@ -139,5 +139,5 @@ export default function CreatePlaylistButton({
             {modalContent}
          </Modal>
       </>
-   );
+   )
 }

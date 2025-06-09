@@ -1,5 +1,5 @@
-import { Video } from '@/types/yt';
-import Image from 'next/image';
+import { Video } from '@/types/yt'
+import Image from 'next/image'
 
 export default function YtVideo({ data }: { data: Video }) {
    return (
@@ -25,5 +25,5 @@ export default function YtVideo({ data }: { data: Video }) {
             {new Date(data.duration * 1000).toISOString().slice(14, 19)}
          </div>
       </a>
-   );
+   )
 }

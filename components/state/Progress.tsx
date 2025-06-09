@@ -1,4 +1,4 @@
-import { LinearProgress } from '@mui/material';
+import { LinearProgress } from '@mui/material'
 
 export default function Progress({ isLoading, value }: { isLoading: boolean; value: number }) {
    return (
@@ -11,5 +11,5 @@ export default function Progress({ isLoading, value }: { isLoading: boolean; val
             <div className="h-0.75 fixed top-0 bg-darker w-screen z-1000"></div>
          )}
       </>
-   );
+   )
 }

@@ -1,5 +1,5 @@
-'use client';
-import { twMerge as tw } from 'tailwind-merge';
+'use client'
+import { twMerge as tw } from 'tailwind-merge'
 
 export default function TextSwitch({
    options,
@@ -7,10 +7,10 @@ export default function TextSwitch({
    setSelected,
    className,
 }: {
-   options: { value: string; label: string | React.ReactNode }[];
-   selected: string;
-   setSelected: (value: string) => void;
-   className?: string;
+   options: { value: string; label: string | React.ReactNode }[]
+   selected: string
+   setSelected: (value: string) => void
+   className?: string
 }) {
    return (
       <div className={`flex ${className}`}>
@@ -27,5 +27,5 @@ export default function TextSwitch({
             </button>
          ))}
       </div>
-   );
+   )
 }

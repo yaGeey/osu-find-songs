@@ -1,11 +1,11 @@
-import Image from 'next/image';
-import { useState } from 'react';
-import Modal from '../Modal';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image'
+import { useState } from 'react'
+import Modal from '../Modal'
+import { useRouter } from 'next/navigation'
 
 export default function HomeBtn() {
-   const [isHomeRedirectModalVisible, setIsHomeRedirectModalVisible] = useState(false);
-   const router = useRouter();
+   const [isHomeRedirectModalVisible, setIsHomeRedirectModalVisible] = useState(false)
+   const router = useRouter()
 
    return (
       <>
@@ -23,5 +23,5 @@ export default function HomeBtn() {
             You are about to redirect to the landing page
          </Modal>
       </>
-   );
+   )
 }

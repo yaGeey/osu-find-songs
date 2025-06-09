@@ -1,7 +1,7 @@
-'use client';
-import { twMerge as tw } from 'tailwind-merge';
-import { useEffect, useState } from 'react';
-import CursorBtn from './CursorBtn';
+'use client'
+import { twMerge as tw } from 'tailwind-merge'
+import { useEffect, useState } from 'react'
+import CursorBtn from './CursorBtn'
 
 export default function SwitchFull({
    options,
@@ -11,19 +11,19 @@ export default function SwitchFull({
    defaultValue,
    className,
 }: {
-   options: string[];
-   onChange: (value: string) => void;
-   disabled?: boolean;
-   required?: boolean;
-   defaultValue?: number;
-   className?: string;
+   options: string[]
+   onChange: (value: string) => void
+   disabled?: boolean
+   required?: boolean
+   defaultValue?: number
+   className?: string
 }) {
-   const [isDisabled, setIsDisabled] = useState(disabled);
-   const [selection, setSelection] = useState<string | null>(defaultValue ? options[defaultValue] : null);
+   const [isDisabled, setIsDisabled] = useState(disabled)
+   const [selection, setSelection] = useState<string | null>(defaultValue ? options[defaultValue] : null)
    useEffect(() => {
-      if (isDisabled) onChange('');
-      else onChange(selection || '');
-   }, [selection, isDisabled]);
+      if (isDisabled) onChange('')
+      else onChange(selection || '')
+   }, [selection, isDisabled])
 
    return (
       <div
@@ -53,5 +53,5 @@ export default function SwitchFull({
             ))}
          </div>
       </div>
-   );
+   )
 }

@@ -1,87 +1,87 @@
-'use client';
-import { use, useEffect, useMemo, useRef, useState } from 'react';
-import { SongData, SongDataQueried } from '@/types/types';
-import { searchSongWithConditions } from '@/lib/Spotify';
-import Image from 'next/image';
-import Card from '@/components/cards/Card';
-import Info from '@/components/Info';
-import { twMerge as tw } from 'tailwind-merge';
-import dynamic from 'next/dynamic';
-import { useQueries } from '@tanstack/react-query';
-import { Track } from '@/types/Spotify';
-import { getBeatmap } from '@/lib/osu';
-import { BeatmapSet } from '@/types/Osu';
-import { groupOptions, sortOptions, selectStyles } from '@/utils/selectOptions';
-import './page.css';
-import BgImage from '@/components/BgImage';
-import { useSongContext } from '@/contexts/SongContext';
-import SettingsPopup from '@/components/SettingsPopup';
-import { useRouter } from 'next/navigation';
-import CreatePlaylistButton from '@/components/buttons/CreatePlaylistButton';
-import GroupSeparator from '@/components/GroupSeparator';
-import TextSwitch from '@/components/TextSwitch';
-import HomeBtn from '@/components/buttons/HomeBtn';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { filterFn, searchFilterFn, groupArray } from '@/utils/arrayManaging';
-import Progress from '@/components/state/Progress';
-import DynamicBg from '@/components/DynamicBg';
-import { Tooltip } from 'react-tooltip';
-const Select = dynamic(() => import('react-select'), { ssr: false });
+'use client'
+import { use, useEffect, useMemo, useRef, useState } from 'react'
+import { SongData, SongDataQueried } from '@/types/types'
+import { searchSongWithConditions } from '@/lib/Spotify'
+import Image from 'next/image'
+import Card from '@/components/cards/Card'
+import Info from '@/components/Info'
+import { twMerge as tw } from 'tailwind-merge'
+import dynamic from 'next/dynamic'
+import { useQueries } from '@tanstack/react-query'
+import { Track } from '@/types/Spotify'
+import { getBeatmap } from '@/lib/osu'
+import { BeatmapSet } from '@/types/Osu'
+import { groupOptions, sortOptions, selectStyles } from '@/utils/selectOptions'
+import './page.css'
+import BgImage from '@/components/BgImage'
+import { useSongContext } from '@/contexts/SongContext'
+import SettingsPopup from '@/components/SettingsPopup'
+import { useRouter } from 'next/navigation'
+import CreatePlaylistButton from '@/components/buttons/CreatePlaylistButton'
+import GroupSeparator from '@/components/GroupSeparator'
+import TextSwitch from '@/components/TextSwitch'
+import HomeBtn from '@/components/buttons/HomeBtn'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { filterFn, searchFilterFn, groupArray } from '@/utils/arrayManaging'
+import Progress from '@/components/state/Progress'
+import DynamicBg from '@/components/DynamicBg'
+import { Tooltip } from 'react-tooltip'
+const Select = dynamic(() => import('react-select'), { ssr: false })
 
 export default function FromOsu() {
-   const router = useRouter();
-   const { songs, setSongs } = useSongContext();
+   const router = useRouter()
+   const { songs, setSongs } = useSongContext()
    useEffect(() => {
       if (!songs.length) {
          if (localStorage.getItem('songs_context')) {
-            setSongs(JSON.parse(localStorage.getItem('songs_context')!));
+            setSongs(JSON.parse(localStorage.getItem('songs_context')!))
          } else {
-            router.push('/from-osu/select');
+            router.push('/from-osu/select')
          }
       }
-   }, [songs, setSongs, router]);
+   }, [songs, setSongs, router])
 
-   const [info, setInfo] = useState<SongData | null>(null);
-   const [filters, setFilters] = useState<string[]>([]);
-   const [groupFn, setGroupFn] = useState<string>('no');
-   const [sortFn, setSortFn] = useState('sort-date');
-   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-   const [groupedDict, setGroupedDict] = useState<any>(undefined);
-   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-   const [search, setSearch] = useState('');
-   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]);
+   const [info, setInfo] = useState<SongData | null>(null)
+   const [filters, setFilters] = useState<string[]>([])
+   const [groupFn, setGroupFn] = useState<string>('no')
+   const [sortFn, setSortFn] = useState('sort-date')
+   const [isSettingsVisible, setIsSettingsVisible] = useState(false)
+   const [groupedDict, setGroupedDict] = useState<any>(undefined)
+   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+   const [search, setSearch] = useState('')
+   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([])
 
    useEffect(() => {
-      setInfo(null);
-   }, [filters, groupFn, sortFn]);
+      setInfo(null)
+   }, [filters, groupFn, sortFn])
 
    // queries
    const songQueries = useQueries({
       queries: songs.map((song) => ({
          queryKey: ['spotify', song.id],
          queryFn: async (): Promise<Track[] | null> => {
-            const tracks = await searchSongWithConditions(song);
-            if (!tracks?.length) return null;
-            return tracks;
+            const tracks = await searchSongWithConditions(song)
+            if (!tracks?.length) return null
+            return tracks
          },
          cacheTime: 1000 * 60 * 60 * 24,
       })),
-   });
+   })
 
    const beatmapsetQueries = useQueries({
       queries: songs.map((song) => ({
          queryKey: ['beatmap', song.id],
          queryFn: async (): Promise<BeatmapSet> => {
-            const t0 = performance.now();
-            const res = await getBeatmap(song.id);
-            setTimePerOneAcc((prev) => [...prev, performance.now() - t0]);
-            return res;
+            const t0 = performance.now()
+            const res = await getBeatmap(song.id)
+            setTimePerOneAcc((prev) => [...prev, performance.now() - t0])
+            return res
          },
          cacheTime: 1000 * 60 * 60 * 24,
       })),
-   });
+   })
 
    // Combine the arrays
    const combinedArray = useMemo(() => {
@@ -89,18 +89,18 @@ export default function FromOsu() {
          local: song,
          spotifyQuery: songQueries[i],
          beatmapsetQuery: beatmapsetQueries[i],
-      }));
-   }, [songs, beatmapsetQueries.filter((q) => q.isLoading).length, songQueries.filter((q) => q.isLoading).length]);
-   const isLoading = combinedArray.some((q) => q.spotifyQuery.isLoading || q.beatmapsetQuery.isLoading);
+      }))
+   }, [songs, beatmapsetQueries.filter((q) => q.isLoading).length, songQueries.filter((q) => q.isLoading).length])
+   const isLoading = combinedArray.some((q) => q.spotifyQuery.isLoading || q.beatmapsetQuery.isLoading)
 
    // Grouping and sorting
    useEffect(() => {
       if (isLoading) {
-         setGroupedDict({ '': combinedArray });
-         return;
+         setGroupedDict({ '': combinedArray })
+         return
       }
-      const sortedGroupedArray = groupArray(groupFn, sortOrder, sortFn, combinedArray);
-      setGroupedDict(sortedGroupedArray);
+      const sortedGroupedArray = groupArray(groupFn, sortOrder, sortFn, combinedArray)
+      setGroupedDict(sortedGroupedArray)
    }, [
       groupFn,
       sortFn,
@@ -108,11 +108,11 @@ export default function FromOsu() {
       combinedArray,
       beatmapsetQueries.filter((q) => q.isLoading).length,
       songQueries.filter((q) => q.isLoading).length,
-   ]);
+   ])
 
    function handleCardClick(props: SongData) {
-      if (info?.local.id === props.local.id) setInfo(null);
-      else setInfo({ ...props });
+      if (info?.local.id === props.local.id) setInfo(null)
+      else setInfo({ ...props })
    }
 
    const msLeft =
@@ -121,8 +121,8 @@ export default function FromOsu() {
          .slice(1)
          .reduce((a, b) => a + b, 0) /
          timePerOneAcc.length) *
-      beatmapsetQueries.filter((q) => !q.isFetched).length;
-   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : '';
+      beatmapsetQueries.filter((q) => !q.isFetched).length
+   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : ''
 
    return (
       <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
@@ -289,5 +289,5 @@ export default function FromOsu() {
          </footer>
          <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
       </div>
-   );
+   )
 }

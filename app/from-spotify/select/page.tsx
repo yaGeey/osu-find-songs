@@ -1,22 +1,22 @@
-'use client';
-import BgImage from '@/components/BgImage';
-import { Button } from '@/components/buttons/Buttons';
-import { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+'use client'
+import BgImage from '@/components/BgImage'
+import { Button } from '@/components/buttons/Buttons'
+import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 
 export default function SelectPage() {
-   const [value, setValue] = useState('');
-   const [isLoading, setIsLoading] = useState(false);
-   const inputRef = useRef<HTMLInputElement>(null);
-   const router = useRouter();
+   const [value, setValue] = useState('')
+   const [isLoading, setIsLoading] = useState(false)
+   const inputRef = useRef<HTMLInputElement>(null)
+   const router = useRouter()
 
    function handleClick() {
-      setIsLoading(true);
-      const parts = value.split('/');
-      const id = parts[parts.length - 1].split('?')[0];
-      router.push('/from-spotify/' + id);
+      setIsLoading(true)
+      const parts = value.split('/')
+      const id = parts[parts.length - 1].split('?')[0]
+      router.push('/from-spotify/' + id)
    }
 
    return (
@@ -50,5 +50,5 @@ export default function SelectPage() {
             </Button>
          </div>
       </div>
-   );
+   )
 }

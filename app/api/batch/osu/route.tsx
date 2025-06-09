@@ -1,22 +1,22 @@
-import { getBeatmap, revalidateOsuToken } from '@/lib/osu';
-import { cookies } from 'next/headers';
-const BATCH_SIZE = 50;
+import { getBeatmap, revalidateOsuToken } from '@/lib/osu'
+import { cookies } from 'next/headers'
+const BATCH_SIZE = 50
 
 export async function GET(req: Request) {
-   const { searchParams } = new URL(req.url);
-   const ids = searchParams.getAll('id');
+   const { searchParams } = new URL(req.url)
+   const ids = searchParams.getAll('id')
 
    if (!ids.length || ids.length > BATCH_SIZE)
       return new Response(JSON.stringify({ error: `No IDs provided or more than ${BATCH_SIZE}` }), {
          status: 400,
          headers: { 'Content-Type': 'application/json' },
-      });
+      })
 
-   let token = (await cookies()).get('osuToken')?.value;
-   if (!token) token = await revalidateOsuToken();
+   let token = (await cookies()).get('osuToken')?.value
+   if (!token) token = await revalidateOsuToken()
 
-   const result = await Promise.all(ids.map((id) => getBeatmap(id, token)));
-   const filtered = result.filter(Boolean);
+   const result = await Promise.all(ids.map((id) => getBeatmap(id, token)))
+   const filtered = result.filter(Boolean)
    const simplified = filtered.map((bs) => ({
       artist: bs.artist,
       covers: bs.covers,
@@ -51,10 +51,10 @@ export async function GET(req: Request) {
          ar: b.ar,
          hp: b.drain,
       })),
-   }));
+   }))
 
    return new Response(JSON.stringify(simplified), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
-   });
+   })
 }

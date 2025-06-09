@@ -1,47 +1,47 @@
-'use client';
-import { useEffect, useMemo, useState } from 'react';
-import { twMerge as tw } from 'tailwind-merge';
-import { useParams, useSearchParams } from 'next/navigation';
-import OsuCard from '@/components/cards/OsuCard';
-import { useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-query';
-import { fetchWithToken } from '@/lib/Spotify';
-import { PlaylistPage } from '@/types/Spotify';
-import { Button } from '@/components/buttons/Buttons';
-import { beatmapsSearch } from '@/lib/osu';
-import HomeBtn from '@/components/buttons/HomeBtn';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import JSZip from 'jszip';
-import { getNoVideo, download, getVideo, downloadNoVideo } from '@/utils/osuDownload';
-import Modal from '@/components/Modal';
-import { BeatmapSet } from '@/types/Osu';
-import OsuCardSet from '@/components/cards/OsuCardSet';
-import { ToastContainer, toast } from 'react-toastify';
-import Filters from './Filters';
-import Search from './Search';
-import Progress from '@/components/state/Progress';
-import BgImage from '@/components/BgImage';
-import { LinearProgress } from '@mui/material';
-import { sortBeatmapsMatrix } from '@/utils/sortBeatmapsMatrix';
-import { uniqueArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
+'use client'
+import { useEffect, useMemo, useState } from 'react'
+import { twMerge as tw } from 'tailwind-merge'
+import { useParams, useSearchParams } from 'next/navigation'
+import OsuCard from '@/components/cards/OsuCard'
+import { useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-query'
+import { fetchWithToken } from '@/lib/Spotify'
+import { PlaylistPage } from '@/types/Spotify'
+import { Button } from '@/components/buttons/Buttons'
+import { beatmapsSearch } from '@/lib/osu'
+import HomeBtn from '@/components/buttons/HomeBtn'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDownload } from '@fortawesome/free-solid-svg-icons'
+import JSZip from 'jszip'
+import { getNoVideo, download, getVideo, downloadNoVideo } from '@/utils/osuDownload'
+import Modal from '@/components/Modal'
+import { BeatmapSet } from '@/types/Osu'
+import OsuCardSet from '@/components/cards/OsuCardSet'
+import { ToastContainer, toast } from 'react-toastify'
+import Filters from './Filters'
+import Search from './Search'
+import Progress from '@/components/state/Progress'
+import BgImage from '@/components/BgImage'
+import { LinearProgress } from '@mui/material'
+import { sortBeatmapsMatrix } from '@/utils/sortBeatmapsMatrix'
+import { uniqueArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
 
 export default function PLaylistPage() {
-   const params = useParams();
-   const searchParams = useSearchParams();
-   const { playlistId } = params;
+   const params = useParams()
+   const searchParams = useSearchParams()
+   const { playlistId } = params
 
-   const [queriesDict, setQueriesDict] = useState<{ [key: string]: string }>({});
-   const [hasQueryChanged, setHasQueryChanged] = useState(false);
-   const [timeToSearch, setTimeToSearch] = useState<number | null>(null);
-   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]);
-   const [searchType, setSearchType] = useState<'local' | 'api'>('api');
-   const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([]);
-   const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([]);
+   const [queriesDict, setQueriesDict] = useState<{ [key: string]: string }>({})
+   const [hasQueryChanged, setHasQueryChanged] = useState(false)
+   const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
+   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([])
+   const [searchType, setSearchType] = useState<'local' | 'api'>('api')
+   const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
+   const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
 
-   const [isModalVisible, setIsModalVisible] = useState(false);
-   const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false);
-   const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false);
+   const [isModalVisible, setIsModalVisible] = useState(false)
+   const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false)
+   const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false)
 
    // fetching playlist
    const {
@@ -57,113 +57,113 @@ export default function PLaylistPage() {
       getNextPageParam: (lastPage) => (lastPage.next ? lastPage.next : undefined),
       getPreviousPageParam: (firstPage) => (firstPage.previous ? firstPage.previous : undefined),
       initialPageParam: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100`,
-   });
+   })
    useEffect(() => {
-      if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+      if (hasNextPage && !isFetchingNextPage) fetchNextPage()
+   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-   const queryClient = useQueryClient();
+   const queryClient = useQueryClient()
    useEffect(() => {
       //? ...we are cancelling the query on mount and the refetching it
       // console.log('cancelling query', playlistId);
       // queryClient.cancelQueries({ queryKey: ['spotify-playlist', playlistId] })
       // refetch();
-   }, []);
+   }, [])
 
-   const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || [];
+   const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || []
 
    // beatmapset search
    const beatmapsetQueries = useQueries({
       queries: tracks.map((track) => ({
          queryKey: ['beatmapset', track.track ? track.track.artists[0].name : 'err', track.track ? track.track.name : 'err'],
          queryFn: async () => {
-            const t0 = performance.now();
-            if (!track.track) return []; //? odd error rarely occurs
+            const t0 = performance.now()
+            if (!track.track) return [] //? odd error rarely occurs
             const res = await beatmapsSearch({
                q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
                // sort: searchParams.get('sort'),
                m: searchParams.get('m'),
                s: searchParams.get('s'),
-            });
-            setTimePerOneAcc((prev) => [...prev, performance.now() - t0]);
-            return res;
+            })
+            setTimePerOneAcc((prev) => [...prev, performance.now() - t0])
+            return res
          },
          enabled: !!tracks,
          staleTime: Infinity,
       })),
-   });
-   const isLoading = useMemo(() => beatmapsetQueries.some((q) => q.isLoading), [beatmapsetQueries]);
+   })
+   const isLoading = useMemo(() => beatmapsetQueries.some((q) => q.isLoading), [beatmapsetQueries])
 
    // setting data for display
    useEffect(() => {
-      const data = beatmapsetQueries.map((q) => q.data?.beatmapsets);
-      setBeatmapsets(data);
-      setFilteredBeatmapsets(data);
-   }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length]);
+      const data = beatmapsetQueries.map((q) => q.data?.beatmapsets)
+      setBeatmapsets(data)
+      setFilteredBeatmapsets(data)
+   }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length])
 
    // search
    useEffect(() => {
-      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('m') && !searchParams.get('s')) return;
-      else setHasQueryChanged(true);
-      setTimePerOneAcc([]);
+      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('m') && !searchParams.get('s')) return
+      else setHasQueryChanged(true)
+      setTimePerOneAcc([])
 
-      let time = 0;
-      setTimeToSearch(time);
+      let time = 0
+      setTimeToSearch(time)
 
       if (searchType == 'api') {
          const interval = setInterval(() => {
-            time += 100;
-            setTimeToSearch(Math.min(time, 2000));
-         }, 100);
+            time += 100
+            setTimeToSearch(Math.min(time, 2000))
+         }, 100)
 
          const timer = setTimeout(() => {
             queryClient.removeQueries({
                predicate: (query) => {
-                  return query.queryKey[0] !== 'spotify-playlist';
+                  return query.queryKey[0] !== 'spotify-playlist'
                },
-            });
-            beatmapsetQueries.forEach((query) => query.refetch());
+            })
+            beatmapsetQueries.forEach((query) => query.refetch())
 
-            setTimeToSearch(null);
-            clearInterval(interval);
-         }, 2000);
+            setTimeToSearch(null)
+            clearInterval(interval)
+         }, 2000)
          return () => {
-            clearTimeout(timer);
-            clearInterval(interval);
-         };
+            clearTimeout(timer)
+            clearInterval(interval)
+         }
       }
-      if (searchType == 'local') console.log('local search');
+      if (searchType == 'local') console.log('local search')
       // }, [searchParams.toString()]);
-   }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')]);
+   }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
 
    // download maps
    function handleDownloadAll(video: boolean) {
-      const zip = new JSZip();
+      const zip = new JSZip()
       beatmapsetQueries.forEach((q) => {
-         if (!q.data || !q.data.beatmapsets.length) return;
-         const beatmapset: BeatmapSet = q.data?.beatmapsets[0];
+         if (!q.data || !q.data.beatmapsets.length) return
+         const beatmapset: BeatmapSet = q.data?.beatmapsets[0]
 
-         const filename = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`;
+         const filename = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
          if (video) {
-            if (beatmapset.video) zip.file(filename, getVideo(beatmapset.id));
-            else zip.file(filename, getNoVideo(beatmapset.id));
+            if (beatmapset.video) zip.file(filename, getVideo(beatmapset.id))
+            else zip.file(filename, getNoVideo(beatmapset.id))
          } else {
-            zip.file(filename, getNoVideo(beatmapset.id));
+            zip.file(filename, getNoVideo(beatmapset.id))
          }
-      });
-      const promise = zip.generateAsync({ type: 'blob' }).then((blob) => download(blob, 'beatmaps.zip'));
+      })
+      const promise = zip.generateAsync({ type: 'blob' }).then((blob) => download(blob, 'beatmaps.zip'))
 
       toast.promise(promise, {
          pending: 'Downloading...',
          success: 'Downloaded successfully',
          error: 'Download failed',
-      });
+      })
       promise.then(() => {
          if (isModalDownloadingVisible) {
-            setIsModalDownloadingVisible(false);
-            setIsModalDownloadedVisible(true);
+            setIsModalDownloadingVisible(false)
+            setIsModalDownloadedVisible(true)
          }
-      });
+      })
    }
    const msLeft =
       (timePerOneAcc
@@ -171,8 +171,8 @@ export default function PLaylistPage() {
          .slice(1)
          .reduce((a, b) => a + b, 0) /
          timePerOneAcc.length) *
-      beatmapsetQueries.filter((q) => !q.isFetched).length;
-   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : '';
+      beatmapsetQueries.filter((q) => !q.isFetched).length
+   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : ''
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
@@ -212,8 +212,8 @@ export default function PLaylistPage() {
                      beatmapsets.length ? beatmapsets.filter((a) => !!a && a.length).length + '/' + beatmapsets.length : ''
                   }
                   onChange={(val, searchTypeRes, mode) => {
-                     setQueriesDict({ sort: val, m: mode });
-                     setSearchType(searchTypeRes);
+                     setQueriesDict({ sort: val, m: mode })
+                     setSearchType(searchTypeRes)
                   }}
                />
 
@@ -229,7 +229,7 @@ export default function PLaylistPage() {
                                  sortQuery={searchParams.get('sort') || 'relevance_asc'}
                                  className="flex-grow animate-in fade-in duration-1000"
                               />
-                           );
+                           )
                         else
                            return (
                               <OsuCard
@@ -237,7 +237,7 @@ export default function PLaylistPage() {
                                  beatmapset={data[0]}
                                  className="flex-grow animate-in fade-in duration-1000 shadow-sm"
                               />
-                           );
+                           )
                      })}
                   {!filteredBeatmapsets.filter((data) => data && data.length).length && !isLoading && (
                      <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
@@ -253,13 +253,13 @@ export default function PLaylistPage() {
          <Modal
             isOpen={isModalVisible}
             onOkay={() => {
-               setIsModalVisible(false);
-               setIsModalDownloadingVisible(true);
-               handleDownloadAll(false);
+               setIsModalVisible(false)
+               setIsModalDownloadingVisible(true)
+               handleDownloadAll(false)
             }}
             okBtn="Download"
             onClose={() => {
-               setIsModalVisible(false);
+               setIsModalVisible(false)
                // setIsModalDownloadingVisible(true);
                // handleDownloadAll(true);
             }}
@@ -286,5 +286,5 @@ export default function PLaylistPage() {
          </Modal>
          <ToastContainer />
       </div>
-   );
+   )
 }

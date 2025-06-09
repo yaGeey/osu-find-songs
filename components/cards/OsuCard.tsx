@@ -1,25 +1,25 @@
-import { BeatmapSet } from '@/types/Osu';
-import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faCirclePlay, faCircleCheck } from '@fortawesome/free-regular-svg-icons';
-import { faDownload, faFileVideo } from '@fortawesome/free-solid-svg-icons';
-import { twMerge as tw } from 'tailwind-merge';
-import { downloadNoVideo, downloadVideo } from '@/utils/osuDownload';
-import { Tooltip } from 'react-tooltip';
-import { groupBy } from '@/utils/arrayManaging';
-import { useRef } from 'react';
-import ImageFallback from '../ImageFallback';
+import { BeatmapSet } from '@/types/Osu'
+import Image from 'next/image'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHeart, faCirclePlay, faCircleCheck } from '@fortawesome/free-regular-svg-icons'
+import { faDownload, faFileVideo } from '@fortawesome/free-solid-svg-icons'
+import { twMerge as tw } from 'tailwind-merge'
+import { downloadNoVideo, downloadVideo } from '@/utils/osuDownload'
+import { Tooltip } from 'react-tooltip'
+import { groupBy } from '@/utils/arrayManaging'
+import { useRef } from 'react'
+import ImageFallback from '../ImageFallback'
 
 export default function OsuCard({
    beatmapset,
    onHover = true,
    className,
 }: {
-   beatmapset: BeatmapSet;
-   onHover?: boolean;
-   className?: string;
+   beatmapset: BeatmapSet
+   onHover?: boolean
+   className?: string
 }) {
-   const ref = useRef<HTMLDivElement>(null);
+   const ref = useRef<HTMLDivElement>(null)
    return (
       <>
          <div
@@ -142,15 +142,15 @@ export default function OsuCard({
             }
          </div>
       </>
-   );
+   )
 }
 
 function getColor(diff: number) {
-   const clamped = Math.max(0, Math.min(diff, 9));
-   const hue = 250 - (250 * clamped) / 6;
+   const clamped = Math.max(0, Math.min(diff, 9))
+   const hue = 250 - (250 * clamped) / 6
    return {
       backgroundColor: `hsl(${hue}, 70%, 50%)`,
       color: diff > 5.8 ? '#FFD700' : 'black',
       fontWeight: 600,
-   };
+   }
 }

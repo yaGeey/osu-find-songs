@@ -1,70 +1,70 @@
-'use client';
-import Image from 'next/image';
-import { SongData, Song } from '@/types/types';
-import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn } from './buttons/Buttons';
-import { Spotify } from 'react-spotify-embed';
-import axios from 'axios';
-import Link from 'next/link';
-import { HTMLAttributes, Ref, use, useEffect, useRef, useState } from 'react';
-import { useQueries, useQuery } from '@tanstack/react-query';
-import { Media } from '@/types/yt';
-import { applyAlwaysConditions } from '@/utils/conditions';
-import { Artist, Track } from '@/types/Spotify';
-import AuthorString from './AuthorString';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import Cookies from 'js-cookie';
-import YtVideo from './embeds/YtVideo';
-import SpotifyEmbed from './embeds/Spotify';
-import SVG from './SVG';
-import { twMerge as tw } from 'tailwind-merge';
-import Loading from './state/Loading';
-import YtSongEmbed from './embeds/YtSong';
-import { wikiSearchExact, wikiSearchMusicianTitle } from '@/lib/wiki';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWikipediaW } from '@fortawesome/free-brands-svg-icons';
-gsap.registerPlugin(useGSAP);
+'use client'
+import Image from 'next/image'
+import { SongData, Song } from '@/types/types'
+import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn } from './buttons/Buttons'
+import { Spotify } from 'react-spotify-embed'
+import axios from 'axios'
+import Link from 'next/link'
+import { HTMLAttributes, Ref, use, useEffect, useRef, useState } from 'react'
+import { useQueries, useQuery } from '@tanstack/react-query'
+import { Media } from '@/types/yt'
+import { applyAlwaysConditions } from '@/utils/conditions'
+import { Artist, Track } from '@/types/Spotify'
+import AuthorString from './AuthorString'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import Cookies from 'js-cookie'
+import YtVideo from './embeds/YtVideo'
+import SpotifyEmbed from './embeds/Spotify'
+import SVG from './SVG'
+import { twMerge as tw } from 'tailwind-merge'
+import Loading from './state/Loading'
+import YtSongEmbed from './embeds/YtSong'
+import { wikiSearchExact, wikiSearchMusicianTitle } from '@/lib/wiki'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faWikipediaW } from '@fortawesome/free-brands-svg-icons'
+gsap.registerPlugin(useGSAP)
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-   data: SongData;
-   onClose: () => void;
+   data: SongData
+   onClose: () => void
 }
 
 export default function Info({ data, onClose, className }: Props) {
-   const { spotify, beatmapset, local } = data;
-   const [selection, setSelection] = useState<'spotify' | 'youtube' | 'other'>('spotify');
-   const container = useRef<HTMLDivElement>(null);
+   const { spotify, beatmapset, local } = data
+   const [selection, setSelection] = useState<'spotify' | 'youtube' | 'other'>('spotify')
+   const container = useRef<HTMLDivElement>(null)
 
    useEffect(() => {
-      if (spotify && spotify?.length !== 20) setSelection('spotify');
-      else setSelection('youtube');
-   }, [spotify || null, beatmapset || null]);
+      if (spotify && spotify?.length !== 20) setSelection('spotify')
+      else setSelection('youtube')
+   }, [spotify || null, beatmapset || null])
 
    useEffect(() => {
-      if (!Cookies.get('showSpotifyEmbeds')) Cookies.set('showSpotifyEmbeds', 'true');
-      if (!Cookies.get('showYouTubeEmbeds')) Cookies.set('showYouTubeEmbeds', 'true');
-   }, []);
+      if (!Cookies.get('showSpotifyEmbeds')) Cookies.set('showSpotifyEmbeds', 'true')
+      if (!Cookies.get('showYouTubeEmbeds')) Cookies.set('showYouTubeEmbeds', 'true')
+   }, [])
 
    const yt = useQuery({
       queryKey: ['youtube', local.id],
       queryFn: async (): Promise<Media[]> => {
-         let song = applyAlwaysConditions(local);
-         const { data } = await axios.get(`/api?query=${encodeURIComponent(song.author + ' ' + song.title)}`);
-         return data;
+         let song = applyAlwaysConditions(local)
+         const { data } = await axios.get(`/api?query=${encodeURIComponent(song.author + ' ' + song.title)}`)
+         return data
       },
       enabled: selection == 'youtube',
-   });
+   })
 
    const wikiQuery = useQuery({
       queryKey: ['wiki', local.author],
       queryFn: async () => {
-         const { title, url } = await wikiSearchMusicianTitle(local.author);
-         if (!title || !url) return null;
-         const content = await wikiSearchExact(title);
-         if (!content) return null;
-         return { title, url, content };
+         const { title, url } = await wikiSearchMusicianTitle(local.author)
+         if (!title || !url) return null
+         const content = await wikiSearchExact(title)
+         if (!content) return null
+         return { title, url, content }
       },
-   });
+   })
 
    return (
       <div
@@ -185,14 +185,14 @@ export default function Info({ data, onClose, className }: Props) {
                               height="140px"
                               allowFullScreen
                            ></iframe>
-                        );
+                        )
                   } else {
-                     if (media.type === 'VIDEO') return <YtVideo key={i} data={media} />;
-                     if (media.type === 'SONG') return <YtSongEmbed key={i} song={media} />;
+                     if (media.type === 'VIDEO') return <YtVideo key={i} data={media} />
+                     if (media.type === 'SONG') return <YtSongEmbed key={i} song={media} />
                   }
                })}
             </li>
          )}
       </div>
-   );
+   )
 }

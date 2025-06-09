@@ -1,4 +1,4 @@
-import Head from 'next/head';
+import Head from 'next/head'
 
 export default function CustomHead({ title, desc, url, imgURL }: { title: string; desc: string; url?: string; imgURL?: string }) {
    return (
@@ -16,5 +16,5 @@ export default function CustomHead({ title, desc, url, imgURL }: { title: string
          <meta name="twitter:url" content={imgURL || 'https://osu-find-songs.vercel.app/icon.png'} key="tw_url" />
          <meta name="twitter:card" content="summary" key="tw_card" />
       </Head>
-   );
+   )
 }

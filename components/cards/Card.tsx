@@ -1,37 +1,37 @@
-import { SongData } from '@/types/types';
-import Image from 'next/image';
-import Loading from '../state/Loading';
-import { twMerge as tw } from 'tailwind-merge';
-import { SongDataQueried } from '@/types/types';
-import React from 'react';
-import Spinner from 'react-spinner-material';
+import { SongData } from '@/types/types'
+import Image from 'next/image'
+import Loading from '../state/Loading'
+import { twMerge as tw } from 'tailwind-merge'
+import { SongDataQueried } from '@/types/types'
+import React from 'react'
+import Spinner from 'react-spinner-material'
 
 const getSortValue = (sortFn: string, data: SongDataQueried) => {
    switch (sortFn) {
       case 'sort-title':
-         return null;
+         return null
       case 'sort-artist':
-         return null;
+         return null
       case 'sort-bpm':
-         return Math.round(data.beatmapsetQuery.data?.bpm!);
+         return Math.round(data.beatmapsetQuery.data?.bpm!)
       case 'sort-creator':
-         return data.beatmapsetQuery.data?.creator;
+         return data.beatmapsetQuery.data?.creator
       case 'sort-date':
-         return null;
+         return null
       case 'sort-date-mapped':
          return data.beatmapsetQuery.data?.submitted_date
             ? new Date(data.beatmapsetQuery.data.submitted_date).toLocaleDateString()
-            : null;
+            : null
       case 'sort-date-updated':
          return data.beatmapsetQuery.data?.last_updated
             ? new Date(data.beatmapsetQuery.data.last_updated).toLocaleDateString()
-            : null;
+            : null
       case 'sort-length':
          return data.beatmapsetQuery.data?.beatmaps[0].total_length
             ? new Date(data.beatmapsetQuery.data?.beatmaps[0].total_length * 1000).toISOString().slice(14, 19)
-            : null;
+            : null
    }
-};
+}
 
 function Card({
    data,
@@ -40,13 +40,13 @@ function Card({
    onClick,
    className,
 }: {
-   data: SongDataQueried;
-   sortFn?: string;
-   selected: boolean;
-   onClick?: ({ beatmapset, spotify, local }: SongData) => void;
-   className?: string;
+   data: SongDataQueried
+   sortFn?: string
+   selected: boolean
+   onClick?: ({ beatmapset, spotify, local }: SongData) => void
+   className?: string
 }) {
-   const { local, beatmapsetQuery, spotifyQuery } = data;
+   const { local, beatmapsetQuery, spotifyQuery } = data
 
    const handleClick = () => {
       if (onClick && (beatmapsetQuery.data || spotifyQuery.data)) {
@@ -54,9 +54,9 @@ function Card({
             beatmapset: beatmapsetQuery.data,
             spotify: spotifyQuery.data,
             local,
-         });
+         })
       }
-   };
+   }
 
    return (
       <div
@@ -121,6 +121,6 @@ function Card({
             </div>
          </div>
       </div>
-   );
+   )
 }
-export default React.memo(Card);
+export default React.memo(Card)

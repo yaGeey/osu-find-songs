@@ -1,37 +1,37 @@
-'use client';
-import { twMerge as tw } from 'tailwind-merge';
-import { useEffect, useState } from 'react';
-import CursorBtn from './CursorBtn';
+'use client'
+import { twMerge as tw } from 'tailwind-merge'
+import { useEffect, useState } from 'react'
+import CursorBtn from './CursorBtn'
 
 export default function Switch({
    options,
    onChange,
    disabled = false,
 }: {
-   options: string[];
-   onChange: (value: string) => void;
-   disabled?: boolean;
+   options: string[]
+   onChange: (value: string) => void
+   disabled?: boolean
 }) {
-   const [isDisabled, setIsDisabled] = useState(disabled);
-   const [selection, setSelection] = useState(options[0]);
+   const [isDisabled, setIsDisabled] = useState(disabled)
+   const [selection, setSelection] = useState(options[0])
 
    function handleIncrease() {
-      const index = options.indexOf(selection) + 1;
-      if (index >= options.length) return;
-      setSelection(options[index]);
-      onChange(options[index]);
+      const index = options.indexOf(selection) + 1
+      if (index >= options.length) return
+      setSelection(options[index])
+      onChange(options[index])
    }
    function handleDecrease() {
-      const newIndex = options.indexOf(selection) - 1;
-      if (newIndex < 0) return;
-      setSelection(options[newIndex]);
-      onChange(options[newIndex]);
+      const newIndex = options.indexOf(selection) - 1
+      if (newIndex < 0) return
+      setSelection(options[newIndex])
+      onChange(options[newIndex])
    }
 
    useEffect(() => {
-      if (isDisabled) onChange('');
-      else onChange(selection || '');
-   }, [selection, isDisabled]);
+      if (isDisabled) onChange('')
+      else onChange(selection || '')
+   }, [selection, isDisabled])
 
    return (
       <div
@@ -66,5 +66,5 @@ export default function Switch({
             </button>
          </div>
       </div>
-   );
+   )
 }

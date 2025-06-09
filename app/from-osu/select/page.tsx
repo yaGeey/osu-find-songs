@@ -1,56 +1,56 @@
-'use client';
-import BgImage from '@/components/BgImage';
-import { Song } from '@/types/types';
-import { useSongContext } from '@/contexts/SongContext';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
-import { ToastContainer, toast } from 'react-toastify';
+'use client'
+import BgImage from '@/components/BgImage'
+import { Song } from '@/types/types'
+import { useSongContext } from '@/contexts/SongContext'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import Cookies from 'js-cookie'
+import { ToastContainer, toast } from 'react-toastify'
 
 export default function SelectPage() {
-   const { setSongs } = useSongContext();
-   const router = useRouter();
+   const { setSongs } = useSongContext()
+   const router = useRouter()
 
    useEffect(() => {
-      if (Cookies.get('showSpotifyEmbeds') === undefined) Cookies.set('showSpotifyEmbeds', 'true');
-      if (Cookies.get('showYouTubeEmbeds') === undefined) Cookies.set('showYouTubeEmbeds', 'true');
-   }, []);
+      if (Cookies.get('showSpotifyEmbeds') === undefined) Cookies.set('showSpotifyEmbeds', 'true')
+      if (Cookies.get('showYouTubeEmbeds') === undefined) Cookies.set('showYouTubeEmbeds', 'true')
+   }, [])
 
    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-      toast.loading('Loading beatmaps...', { delay: 1000 });
-      const files = e.target.files;
+      toast.loading('Loading beatmaps...', { delay: 1000 })
+      const files = e.target.files
       if (files && files?.length != 0) {
-         const songsMap = new Map<string, Song>();
+         const songsMap = new Map<string, Song>()
          Array.from(files).forEach((file) => {
-            let song = file.webkitRelativePath.split('/').slice(1, -1)[0].split(' ');
+            let song = file.webkitRelativePath.split('/').slice(1, -1)[0].split(' ')
 
             // check if beatmapset folder
-            const id = song.length > 0 && !isNaN(parseInt(song[0])) ? song.shift() : null;
-            if (!id) return;
+            const id = song.length > 0 && !isNaN(parseInt(song[0])) ? song.shift() : null
+            if (!id) return
             // if (songsMap) return;
 
             // getting bg image
-            const potentialImage = file.webkitRelativePath.split('/')[2];
-            let image;
+            const potentialImage = file.webkitRelativePath.split('/')[2]
+            let image
             if (potentialImage.includes('png') || potentialImage.includes('jpg')) {
-               image = URL.createObjectURL(file);
+               image = URL.createObjectURL(file)
             }
-            if (!image) return;
+            if (!image) return
 
-            song = song.join(' ').split(' - ');
-            const songKey = `${song[0]} - ${song[1]}`;
+            song = song.join(' ').split(' - ')
+            const songKey = `${song[0]} - ${song[1]}`
             songsMap.set(songKey, {
                author: song[0],
                title: song[1],
                text: songKey,
                image,
                id,
-            });
-         });
-         setSongs(Array.from(songsMap.values()));
-         router.push('/from-osu');
+            })
+         })
+         setSongs(Array.from(songsMap.values()))
+         router.push('/from-osu')
       } else {
-         alert('Please select a valid osu! beatmaps directory');
+         alert('Please select a valid osu! beatmaps directory')
       }
    }
 
@@ -76,5 +76,5 @@ export default function SelectPage() {
          </div>
          <ToastContainer />
       </>
-   );
+   )
 }

@@ -1,8 +1,8 @@
-'use client';
-import { twMerge as tw } from 'tailwind-merge';
-import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+'use client'
+import { twMerge as tw } from 'tailwind-merge'
+import { useEffect, useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons'
 
 export default function SwitchSort({
    options,
@@ -11,16 +11,16 @@ export default function SwitchSort({
    defaultSort = 'desc',
    ...props
 }: {
-   onChange: (value: string | null, sort: 'asc' | 'desc') => void;
-   options: string[];
-   defaultOption?: string | null;
-   defaultSort?: string;
+   onChange: (value: string | null, sort: 'asc' | 'desc') => void
+   options: string[]
+   defaultOption?: string | null
+   defaultSort?: string
 }) {
-   const [selection, setSelection] = useState<string | null>(defaultOption);
-   const [sort, setSort] = useState<'asc' | 'desc'>(defaultSort as 'asc' | 'desc');
+   const [selection, setSelection] = useState<string | null>(defaultOption)
+   const [sort, setSort] = useState<'asc' | 'desc'>(defaultSort as 'asc' | 'desc')
    useEffect(() => {
-      onChange(selection, sort);
-   }, [selection, sort]);
+      onChange(selection, sort)
+   }, [selection, sort])
 
    return (
       <div
@@ -38,9 +38,9 @@ export default function SwitchSort({
                   selection == option && 'selected',
                )}
                onClick={() => {
-                  if (selection === option) setSort(sort === 'asc' ? 'desc' : 'asc');
-                  else setSort('desc');
-                  setSelection(option);
+                  if (selection === option) setSort(sort === 'asc' ? 'desc' : 'asc')
+                  else setSort('desc')
+                  setSelection(option)
                }}
             >
                {option}
@@ -52,5 +52,5 @@ export default function SwitchSort({
             </button>
          ))}
       </div>
-   );
+   )
 }

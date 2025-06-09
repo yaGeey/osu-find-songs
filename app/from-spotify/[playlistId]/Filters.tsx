@@ -1,12 +1,12 @@
-'use client';
-import FilterSelector from '@/components/switches/FilterSelector';
-import Switch from '@/components/switches/Switch';
-import SwitchFullDict from '@/components/switches/SwitchFullDict';
-import SwitchSort from '@/components/switches/SwitchSort';
-import { useEffect, useState } from 'react';
-import { twMerge as tw } from 'tailwind-merge';
-import { parseAsInteger, useQueryState } from 'nuqs';
-import { Tooltip } from 'react-tooltip';
+'use client'
+import FilterSelector from '@/components/switches/FilterSelector'
+import Switch from '@/components/switches/Switch'
+import SwitchFullDict from '@/components/switches/SwitchFullDict'
+import SwitchSort from '@/components/switches/SwitchSort'
+import { useEffect, useState } from 'react'
+import { twMerge as tw } from 'tailwind-merge'
+import { parseAsInteger, useQueryState } from 'nuqs'
+import { Tooltip } from 'react-tooltip'
 // TODO If =1 then res: 1 - 1.99
 
 export default function Filters({
@@ -14,34 +14,34 @@ export default function Filters({
    foundString,
    onSortButtonClick,
 }: {
-   onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void;
-   foundString?: string;
-   onSortButtonClick?: () => void;
+   onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void
+   foundString?: string
+   onSortButtonClick?: () => void
 }) {
-   const [q, setQ] = useQueryState('q', { defaultValue: '' });
-   const [m, setM] = useQueryState('m', { defaultValue: '' });
-   const [s, setS] = useQueryState('s', { defaultValue: '' });
-   const [sort, setSort] = useQueryState('sort', { defaultValue: '' });
+   const [q, setQ] = useQueryState('q', { defaultValue: '' })
+   const [m, setM] = useQueryState('m', { defaultValue: '' })
+   const [s, setS] = useQueryState('s', { defaultValue: '' })
+   const [sort, setSort] = useQueryState('sort', { defaultValue: '' })
    // useEffect(() => { if (sort) setSort('') }, []) //? don't work, don't know why it's not clearing
 
-   const [unfolded, setUnfolded] = useState(false);
-   const [queryDict, setQueryDict] = useState<{ [key: string]: string }>({});
-   const [searchType, setSearchType] = useState<'local' | 'api'>('api');
+   const [unfolded, setUnfolded] = useState(false)
+   const [queryDict, setQueryDict] = useState<{ [key: string]: string }>({})
+   const [searchType, setSearchType] = useState<'local' | 'api'>('api')
 
    // creating query
    const createQueryString = (name: string, operator: '<' | '=' | '>' | '', value: string) => {
-      const operatorRes = value && value != '0' && operator ? operator : '';
-      const newQuery = { ...queryDict, [name]: operatorRes + value };
-      setQueryDict(newQuery);
+      const operatorRes = value && value != '0' && operator ? operator : ''
+      const newQuery = { ...queryDict, [name]: operatorRes + value }
+      setQueryDict(newQuery)
 
       const queryString = Object.entries(newQuery)
          .flatMap(([key, value]) => {
-            if (!value || value == '0' || value == '') return [];
-            return `${key}${value}`;
+            if (!value || value == '0' || value == '') return []
+            return `${key}${value}`
          })
-         .join(' ');
-      setQ(queryString);
-   };
+         .join(' ')
+      setQ(queryString)
+   }
 
    return (
       <div
@@ -105,7 +105,7 @@ export default function Filters({
             <SwitchSort
                options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']}
                onChange={(val, sort) => {
-                  if (val) setSort(`${val}_${sort}`);
+                  if (val) setSort(`${val}_${sort}`)
                }}
                defaultOption={sort.split('_')[0]}
                defaultSort={sort.split('_')[1] as 'asc' | 'desc'}
@@ -224,5 +224,5 @@ export default function Filters({
             </div>
          )}
       </div>
-   );
+   )
 }
