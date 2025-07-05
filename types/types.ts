@@ -26,3 +26,8 @@ export type SongDataQueried = {
    spotifyQuery: UseQueryResult<Track[] | null, unknown>
    local: Song
 }
+// export type SongDataQueried = {
+//    local: Song[]
+//    spotifyQuery: UseQueryResult<Track[][], Error>
+//    osuQuery: UseQueryResult<BeatmapSet[], Error>
+// }

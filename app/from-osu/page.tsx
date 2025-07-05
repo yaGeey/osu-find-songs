@@ -23,15 +23,16 @@ import TextSwitch from '@/components/TextSwitch'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from '@fortawesome/free-solid-svg-icons'
-import { filterFn, searchFilterFn, groupArray } from '@/utils/arrayManaging'
+import { filterFn, searchFilterFn, groupArray, chunkArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
 import DynamicBg from '@/components/DynamicBg'
 import { Tooltip } from 'react-tooltip'
+import axios from 'axios'
 const Select = dynamic(() => import('react-select'), { ssr: false })
 
 export default function FromOsu() {
    const router = useRouter()
-   const { songs, setSongs } = useSongContext()
+   let { songs, setSongs } = useSongContext()
    useEffect(() => {
       if (!songs.length) {
          if (localStorage.getItem('songs_context')) {
@@ -41,6 +42,7 @@ export default function FromOsu() {
          }
       }
    }, [songs, setSongs, router])
+   const chunkedLocal = chunkArray(songs, 50)
 
    const [info, setInfo] = useState<SongData | null>(null)
    const [filters, setFilters] = useState<string[]>([])
@@ -58,57 +60,61 @@ export default function FromOsu() {
    }, [filters, groupFn, sortFn])
 
    // queries
-   const songQueries = useQueries({
-      queries: songs.map((song) => ({
-         queryKey: ['spotify', song.id],
-         queryFn: async (): Promise<Track[] | null> => {
-            const tracks = await searchSongWithConditions(song)
-            if (!tracks?.length) return null
-            return tracks
+   const spotifyQueries = useQueries({
+      queries: chunkedLocal.map((localChunk) => ({
+         queryKey: ['spotifyChunk', localChunk.map((s) => s.id)],
+         queryFn: async () => {
+            const res = await axios.post<Track[][]>('/api/batch/spotify', localChunk)
+            return res.data
          },
-         cacheTime: 1000 * 60 * 60 * 24,
+         cacheTime: 1000 * 60 * 60,
       })),
    })
 
-   const beatmapsetQueries = useQueries({
-      queries: songs.map((song) => ({
-         queryKey: ['beatmap', song.id],
-         queryFn: async (): Promise<BeatmapSet> => {
-            const t0 = performance.now()
-            const res = await getBeatmap(song.id)
-            setTimePerOneAcc((prev) => [...prev, performance.now() - t0])
-            return res
+   const osuQueries = useQueries({
+      queries: chunkedLocal.map((localChunk) => ({
+         queryKey: ['osuChunk', localChunk.map((s) => s.id)],
+         queryFn: async () => {
+            const res = await axios.get<BeatmapSet[]>(`/api/batch/osu`, {
+               params: {
+                  id: localChunk.map((s) => s.id),
+               },
+               paramsSerializer: { indexes: null },
+            })
+            return res.data
          },
-         cacheTime: 1000 * 60 * 60 * 24,
+         cacheTime: 1000 * 60 * 60,
       })),
    })
 
    // Combine the arrays
-   const combinedArray = useMemo(() => {
-      return songs.map((song, i) => ({
-         local: song,
-         spotifyQuery: songQueries[i],
-         beatmapsetQuery: beatmapsetQueries[i],
+   const combined = useMemo(() => {
+      return chunkedLocal.map((localChunk, i) => ({
+         local: localChunk,
+         spotifyQuery: spotifyQueries[i],
+         osuQuery: osuQueries[i],
       }))
-   }, [songs, beatmapsetQueries.filter((q) => q.isLoading).length, songQueries.filter((q) => q.isLoading).length])
-   const isLoading = combinedArray.some((q) => q.spotifyQuery.isLoading || q.beatmapsetQuery.isLoading)
+   }, [songs, osuQueries.filter((q) => q.isLoading).length, spotifyQueries.filter((q) => q.isLoading).length])
+   console.log('Combined array:', combined)
+   const isLoading = combined.some((q) => q.spotifyQuery.isLoading || q.osuQuery.isLoading)
 
    // Grouping and sorting
    useEffect(() => {
       if (isLoading) {
-         setGroupedDict({ '': combinedArray })
+         setGroupedDict({ '': combined })
          return
       }
-      const sortedGroupedArray = groupArray(groupFn, sortOrder, sortFn, combinedArray)
+      const sortedGroupedArray = combined.map((item) => groupArray(groupFn, sortOrder, sortFn, item))
       setGroupedDict(sortedGroupedArray)
    }, [
       groupFn,
       sortFn,
       sortOrder,
-      combinedArray,
-      beatmapsetQueries.filter((q) => q.isLoading).length,
-      songQueries.filter((q) => q.isLoading).length,
+      combined,
+      osuQueries.filter((q) => q.isLoading).length,
+      spotifyQueries.filter((q) => q.isLoading).length,
    ])
+   console.log('Grouped dictionary:', groupedDict)
 
    function handleCardClick(props: SongData) {
       if (info?.local.id === props.local.id) setInfo(null)
@@ -121,7 +127,7 @@ export default function FromOsu() {
          .slice(1)
          .reduce((a, b) => a + b, 0) /
          timePerOneAcc.length) *
-      beatmapsetQueries.filter((q) => !q.isFetched).length
+      osuQueries.filter((q) => !q.isFetched).length
    const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : ''
 
    return (
@@ -130,15 +136,15 @@ export default function FromOsu() {
          <Progress
             isLoading={isLoading}
             value={
-               ((combinedArray.filter((q) => !q.beatmapsetQuery.isLoading).length +
-                  combinedArray.filter((q) => !q.spotifyQuery.isLoading).length) *
+               ((combined.filter((q) => !q.osuQuery.isLoading).length +
+                  combined.filter((q) => !q.spotifyQuery.isLoading).length) *
                   100) /
-               (combinedArray.length * 2)
+               (combined.length * 2)
             }
          />
          {isLoading && msLeft > 5000 && (
             <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
-               {beatmapsetQueries.filter((q) => !q.isLoading).length}/{songs.length} | {timeLeft} left
+               {osuQueries.filter((q) => !q.isLoading).length}/{songs.length} | {timeLeft} left
             </div>
          )}
 
@@ -284,8 +290,8 @@ export default function FromOsu() {
          </main>
 
          <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-13 flex justify-center items-center px-8 gap-8 z-100">
-            <CreatePlaylistButton songQueries={songQueries} className="w-[215px] py-1" />
-            {/* <SharePlaylistButton data={combinedArray} className="w-[215px] py-1" /> */}
+            <CreatePlaylistButton songQueries={spotifyQueries} className="w-[215px] py-1" />
+            {/* <SharePlaylistButton data={combined} className="w-[215px] py-1" /> */}
          </footer>
          <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
       </div>

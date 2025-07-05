@@ -23,6 +23,15 @@ export const searchFilterFn = (search: string) => (a: SongDataQueried) => {
    )
 }
 
+// chunk array
+export function chunkArray<T>(arr: T[], chunkSize: number) {
+   const res: T[][] = []
+   for (let i = 0; i < arr.length; i += chunkSize) {
+      res.push(arr.slice(i, i + chunkSize))
+   }
+   return res;
+}
+
 // simple group
 export function groupBy<T extends Record<string, any>>(array: Array<T>, key: string) {
    return array.reduce((acc: Record<string, T[]>, item) => {
@@ -61,7 +70,7 @@ export function uniqueArray<T>(arr: T[], key: keyof T) {
 }
 
 // group
-export function groupArray(groupFn: string, sortOrder: string, sortFn: string, combinedArray: SongDataQueried[]) {
+export function groupArray(groupFn: string, sortOrder: string, sortFn: string, combinedArray: SongDataQueried) {
    let groupedArray
 
    // Grouping

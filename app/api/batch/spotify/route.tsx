@@ -5,6 +5,7 @@ const BATCH_SIZE = 50
 
 export async function POST(req: Request) {
    const songs: Song[] = await req.json()
+   console.log('Received songs:', songs)
 
    if (!songs.length || songs.length > BATCH_SIZE)
       return new Response(JSON.stringify({ error: `No songs provided or more than ${BATCH_SIZE}` }), {
