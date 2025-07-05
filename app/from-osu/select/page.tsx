@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { ToastContainer, toast } from "react-toastify";
 
+// prettier-ignore
 export default function SelectPage() {
    const { setSongs } = useSongContext();
    const router = useRouter();
@@ -63,7 +64,12 @@ export default function SelectPage() {
                <em className="text-black/80 ">C:/Users/.../AppData/Local/osu!/Songs</em>
                <h3 className="text-sm mt-2">⚠️ This may take some time depending on the number of beatmaps ⚠️</h3>
                {/* @ts-expect-error */}
-               <input directory="" webkitdirectory="" type="file" onChange={handleFileChange} className="opacity-0 absolute top-0 left-0 w-full h-full" />
+               <input directory=""
+                  webkitdirectory=""
+                  type="file"
+                  onChange={handleFileChange}
+                  className="opacity-0 absolute top-0 left-0 w-full h-full"
+               />
             </div>
          </div>
          <ToastContainer />
