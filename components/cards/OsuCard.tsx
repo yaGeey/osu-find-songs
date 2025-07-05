@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo } from '@fortawesome/free-solid-svg-icons';
 import { twMerge as tw } from "tailwind-merge"
-import { downloadNoVideo, downloadVideo } from "@/utils/osuDownload"
+import { useNoVideoAxios } from "@/utils/osuDownload"
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from "@/utils/arrayManaging";
 import { useRef } from "react";
@@ -12,6 +12,7 @@ import ImageFallback from "../ImageFallback";
 
 export default function OsuCard({ beatmapset, onHover = true, className }: { beatmapset: BeatmapSet, onHover?: boolean, className?: string }) {
    const ref = useRef<HTMLDivElement>(null);
+   const mutation = useNoVideoAxios(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
    return (
       <>
          <div ref={ref} className={tw("group/card select-none relative h-26 font-inter rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0", className)}>
@@ -74,7 +75,7 @@ export default function OsuCard({ beatmapset, onHover = true, className }: { bea
             <div className={tw("absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden", onHover && 'group-hover/card:flex')}>
                <FontAwesomeIcon
                   icon={beatmapset.video ? faFileVideo : faDownload}
-                  onClick={() => downloadNoVideo(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)}
+                  onClick={() => mutation.mutate()}
                   className="cursor-pointer"
                   data-tooltip-id='tooltip'
                   data-tooltip-content='Download without video'

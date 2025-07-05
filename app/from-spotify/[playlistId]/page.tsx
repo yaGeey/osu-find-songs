@@ -11,12 +11,10 @@ import { beatmapsSearch } from "@/lib/osu";
 import HomeBtn from "@/components/buttons/HomeBtn";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
-import JSZip from 'jszip';
-import { getNoVideo, download, getVideo, downloadNoVideo } from "@/utils/osuDownload";
 import Modal from "@/components/Modal";
 import { BeatmapSet } from "@/types/Osu";
 import OsuCardSet from "@/components/cards/OsuCardSet";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import Filters from "./Filters";
 import Search from "./Search";
 import Progress from "@/components/state/Progress";
@@ -24,6 +22,7 @@ import BgImage from "@/components/BgImage";
 import { LinearProgress } from "@mui/material";
 import { sortBeatmapsMatrix } from "@/utils/sortBeatmapsMatrix";
 import { uniqueArray, uniqueBeatmapsetMatrix } from "@/utils/arrayManaging";
+import useDownloadAll from "@/hooks/useDownloadAll";
 
 export default function PLaylistPage() {
    const params = useParams();
@@ -41,7 +40,6 @@ export default function PLaylistPage() {
    const [isModalVisible, setIsModalVisible] = useState(false);
    const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false);
    const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false);
-
 
    // fetching playlist
    const { data: tracksData, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
@@ -129,38 +127,10 @@ export default function PLaylistPage() {
       // }, [searchParams.toString()]);
    }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')]);
 
-
-   // download maps
-   function handleDownloadAll(video: boolean) {
-      const zip = new JSZip();
-      beatmapsetQueries.forEach((q) => {
-         if (!q.data || !q.data.beatmapsets.length) return;
-         const beatmapset: BeatmapSet = q.data?.beatmapsets[0];
-
-         const filename = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`;
-         if (video) {
-            if (beatmapset.video) zip.file(filename, getVideo(beatmapset.id));
-            else zip.file(filename, getNoVideo(beatmapset.id));
-         } else {
-            zip.file(filename, getNoVideo(beatmapset.id));
-         }
-      });
-      const promise = zip.generateAsync({ type: 'blob' }).then((blob) => download(blob, 'beatmaps.zip'))
-
-      toast.promise(promise, {
-         pending: 'Downloading...',
-         success: 'Downloaded successfully',
-         error: 'Download failed',
-      });
-      promise.then(() => {
-         if (isModalDownloadingVisible) {
-            setIsModalDownloadingVisible(false);
-            setIsModalDownloadedVisible(true);
-         }
-      })
-   }
    const msLeft = ((timePerOneAcc.map((item, i) => item - timePerOneAcc[i - 1]).slice(1).reduce((a, b) => a + b, 0) / timePerOneAcc.length) * (beatmapsetQueries.filter(q => !q.isFetched).length));
    const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : '';
+
+   const { current, progress, handleDownloadAll } = useDownloadAll(beatmapsetQueries)
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
@@ -168,9 +138,17 @@ export default function PLaylistPage() {
          <div className={tw("fixed top-0 h-0.6 z-100000 w-screen text-main-lighter", timeToSearch ? 'block' : 'hidden')}>
             <LinearProgress variant="determinate" value={timeToSearch! * 100 / 2000} color="inherit" />
          </div>
+
+         {/* fetching spotify progress */}
          <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
          {isLoading && msLeft > 5000 && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
             {beatmapsetQueries.filter(q => !q.isLoading).length}/{tracks.length} | {timeLeft} left
+         </div>}
+
+         {/* download all progress */}
+         {progress !== null && <div className="fixed top-0 h-0.6 z-100000 w-screen text-success block text-xs text-end">
+            <LinearProgress variant="determinate" value={progress} color="inherit" />
+            <span className="bg-success/20 text-xs px-1 rounded-bl-sm min-w-[120px] text-highlight">{current}</span>
          </div>}
 
          <header className={tw("min-w-[800px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker",)}>
@@ -221,13 +199,11 @@ export default function PLaylistPage() {
             onOkay={() => {
                setIsModalVisible(false);
                setIsModalDownloadingVisible(true);
-               handleDownloadAll(false);
+               handleDownloadAll();
             }}
             okBtn='Download'
             onClose={() => {
                setIsModalVisible(false);
-               // setIsModalDownloadingVisible(true);
-               // handleDownloadAll(true);
             }}
             closeBtn='Close'
             state='info'
