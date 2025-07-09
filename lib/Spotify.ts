@@ -2,7 +2,7 @@
 import { cookies } from 'next/headers'
 import { Song } from "@/types/types";
 import {conditions, hardConditions, applyAlwaysConditions} from '../utils/conditions';
-import { Playlist } from '@/types/Spotify';
+import { Playlist, Track } from '@/types/Spotify';
 
 export const findSong = async (song: Song) => {
    let token = (await cookies()).get('spotifyToken')?.value
@@ -28,7 +28,7 @@ export const findSongQuery = async (song: Song) => {
    return await response.json(); 
 }
 
-export const searchSongWithConditions = async (song: Song): Promise<[any] | null> => {
+export const searchSongWithConditions = async (song: Song): Promise<Track[] | null> => {
    let modifiedSong = applyAlwaysConditions(song);
    
    for (const condition of conditions) {
