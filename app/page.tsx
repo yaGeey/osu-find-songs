@@ -4,6 +4,7 @@ import { Button } from "@/components/buttons/Buttons";
 import BgImage from "@/components/BgImage";
 import Image from 'next/image'
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 // import { useState } from "react";
 // import { twMerge as tw } from "tailwind-merge";
 
@@ -22,6 +23,7 @@ export default function LandingPage() {
    //       setSrc('/bg.svg')
    //    }, 700)
    // }
+   const router = useRouter()
    useEffect(() => {
       if (localStorage.getItem('songs_context')) {
          localStorage.removeItem('songs_context')
@@ -38,10 +40,13 @@ export default function LandingPage() {
             <h1 className="text-3xl  mt-3">Welcome to osu! find songs</h1>
             <h2 className="text-2xl ">Choose one of the options</h2>
             <div className="flex gap-4 mt-10 w-full">
-               <Link href="/from-osu/select">
+               {/* <Link href="/from-osu/select"> */}
                   {/* onMouseEnter={() => handleMouseEnter('/from-osu.png')} onMouseLeave={handleMouseLeave} */}
-                  <Button className="text-black bg-gradient-to-l from-[#1DB954] to-[#FF66AA] font-medium" >Beatmaps to Spotify</Button>
-               </Link>
+               <Button className="text-black bg-gradient-to-l from-[#1DB95499] to-[#FF66AA99] font-medium"
+                  onClick={() => {
+                     confirm('App will work normally only with a small amount of apps selected (<100). Do you want to continue?') ? router.push('/from-osu/select') : null
+                  }}>Beatmaps to Spotify (not stable)</Button>
+               {/* </Link> */}
                <Link href="/from-spotify/select">
                   {/* onMouseEnter={() => handleMouseEnter('/from-spotify.png')} onMouseLeave={handleMouseLeave} */}
                   <Button className="text-black bg-gradient-to-r from-[#1DB954] to-[#FF66AA] font-medium">Spotify playlist to beatmaps</Button>
