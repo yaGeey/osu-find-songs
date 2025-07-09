@@ -65,8 +65,7 @@ export default function SelectPage() {
                <em className="text-black/80 ">C:/Users/.../AppData/Local/osu!/Songs</em>
                <h3 className="text-sm mt-2">⚠️ This may take some time depending on the number of beatmaps ⚠️</h3>
                {/* @ts-expect-error */}
-               <input
-                  directory=""
+               <input directory=""
                   webkitdirectory=""
                   type="file"
                   onChange={handleFileChange}
