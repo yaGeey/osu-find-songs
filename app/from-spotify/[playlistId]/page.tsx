@@ -224,7 +224,7 @@ export default function PLaylistPage() {
                         if (data.length > 1 && data.length < 18)
                            return (
                               <OsuCardSet
-                                 key={i}
+                                 key={data[0].id + i}
                                  beatmapsets={data}
                                  sortQuery={searchParams.get('sort') || 'relevance_asc'}
                                  className="flex-grow animate-in fade-in duration-1000"
@@ -233,7 +233,7 @@ export default function PLaylistPage() {
                         else
                            return (
                               <OsuCard
-                                 key={i}
+                                 key={data[0].id}
                                  beatmapset={data[0]}
                                  className="flex-grow animate-in fade-in duration-1000 shadow-sm"
                               />
