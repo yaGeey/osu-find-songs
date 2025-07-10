@@ -47,6 +47,7 @@
       "react-switch": "^7.1.0",
       "react-toastify": "^11.0.5",
       "react-tooltip": "^5.28.0",
+      "react-virtuoso": "^4.13.0",
       "react-window": "^1.8.11",
       "tailwind-merge": "^3.0.1",
       "tailwindcss-animate": "^1.0.7",

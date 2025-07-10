@@ -28,6 +28,7 @@ import DynamicBg from '@/components/DynamicBg'
 import { Tooltip } from 'react-tooltip'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { Virtuoso } from 'react-virtuoso'
 const Select = dynamic(() => import('react-select'), { ssr: false })
 
 const CHUNK_SIZE = 10 // TODO make it dynamic depending on the songs length
@@ -48,7 +49,7 @@ export default function FromOsu() {
    const [groupFn, setGroupFn] = useState<string>('no')
    const [sortFn, setSortFn] = useState('sort-date')
    const [isSettingsVisible, setIsSettingsVisible] = useState(false)
-   const [groupedDict, setGroupedDict] = useState<Record<string, CombinedSingleSimple[]>>({"":[]})
+   const [groupedDict, setGroupedDict] = useState<Record<string, CombinedSingleSimple[]>>({ '': [] })
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
@@ -133,6 +134,27 @@ export default function FromOsu() {
          timePerOneAcc.length) *
       osuQueries.filter((q) => !q.isFetched).length
    const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : ''
+
+   // for virtual list
+   // TODO розібратися
+   type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
+
+   const virtualListItems: ListItem[] = useMemo(() => {
+      const items: ListItem[] = []
+
+      for (const group of Object.keys(groupedDict || {})) {
+         if (group !== '') items.push({ type: 'group', key: group })
+
+         if (group === '' || group === selectedGroup) {
+            const filtered = groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search))
+            filtered.forEach((data) => {
+               items.push({ type: 'card', data })
+            })
+         }
+      }
+
+      return items
+   }, [groupedDict, selectedGroup, filters, search])
 
    return (
       <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
@@ -259,38 +281,37 @@ export default function FromOsu() {
                {info && <Info data={info} onClose={() => setInfo(null)} />}
             </div>
 
-            <ul className="flex flex-col pt-3 overflow-y-auto scrollbar">
-               {groupedDict &&
-                  Object.keys(groupedDict).map((group, i) => (
-                     <div key={i} className="w-full flex flex-col items-end">
-                        {group !== '' && (
-                           <GroupSeparator
-                              selected={group == selectedGroup}
-                              onClick={() => setSelectedGroup(group === selectedGroup ? null : group)}
-                           >
-                              {group}
-                           </GroupSeparator>
-                        )}
-                        {(group == selectedGroup || group === '') && (
-                           <ul className="flex flex-col gap-2 items-end ">
-                              {groupedDict[group]
-                                 .filter(filterFn(filters))
-                                 .filter(searchFilterFn(search))
-                                 .map((songData, i: number) => (
-                                    <Card
-                                       key={i}
-                                       data={songData}
-                                       sortFn={sortFn}
-                                       className="-mt-3"
-                                       selected={info?.local.id === songData.local.id}
-                                       onClick={handleCardClick}
-                                    />
-                                 ))}
-                           </ul>
-                        )}
-                     </div>
-                  ))}
-            </ul>
+            <Virtuoso
+               key={virtualListItems.length}
+               data={virtualListItems}
+               itemContent={(index, item) => (
+                  // TODO without wrapper no transition effect, but even with this padding top don't work.. why? and how virtuoso work
+                  //? padding не робе, бо весь список симулюється через нього або translate-y
+                  <div className={tw('flex justify-end w-full', virtualListItems.indexOf(item) === 0 && 'mt-3')}>
+                     {item.type === 'group' ? (
+                        <GroupSeparator
+                           className="-mt-3"
+                           selected={item.key === selectedGroup}
+                           onClick={() => setSelectedGroup(item.key === selectedGroup ? null : item.key)}
+                        >
+                           {item.key}
+                        </GroupSeparator>
+                     ) : item.type === 'card' ? (
+                        <Card
+                           data={item.data}
+                           sortFn={sortFn}
+                           className="-mt-3 "
+                           selected={info?.local.id === item.data.local.id}
+                           onClick={handleCardClick}
+                        />
+                     ) : null}
+                  </div>
+               )}
+               className="scrollbar w-full"
+               style={{ height: 'calc(100dvh - 108px)' }} // 108px = header + footer height. doesn't changing
+               overscan={300}
+               defaultItemHeight={85} //  why do I need this?
+            />
          </main>
 
          <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-13 flex justify-center items-center px-8 gap-8 z-100">
