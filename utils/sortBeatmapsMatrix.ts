@@ -31,7 +31,7 @@ export const sortBeatmapsMatrix = (a: BeatmapSet[], b: BeatmapSet[], sortFnName:
       case 'favorites':
          return sign * (a[0].favourite_count - b[0].favourite_count)
    }
-   return sign
+   return 0
 }
 
 export const getRating = (beatmapset: BeatmapSet) => Math.floor((beatmapset.favourite_count / beatmapset.play_count) * 10000)
