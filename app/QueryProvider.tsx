@@ -1,10 +1,10 @@
 'use client'
 
 // Since QueryClientProvider relies on useContext under the hood, we have to put 'use client' on top
-import { isServer, QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { isServer, QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 
 function makeQueryClient() {
    return new QueryClient({
@@ -43,7 +43,7 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
    const queryClient = getQueryClient()
    const persister = createSyncStoragePersister({
       storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-   });
+   })
 
    return (
       <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
@@ -57,9 +57,9 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
                </div>
             )}
          > */}
-            {children}
+         {children}
          {/* </ErrorBoundary> */}
-         <ReactQueryDevtools initialIsOpen={false} />
+         {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
       </PersistQueryClientProvider>
-   );
-};
+   )
+}

@@ -1,23 +1,23 @@
 'use client'
-import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 function CallbackPage() {
-   const searchParams = useSearchParams();
-   const router = useRouter();
+   const searchParams = useSearchParams()
+   const router = useRouter()
 
    useEffect(() => {
-      const code = searchParams.get('code');
+      const code = searchParams.get('code')
       if (!code) {
-         router.push('/');
-         return;
+         router.push('/')
+         return
       }
 
       // Redirect to the server-side route to handle the OAuth callback
-      router.push(`/api/auth/spotify/callback?code=${code}`);
-   }, [searchParams, router]);
+      router.push(`/api/auth/spotify/callback?code=${code}`)
+   }, [searchParams, router])
 
-   return <div>Authorizing...</div>;
+   return <div>Authorizing...</div>
 }
 export default function Page() {
    return (

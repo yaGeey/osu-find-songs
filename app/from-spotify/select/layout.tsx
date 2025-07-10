@@ -1,7 +1,7 @@
-import { Metadata } from "next";
-import SelectPage from './page';
+import { Metadata } from 'next'
+import SelectPage from './page'
 
 export const metadata: Metadata = {
-   title: "Select Spotify playlist",
-};
-export default SelectPage;
+   title: 'Select Spotify playlist',
+}
+export default SelectPage
