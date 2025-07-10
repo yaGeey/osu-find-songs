@@ -1,3 +1,4 @@
+'use client'
 import { Track } from '@/types/Spotify'
 import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from '@/lib/Spotify'
 import { useMutation, type UseQueryResult } from '@tanstack/react-query'
@@ -11,27 +12,24 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
 import { useSongContext } from '@/contexts/SongContext'
 
-export default function CreatePlaylistButton({
-   songQueries,
-   className,
-}: {
-   songQueries: UseQueryResult<Track[] | null, Error>[]
+interface Props extends React.HTMLAttributes<HTMLButtonElement> {
+   isDisabled: boolean
+   data: Track[][]
    className?: string
-}) {
+}
+export default function CreatePlaylistButton({ data, className, isDisabled, ...props }: Props) {
    const [isModalOpen, setIsModalOpen] = useState(false)
    const [state, setState] = useState<'error' | 'success' | 'warning' | 'info' | 'loading'>('info')
    const [modalContent, setModalContent] = useState<React.ReactNode | null>(null)
    const [onOkayFn, setOnOkayFn] = useState<() => void>(() => {})
    const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay')
    const router = useRouter()
-   const { songs } = useSongContext()
 
    const mutation = useMutation({
       mutationFn: ({ playlistId, uris }: { playlistId: string; uris: string[] }) => AddItemsToPlaylist(playlistId, uris),
    })
 
    function navigateToAuth() {
-      localStorage.setItem('songs_context', JSON.stringify(songs))
       const encodeRedirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!)
       const clientId = process.env.NEXT_PUBLIC_AUTH_SPOTIFY_ID
       const scope = 'playlist-modify-public playlist-modify-private'
@@ -58,11 +56,6 @@ export default function CreatePlaylistButton({
          return
       }
 
-      if (songQueries.filter((q) => q.data).length !== songQueries.length) {
-         handleModal(<h1>Some songs are still loading, try again later</h1>, 'warning')
-         return
-      }
-
       handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading')
       const profile = await fetchMyProfile()
       if (!profile) {
@@ -83,9 +76,10 @@ export default function CreatePlaylistButton({
 
       handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading')
 
-      const allTracks = songQueries.map((q) => q.data).filter((data) => !!data)
-      const spotifyStrict = allTracks.filter((tracks) => tracks.length !== 20)
-      const tracks = spotifyStrict.map((tracks) => tracks[0])
+      // TODO sort by popularity?
+      const filteredErrors = data.filter(Boolean)
+      const strictSearchRes = filteredErrors.filter((track) => track.length !== 20)
+      const tracks = strictSearchRes.map((tracks) => tracks[0])
 
       const promises = []
       const chunkSize = 100
@@ -119,6 +113,8 @@ export default function CreatePlaylistButton({
    return (
       <>
          <Button
+            {...props}
+            disabled={isDisabled}
             onClick={() => handleCreatePlaylist()}
             data-tooltip-id="tooltip-1"
             data-tooltip-content="Create playlist on your Spotify account and populate it with tracks with filter 'Exact Spotify match'"

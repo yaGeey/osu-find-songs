@@ -1,25 +1,25 @@
 import { BeatmapSet } from '@/types/Osu'
-import { SongDataQueried } from '@/types/types'
+import { Combined, CombinedQueried, CombinedSingle, CombinedSingleSimple, Song, SongDataQueried } from '@/types/types'
 
 // filters
-export const filterFn = (filters: string[]) => (a: SongDataQueried) => {
+export const filterFn = (filters: string[]) => (a: CombinedSingleSimple) => {
    if (!filters.length) return true
 
    return filters.every((filter) => {
       switch (filter) {
          case 'exact-spotify':
-            return a.spotifyQuery.data?.length !== 20
+            return a.spotify.length !== 20
       }
    })
 }
 
-export const searchFilterFn = (search: string) => (a: SongDataQueried) => {
+export const searchFilterFn = (search: string) => (a: CombinedSingleSimple) => {
    if (!search.length) return true
    const str = search.toLowerCase()
    return (
       a.local.title.toLowerCase().includes(str) ||
       a.local.author.toLowerCase().includes(str) ||
-      a.beatmapsetQuery.data?.creator.toLowerCase().includes(str)
+      a.osu.creator.toLowerCase().includes(str)
    )
 }
 
@@ -29,7 +29,7 @@ export function chunkArray<T>(arr: T[], chunkSize: number) {
    for (let i = 0; i < arr.length; i += chunkSize) {
       res.push(arr.slice(i, i + chunkSize))
    }
-   return res;
+   return res
 }
 
 // simple group
@@ -69,18 +69,30 @@ export function uniqueArray<T>(arr: T[], key: keyof T) {
    })
 }
 
+export function flatCombinedArray(arr: CombinedQueried): any[] { // TODO fix types
+   return arr.local.map((item, i) => ({
+      local: item,
+      spotify: arr.spotifyQuery.data?.[i],
+      osu: arr.osuQuery.data?.[i],
+      isSpotifyLoading: arr.spotifyQuery.isLoading,
+      isOsuLoading: arr.osuQuery.isLoading,
+      error: arr.spotifyQuery.isError || arr.osuQuery.isError,
+   }))
+}
+
 // group
-export function groupArray(groupFn: string, sortOrder: string, sortFn: string, combinedArray: SongDataQueried) {
+export function groupArray(groupFn: string, sortOrder: string, sortFn: string, combinedArray: CombinedSingleSimple[]) {
    let groupedArray
 
    // Grouping
+   // TODO sort grouping titles UI
    if (groupFn === 'year') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.beatmapsetQuery.data?.submitted_date?.split('-')[0]!)
+      groupedArray = Object.groupBy(combinedArray, (q) => q.osu.submitted_date?.split('-')[0]!)
    } else if (groupFn === 'genre') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.beatmapsetQuery.data?.genre.name!)
+      groupedArray = Object.groupBy(combinedArray, (q) => q.osu.genre.name!)
    } else if (groupFn === 'length') {
       groupedArray = Object.groupBy(combinedArray, (q) => {
-         const length = q.beatmapsetQuery.data?.beatmaps[0].total_length!
+         const length = q.osu.beatmaps[0].total_length!
          if (length < 60) return '< 1 minute'
          if (length < 120) return '1 - 2 minutes'
          if (length < 300) return '2 - 5 minutes'
@@ -88,10 +100,10 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
          return '> 10 minutes'
       })
    } else if (groupFn === 'artist') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.beatmapsetQuery.data?.artist!)
+      groupedArray = Object.groupBy(combinedArray, (q) => q.osu.artist!)
    } else if (groupFn === 'bpm') {
       groupedArray = Object.groupBy(combinedArray, (q) => {
-         const bpm = q.beatmapsetQuery.data?.bpm!
+         const bpm = q.osu.bpm!
          if (bpm < 100) return '< 100 bpm'
          if (bpm < 200) return '100 - 200 bpm'
          if (bpm < 300) return '200 - 300 bpm'
@@ -104,11 +116,12 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
    }
 
    // Sort each group
+   // TODO розберись, перепиши мб
    const sortedGroupedArray = Object.entries(groupedArray).reduce(
       (acc, [key, value]) => {
          const sortedArray = value.sort((a, b) => {
-            const aData = sortOrder == 'asc' ? a.beatmapsetQuery.data : b.beatmapsetQuery.data
-            const bData = sortOrder == 'asc' ? b.beatmapsetQuery.data : a.beatmapsetQuery.data
+            const aData = sortOrder == 'asc' ? a.osu : b.osu
+            const bData = sortOrder == 'asc' ? b.osu : a.osu
             if (!aData || !bData) return 0
 
             switch (sortFn) {
@@ -141,4 +154,17 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
    )
 
    return sortedGroupedArray
+}
+
+// TODO розберись, це чат гпт
+export function mergeGroupedArrays<T>(grouped: Record<string, any[]>[]) {
+   return grouped.reduce(
+      (acc, obj) => {
+         for (const [key, value] of Object.entries(obj)) {
+            acc[key] = [...(acc[key] || []), ...(value || [])]
+         }
+         return acc
+      },
+      {} as Record<string, T[]>,
+   )
 }

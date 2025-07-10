@@ -14,6 +14,20 @@ export default function SelectPage() {
    useEffect(() => {
       if (Cookies.get('showSpotifyEmbeds') === undefined) Cookies.set('showSpotifyEmbeds', 'true')
       if (Cookies.get('showYouTubeEmbeds') === undefined) Cookies.set('showYouTubeEmbeds', 'true')
+      if (!Cookies.get('spotify_oauth_access_token')) {
+         if (
+            confirm(
+               'You must be logged in to your Spotify account.' +
+                  'You can skip login, but you won’t be able to create playlists. Do you want to log in now?',
+            )
+         ) {
+            const encodeRedirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!)
+            const clientId = process.env.NEXT_PUBLIC_AUTH_SPOTIFY_ID
+            const scope = 'playlist-modify-public playlist-modify-private'
+            const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeRedirectUri}&scope=${scope}`
+            router.push(url)
+         }
+      }
    }, [])
 
    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {

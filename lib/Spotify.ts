@@ -2,27 +2,32 @@
 import { cookies } from 'next/headers'
 import { Song } from '@/types/types'
 import { conditions, hardConditions, applyAlwaysConditions } from '../utils/conditions'
-import { Playlist } from '@/types/Spotify'
+import { Playlist, SpotifyError, Track, TrackFull } from '@/types/Spotify'
+import axios from 'axios'
 
-export const findSong = async (song: Song, token: string) => {
-   const query = `artist:${song.author} track:${song.title}`
-   const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
-      headers: { Authorization: `Bearer ${token}` },
-   })
-   if (!response.ok) throw new Error(await response.text())
-   return await response.json()
+export const findSong = async (query: string, token: string): Promise<{ tracks: { items: [TrackFull] | [] } }> => {
+   try {
+      const res = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
+         headers: { Authorization: `Bearer ${token}` },
+      })
+      return res.data
+   } catch (err: any) {
+      const data = err.response?.data as SpotifyError
+      if (err.response?.status === 429) {
+         const wait = err.response.headers.get('Retry-After')
+         console.warn(`Rate limit exceeded. Waiting for ${wait} seconds...`)
+         await new Promise((resolve) => setTimeout(resolve, parseInt(wait) * 1000 + 1))
+         return await findSong(query, token)
+      }
+      console.error(data)
+      return { tracks: { items: [] } }
+   }
 }
 
-export const findSongQuery = async (song: Song, token: string) => {
-   const query = `${song.author} - ${song.title}`
-   const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
-      headers: { Authorization: `Bearer ${token}` },
-   })
-   if (!response.ok) throw new Error(await response.text())
-   return await response.json()
-}
-
-export const searchSongWithConditions = async (song: Song, token: string | undefined = undefined): Promise<[any] | null> => {
+export const searchSongWithConditions = async (
+   song: Song,
+   token: string | undefined = undefined,
+): Promise<[TrackFull] | null> => {
    if (!token) {
       token = (await cookies()).get('spotifyToken')?.value
       if (!token) token = await revalidateSpotifyToken()
@@ -34,20 +39,17 @@ export const searchSongWithConditions = async (song: Song, token: string | undef
       if (!conditionSearch) continue
       else modifiedSong = conditionSearch
 
-      const result = await findSong(modifiedSong, token)
+      const result = await findSong(`artist:${modifiedSong.author} track:${modifiedSong.title}`, token!)
       if (result.tracks.items.length) return result.tracks.items
-      console.warn(`Song not found: ${modifiedSong.author} - ${modifiedSong.title}`)
    }
 
    for (const condition of hardConditions) {
       const hardSearch = condition(modifiedSong)
 
-      const result = await findSongQuery(hardSearch, token)
+      const result = await findSong(`${hardSearch.author} - ${hardSearch.title}`, token!)
       if (result.tracks.items.length) return result.tracks.items
       console.warn(`Song not found after HARD: ${hardSearch.author} - ${hardSearch.title}`)
    }
-
-   console.error(`!!! Song not found after all tries`)
    return null
 }
 

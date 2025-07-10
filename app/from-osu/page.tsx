@@ -1,7 +1,6 @@
 'use client'
 import { use, useEffect, useMemo, useRef, useState } from 'react'
-import { SongData, SongDataQueried } from '@/types/types'
-import { searchSongWithConditions } from '@/lib/Spotify'
+import { CombinedSingle, CombinedSingleSimple, SongData, SongDataQueried } from '@/types/types'
 import Image from 'next/image'
 import Card from '@/components/cards/Card'
 import Info from '@/components/Info'
@@ -23,37 +22,41 @@ import TextSwitch from '@/components/TextSwitch'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from '@fortawesome/free-solid-svg-icons'
-import { filterFn, searchFilterFn, groupArray, chunkArray } from '@/utils/arrayManaging'
+import { filterFn, searchFilterFn, groupArray, chunkArray, mergeGroupedArrays, flatCombinedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
 import DynamicBg from '@/components/DynamicBg'
 import { Tooltip } from 'react-tooltip'
 import axios from 'axios'
+import Cookies from 'js-cookie'
 const Select = dynamic(() => import('react-select'), { ssr: false })
+
+const CHUNK_SIZE = 10 // TODO make it dynamic depending on the songs length
+// TODO! yyaaay it's working, but loading spinner breaks. fix this
 
 export default function FromOsu() {
    const router = useRouter()
    let { songs, setSongs } = useSongContext()
    useEffect(() => {
       if (!songs.length) {
-         if (localStorage.getItem('songs_context')) {
-            setSongs(JSON.parse(localStorage.getItem('songs_context')!))
-         } else {
-            router.push('/from-osu/select')
-         }
+         router.push('/from-osu/select')
       }
    }, [songs, setSongs, router])
-   const chunkedLocal = chunkArray(songs, 50)
+   const chunkedLocal = chunkArray(songs, CHUNK_SIZE)
 
-   const [info, setInfo] = useState<SongData | null>(null)
+   const [info, setInfo] = useState<CombinedSingleSimple | null>(null)
    const [filters, setFilters] = useState<string[]>([])
    const [groupFn, setGroupFn] = useState<string>('no')
    const [sortFn, setSortFn] = useState('sort-date')
    const [isSettingsVisible, setIsSettingsVisible] = useState(false)
-   const [groupedDict, setGroupedDict] = useState<any>(undefined)
+   const [groupedDict, setGroupedDict] = useState<Record<string, CombinedSingleSimple[]>>({"":[]})
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
-   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([])
+   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]) // TODO implement
+
+   const isLoggedWithSpotify = useMemo(() => {
+      return Cookies.get('spotify_oauth_access_token') !== undefined
+   }, [])
 
    useEffect(() => {
       setInfo(null)
@@ -67,7 +70,7 @@ export default function FromOsu() {
             const res = await axios.post<Track[][]>('/api/batch/spotify', localChunk)
             return res.data
          },
-         cacheTime: 1000 * 60 * 60,
+         cacheTime: 0,
       })),
    })
 
@@ -83,7 +86,7 @@ export default function FromOsu() {
             })
             return res.data
          },
-         cacheTime: 1000 * 60 * 60,
+         cacheTime: 0,
       })),
    })
 
@@ -95,16 +98,17 @@ export default function FromOsu() {
          osuQuery: osuQueries[i],
       }))
    }, [songs, osuQueries.filter((q) => q.isLoading).length, spotifyQueries.filter((q) => q.isLoading).length])
-   console.log('Combined array:', combined)
    const isLoading = combined.some((q) => q.spotifyQuery.isLoading || q.osuQuery.isLoading)
 
    // Grouping and sorting
    useEffect(() => {
+      const flattened = combined.flatMap((item) => flatCombinedArray(item))
       if (isLoading) {
-         setGroupedDict({ '': combined })
+         setGroupedDict({ '': flattened })
          return
       }
-      const sortedGroupedArray = combined.map((item) => groupArray(groupFn, sortOrder, sortFn, item))
+      // ) // TODO sort by popularity
+      const sortedGroupedArray = groupArray(groupFn, sortOrder, sortFn, flattened)
       setGroupedDict(sortedGroupedArray)
    }, [
       groupFn,
@@ -114,13 +118,13 @@ export default function FromOsu() {
       osuQueries.filter((q) => q.isLoading).length,
       spotifyQueries.filter((q) => q.isLoading).length,
    ])
-   console.log('Grouped dictionary:', groupedDict)
 
-   function handleCardClick(props: SongData) {
+   function handleCardClick(props: CombinedSingleSimple) {
       if (info?.local.id === props.local.id) setInfo(null)
       else setInfo({ ...props })
    }
 
+   // TODO to function / component
    const msLeft =
       (timePerOneAcc
          .map((item, i) => item - timePerOneAcc[i - 1])
@@ -213,6 +217,7 @@ export default function FromOsu() {
                   className="lg:w-[200px] min-w-[75px] w-fit z-1"
                   onChange={(e: any) => setSortFn(e.value)}
                   id="sort-select"
+                  defaultValue={sortOptions[0]}
                   options={sortOptions}
                   isDisabled={isLoading}
                   styles={selectStyles}
@@ -262,7 +267,6 @@ export default function FromOsu() {
                            <GroupSeparator
                               selected={group == selectedGroup}
                               onClick={() => setSelectedGroup(group === selectedGroup ? null : group)}
-                              className="z-1"
                            >
                               {group}
                            </GroupSeparator>
@@ -272,7 +276,7 @@ export default function FromOsu() {
                               {groupedDict[group]
                                  .filter(filterFn(filters))
                                  .filter(searchFilterFn(search))
-                                 .map((songData: SongDataQueried, i: number) => (
+                                 .map((songData, i: number) => (
                                     <Card
                                        key={i}
                                        data={songData}
@@ -290,8 +294,17 @@ export default function FromOsu() {
          </main>
 
          <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-13 flex justify-center items-center px-8 gap-8 z-100">
-            <CreatePlaylistButton songQueries={spotifyQueries} className="w-[215px] py-1" />
-            {/* <SharePlaylistButton data={combined} className="w-[215px] py-1" /> */}
+            <CreatePlaylistButton
+               data={combined.flatMap((item) => flatCombinedArray(item)).map((item) => item.spotify)}
+               className="w-[215px] py-1"
+               isDisabled={!isLoggedWithSpotify || isLoading}
+               data-tooltip-id={!isLoggedWithSpotify || isLoading ? 'tooltip' : undefined}
+               data-tooltip-content={
+                  isLoggedWithSpotify
+                     ? 'Wait for the Spotify data to load'
+                     : 'Log in to your Spotify account on a previous page to create a playlist'
+               }
+            />
          </footer>
          <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
       </div>

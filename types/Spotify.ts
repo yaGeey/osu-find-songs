@@ -8,7 +8,7 @@ type Image = {
    url: string
 }
 
-export type Artist = {
+export type ArtistFull = {
    external_urls: ExternalUrls
    href: string
    id: string
@@ -17,9 +17,9 @@ export type Artist = {
    uri: string
 }
 
-export type Album = {
+export type AlbumFull = {
    album_type: 'single' | 'album' | 'compilation'
-   artists: Artist[]
+   artists: ArtistFull[]
    available_markets: string[]
    external_urls: ExternalUrls
    href: string
@@ -38,9 +38,9 @@ type ExternalIds = {
    isrc: string
 }
 
-export type Track = {
+export type TrackFull = {
    album: Album
-   artists: Artist[]
+   artists: ArtistFull[]
    available_markets: string[]
    disc_number: number
    duration_ms: number
@@ -56,6 +56,17 @@ export type Track = {
    preview_url: string | null
    track_number: number
    type: 'track'
+   uri: string
+}
+export type Album = Omit<AlbumFull, 'available_markets' | 'artists' | 'href' | 'id' | 'total_tracks' | 'uri' | 'is_playable'>
+export type Artist = Omit<ArtistFull, 'id' | 'type' | 'uri'>
+export type Track= {
+   album: Album
+   artists: Artist[]
+   duration_ms: number
+   external_urls: ExternalUrls
+   name: string
+   popularity: number
    uri: string
 }
 
@@ -118,4 +129,11 @@ export type PlaylistPage = {
    offset: number
    previous: string | null
    total: number
+}
+
+export type SpotifyError = {
+   error: {
+      status: number
+      message: string
+   }
 }

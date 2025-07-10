@@ -33,6 +33,7 @@ export async function GET(req: Request) {
       ranked: bs.ranked,
       title: bs.title,
       video: bs.video,
+      submitted_date: bs.submitted_date,
       // rating: bs.rating // TODO
       // tags: bs.tags, // TODO implement this
       ranked_date: bs.ranked_date,

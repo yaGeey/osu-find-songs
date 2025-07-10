@@ -4,7 +4,6 @@ import { ButtonHTMLAttributes, Ref } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-   onClick?: () => void
    ref?: Ref<HTMLButtonElement>
    className?: string
    textClassName?: string

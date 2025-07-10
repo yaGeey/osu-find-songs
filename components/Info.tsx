@@ -1,44 +1,42 @@
 'use client'
 import Image from 'next/image'
-import { SongData, Song } from '@/types/types'
+import { CombinedSingleSimple } from '@/types/types'
 import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn } from './buttons/Buttons'
 import { Spotify } from 'react-spotify-embed'
 import axios from 'axios'
-import Link from 'next/link'
 import { HTMLAttributes, Ref, use, useEffect, useRef, useState } from 'react'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { Media } from '@/types/yt'
 import { applyAlwaysConditions } from '@/utils/conditions'
-import { Artist, Track } from '@/types/Spotify'
 import AuthorString from './AuthorString'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import Cookies from 'js-cookie'
 import YtVideo from './embeds/YtVideo'
 import SpotifyEmbed from './embeds/Spotify'
-import SVG from './SVG'
 import { twMerge as tw } from 'tailwind-merge'
 import Loading from './state/Loading'
 import YtSongEmbed from './embeds/YtSong'
 import { wikiSearchExact, wikiSearchMusicianTitle } from '@/lib/wiki'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWikipediaW } from '@fortawesome/free-brands-svg-icons'
+import ExternalLink from './ExternalLink'
 gsap.registerPlugin(useGSAP)
-
+// TODO remove queries yt and wiki when 0 info
 interface Props extends HTMLAttributes<HTMLDivElement> {
-   data: SongData
+   data: CombinedSingleSimple
    onClose: () => void
 }
 
 export default function Info({ data, onClose, className }: Props) {
-   const { spotify, beatmapset, local } = data
+   const { spotify, osu, local } = data
    const [selection, setSelection] = useState<'spotify' | 'youtube' | 'other'>('spotify')
    const container = useRef<HTMLDivElement>(null)
 
    useEffect(() => {
       if (spotify && spotify?.length !== 20) setSelection('spotify')
       else setSelection('youtube')
-   }, [spotify || null, beatmapset || null])
+   }, [spotify || null, osu || null])
 
    useEffect(() => {
       if (!Cookies.get('showSpotifyEmbeds')) Cookies.set('showSpotifyEmbeds', 'true')
@@ -104,12 +102,12 @@ export default function Info({ data, onClose, className }: Props) {
                   </h1>
                   {/* //! add links to authors spotify && osu authors search */}
                   <h2 className="text-base font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]">
-                     {spotify?.length != 20 && beatmapset ? (
-                        <AuthorString artists={spotify ? spotify[0].artists : []} beatmapset={beatmapset} />
+                     {spotify?.length != 20 && osu ? (
+                        <AuthorString artists={spotify[0].artists} beatmapset={osu} />
                      ) : (
-                        <span>{beatmapset?.artist}</span>
+                        <span>{osu?.artist}</span>
                      )}
-                     {!beatmapset && <span>{local.author}</span>}
+                     {!osu && <span>{local.author}</span>}
                   </h2>
                </div>
                <div className="flex justify-between items-end">
@@ -136,20 +134,20 @@ export default function Info({ data, onClose, className }: Props) {
             </div>
          </div>
 
-         <div className="flex w-full items-end gap-4 mt-4">
+         <div className="flex w-full items-end gap-4 mt-4 align-s">
             <SpotifyBtn
                onClick={() => setSelection('spotify')}
                disabled={spotify ? false : true}
                className={selection == 'spotify' ? 'selection' : ''}
             />
             <YoutubeBtn onClick={() => setSelection('youtube')} className={selection == 'youtube' ? 'selection' : ''} />
-            <a
-               target="_blank"
-               href={`https://osu.ppy.sh/beatmapsets/${beatmapset?.id}`}
-               className={tw(beatmapset ? '' : 'pointer-events-none')}
+            <ExternalLink
+               href={`https://osu.ppy.sh/beatmapsets/${osu?.id}`}
+               className="justify-end flex-1 mr-0.5"
+               disabled={!osu}
             >
-               <OsuBtn disabled={beatmapset ? false : true} />
-            </a>
+               Beatmap
+            </ExternalLink>
          </div>
 
          {selection === 'spotify' && (
