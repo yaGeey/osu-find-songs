@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { ToastContainer, toast } from 'react-toastify'
 
+// prettier-ignore
 export default function SelectPage() {
    const { setSongs } = useSongContext()
    const router = useRouter()

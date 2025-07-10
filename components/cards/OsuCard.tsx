@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faThumbsUp } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
-import { downloadNoVideo, downloadVideo } from '@/utils/osuDownload'
+import { useNoVideoAxios } from '@/utils/osuDownload'
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef } from 'react'
@@ -33,6 +33,7 @@ export default function OsuCard({
       .map(([k, v]) => `${k} ${new Date(v!).toLocaleDateString()}`)
       .join(' | ')
 
+   const mutation = useNoVideoAxios(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
    return (
       <>
          <div
@@ -138,27 +139,18 @@ export default function OsuCard({
                      </div>
                   </a>
 
-                  {/* download buttons */}
-                  <div
-                     className={tw(
-                        'absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
-                        onHover && 'group-hover/card:flex',
-                     )}
-                  >
-                     <FontAwesomeIcon
-                        icon={beatmapset.video ? faFileVideo : faDownload}
-                        onClick={() =>
-                           downloadNoVideo(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
-                        }
-                        className="cursor-pointer"
-                        data-tooltip-id="tooltip"
-                        data-tooltip-content="Download without video"
-                        data-tooltip-delay-show={400}
-                     />
-                  </div>
-                  <Tooltip id="tooltip" place="top" style={{ fontSize: '11px', padding: '0 0.25rem', zIndex: 100000 }} />
-               </>
-            }
+            {/* download buttons */}
+            <div className={tw("absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden", onHover && 'group-hover/card:flex')}>
+               <FontAwesomeIcon
+                  icon={beatmapset.video ? faFileVideo : faDownload}
+                  onClick={() => mutation.mutate()}
+                  className="cursor-pointer"
+                  data-tooltip-id='tooltip'
+                  data-tooltip-content='Download without video'
+                  data-tooltip-delay-show={400}
+               />
+            </div>
+            <Tooltip id='tooltip' place="top" style={{fontSize: '11px', padding: '0 0.25rem', zIndex:100000}}/></>}
          </div>
       </>
    )
