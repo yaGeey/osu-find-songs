@@ -1,7 +1,7 @@
 import { BeatmapSet } from '@/types/Osu'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHeart, faCirclePlay, faCircleCheck } from '@fortawesome/free-regular-svg-icons'
+import { faHeart, faCirclePlay, faCircleCheck, faThumbsUp } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
 import { downloadNoVideo, downloadVideo } from '@/utils/osuDownload'
@@ -9,6 +9,7 @@ import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef } from 'react'
 import ImageFallback from '../ImageFallback'
+import { getRating } from '@/utils/sortBeatmapsMatrix'
 
 export default function OsuCard({
    beatmapset,
@@ -20,6 +21,18 @@ export default function OsuCard({
    className?: string
 }) {
    const ref = useRef<HTMLDivElement>(null)
+
+   // Dates tooltip text
+   const dates = {
+      'Submitted at': beatmapset.submitted_date,
+      'Last updated at': beatmapset.last_updated,
+      'Ranked at': beatmapset.ranked_date,
+   }
+   const dateString = Object.entries(dates)
+      .filter(([_, v]) => v)
+      .map(([k, v]) => `${k} ${new Date(v!).toLocaleDateString()}`)
+      .join(' | ')
+
    return (
       <>
          <div
@@ -31,6 +44,7 @@ export default function OsuCard({
          >
             {
                <>
+                  {/* IMAGES */}
                   <div className="relative w-[100px] h-full rounded-l-2xl overflow-hidden z-0">
                      <ImageFallback
                         src={beatmapset.covers.list}
@@ -59,6 +73,7 @@ export default function OsuCard({
                      href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
                      className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white"
                   >
+                     {/* INFORMATION */}
                      <div>
                         <h2 className="font-semibold text-[17px] truncate font-outline-sm">{beatmapset.title}</h2>
                         <h3 className="font-medium text-sm -mt-1 font-outline-sm">from {beatmapset.artist}</h3>
@@ -71,14 +86,17 @@ export default function OsuCard({
                         <span className="-ml-1.75 -mb-0.25">{beatmapset.favourite_count}</span>
                         <FontAwesomeIcon icon={faCirclePlay} />
                         <span className="-ml-1.75 -mb-0.25">{beatmapset.play_count.toLocaleString(undefined)}</span>
+                        <FontAwesomeIcon icon={faThumbsUp} />
+                        <span className="-ml-1.75 -mb-0.25">{getRating(beatmapset)}%</span>
                         <FontAwesomeIcon icon={faCircleCheck} />
-                        <span className="-ml-1.75 -mb-0.25">
+                        <span className="-ml-1.75 -mb-0.25" data-tooltip-id="tooltip" data-tooltip-content={dateString}>
                            {new Date(
                               beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date,
                            ).toLocaleDateString()}
                         </span>
                      </div>
                      <div className="flex gap-1 items-center">
+                        {/* STATE */}
                         <h4
                            className={tw(
                               'text-xs text-main-gray w-fit px-1 rounded-full font-medium',
@@ -92,6 +110,7 @@ export default function OsuCard({
                            {beatmapset.status.toUpperCase()}
                         </h4>
 
+                        {/* DIFFICULTY */}
                         <section className="peer group/diff flex text-[11px] text-main-gray font-inter-tight gap-1">
                            {beatmapset.beatmaps.length < 15 ? (
                               Object.keys(groupBy(beatmapset.beatmaps, 'mode')).map((mode, i) => (

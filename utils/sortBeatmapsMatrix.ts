@@ -25,10 +25,7 @@ export const sortBeatmapsMatrix = (a: BeatmapSet[], b: BeatmapSet[], sortFnName:
          if (!b[0].ranked_date) return -1
          return sign * (new Date(a[0].ranked_date).getTime() - new Date(b[0].ranked_date).getTime())
       case 'rating':
-         if (!a[0].ranked) return 1
-         if (!b[0].ranked) return -1
-         return sign * (a[0].ranked - b[0].ranked)
-
+         return sign * (getRating(a[0]) - getRating(b[0]))
       case 'plays':
          return sign * (a[0].play_count - b[0].play_count)
       case 'favorites':
@@ -36,3 +33,5 @@ export const sortBeatmapsMatrix = (a: BeatmapSet[], b: BeatmapSet[], sortFnName:
    }
    return sign
 }
+
+export const getRating = (beatmapset: BeatmapSet) => Math.floor((beatmapset.favourite_count / beatmapset.play_count) * 10000)
