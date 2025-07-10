@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
-import { useSongContext } from '@/contexts/SongContext'
+import ExternalLink from '../ExternalLink'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
    isDisabled: boolean
@@ -98,9 +98,9 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             handleModal(
                <>
                   <h1>Success! Visit your new playlist:</h1>
-                  <a href={playlist.external_urls.spotify} target="_blank">
+                  <ExternalLink href={playlist.external_urls.spotify} className="text-black">
                      {playlist.external_urls.spotify}
-                  </a>
+                  </ExternalLink>
                </>,
                'success',
             )

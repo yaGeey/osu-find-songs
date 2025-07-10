@@ -67,7 +67,7 @@ function Card({
             onClick={handleClick}
          >
             {isOsuLoading && isSpotifyLoading && <Loading />}
-            {error && <ErrorBackdrop />}
+            {error && <ErrorBackdrop msg={error} />}
             {(local.image || osu?.covers.card) && (
                <div className="relative w-[150px] h-[85.5px]">
                   <Image

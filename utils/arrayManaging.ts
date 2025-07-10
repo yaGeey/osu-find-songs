@@ -76,7 +76,7 @@ export function flatCombinedArray(arr: CombinedQueried): any[] { // TODO fix typ
       osu: arr.osuQuery.data?.[i],
       isSpotifyLoading: arr.spotifyQuery.isLoading,
       isOsuLoading: arr.osuQuery.isLoading,
-      error: arr.spotifyQuery.isError || arr.osuQuery.isError,
+      error: arr.spotifyQuery.error?.message ?? arr.osuQuery.error?.message,
    }))
 }
 
