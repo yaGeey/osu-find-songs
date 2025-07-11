@@ -1,85 +1,85 @@
 'use server'
+import { BeatmapSet } from '@/types/Osu'
 import { cookies } from 'next/headers'
+import axios, { AxiosError } from 'axios'
 
-export async function getBeatmap(id: string): Promise<any> {
-   let token = (await cookies()).get('osuToken')?.value;
-   if (!token) token = await revalidateOsuToken();
+async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
+   let token = (await cookies()).get('osuToken')?.value
+   if (!token) token = await revalidateOsuToken()
 
-   const response = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`,
-      {
+   try {
+      return await func(token)
+   } catch (error) {
+      const err = error as AxiosError<any>
+      if (err.response?.data?.error === 'Too Many Attempts.') {
+         // TODO test
+         console.warn(`OSU: Too many attempts, retrying in 1s...`)
+         await new Promise((resolve) => setTimeout(resolve, 1000))
+         return await func(token)
+      }
+      console.error('Osu error:', err)
+      return Promise.reject(new Error(err.response?.data?.error ?? err.message ?? 'Unexpected server error'))
+   }
+}
+
+export async function getBeatmap(id: string): Promise<BeatmapSet> {
+   return fetchOsu(async (token) => {
+      const res = await axios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
          headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
-         }
-      }
-   )
-   if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-   }
-   return await response.json();
+            Accept: 'application/json',
+         },
+      })
+      return res.data
+   })
 }
 
-export async function beatmapsSearch(queries:{[key:string]:string|null}): Promise<any> {
-   let token = (await cookies()).get('osuToken')?.value;
-   if (!token) token = await revalidateOsuToken();
+export async function beatmapsSearch(queries: { [key: string]: string | null }): Promise<any> {
+   // TODO fix any
+   return fetchOsu(async (token) => {
+      const queryString = Object.entries(queries)
+         .flatMap(([key, value]) => {
+            if (!value) return []
+            return `${key}=${encodeURIComponent(value)}`
+         })
+         .join('&')
 
-   const queryString = Object.entries(queries).flatMap(([key, value]) => {
-      if (!value) return [];
-      return `${key}=${encodeURIComponent(value)}`
-   }).join('&');
-
-   const response = await fetch(`https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`,
-      {
+      const res = await axios.get(`https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`, {
          headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
-         }
-      }
-   )
-   if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-   }
-   return await response.json();
+            Accept: 'application/json',
+         },
+      })
+      return res.data
+   })
 }
 
-export async function revalidateOsuToken(): Promise<string | undefined> {
+export async function revalidateOsuToken(): Promise<string> {
    const body = new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: process.env.OSU_CLIENT!,
       client_secret: process.env.OSU_SECRET!,
       scope: 'public',
-   });
+   })
 
-   try {
-      const response = await fetch('https://osu.ppy.sh/oauth/token', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json'
-         },
-         body: body.toString(),
-      });
-      if (!response.ok) {
-         const errorText = await response.text();
-         throw new Error(errorText);
-      }
+   const { data } = await axios.post<{
+      access_token: string
+      expires_in: number
+      token_type: string
+   }>('https://osu.ppy.sh/oauth/token', body.toString(), {
+      headers: {
+         'Content-Type': 'application/x-www-form-urlencoded',
+         Accept: 'application/json',
+      },
+   })
+   console.log('osu token revalidation', data)
 
-      const data: {
-         access_token: string;
-         expires_in: number;
-         token_type: string;
-      } = await response.json();
-      console.log(data);
-
-      const storage = await cookies();
-      storage.set('osuToken', data.access_token, { path: '/', expires: new Date(Date.now() + data.expires_in * 1000) });
-      return data.access_token;
-      
-   } catch (error) {
-      console.error('Error fetching token:', error);
-   }
+   const storage = await cookies()
+   storage.set('osuToken', data.access_token, {
+      path: '/',
+      expires: new Date(Date.now() + data.expires_in * 1000),
+   })
+   return data.access_token
 }

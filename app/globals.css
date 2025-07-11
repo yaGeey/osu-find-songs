@@ -1,14 +1,14 @@
 @import 'tailwindcss';
 :root {
-  overflow: hidden;
-  transition-behavior: allow-discrete;
-  interpolate-size: allow-keywords;
-  --color-main: #cf7a7a;
-  --color-main-darker: #AD6666;
-  --color-main-darker-0: #c37272;
-  --color-main-lighter: #eb9090;
-  --color-main-border: #733F3F;
-  --color-highlight: #4CD2FF;
+   overflow: hidden;
+   transition-behavior: allow-discrete;
+   interpolate-size: allow-keywords;
+   --color-main: #cf7a7a;
+   --color-main-darker: #ad6666;
+   --color-main-darker-0: #c37272;
+   --color-main-lighter: #eb9090;
+   --color-main-border: #733f3f;
+   --color-highlight: #4cd2ff;
 }
 
 /*
@@ -20,134 +20,141 @@
 }*/
 
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-song: hsla(347, 36%, 55%, 1);
-  --color-song-select: hsla(347, 36%, 55%, 0.8);
-  --color-song-border: hsla(347, 36%, 35%, 1);
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+   --color-song: hsla(347, 36%, 55%, 1);
+   --color-song-select: hsla(347, 36%, 55%, 0.8);
+   --color-song-border: hsla(347, 36%, 35%, 1);
 
-  --color-main: #cf7a7a;
-  --color-main-lighter: #eb9090;
-  --color-main-darker-0: var(--color-main-darker-0);
-  --color-main-darker: #AD6666;
-  --color-darker: #905959;
-  --color-main-border: #733F3F;
-  --color-light: #FFA3A3;
-  --color-main-gray: #282828;
+   --color-main: #cf7a7a;
+   --color-main-lighter: #eb9090;
+   --color-main-darker-0: var(--color-main-darker-0);
+   --color-main-darker: #ad6666;
+   --color-darker: #905959;
+   --color-main-border: #733f3f;
+   --color-light: #ffa3a3;
+   --color-main-gray: #282828;
 
-  --color-success: #3CA554;
-  --color-invalid: #ff4a4a;
-  --color-warning: #FFD700;
-  --color-highlight: #4CD2FF;
-  --color-white-50: #D9D9D9;
+   --color-success: #3ca554;
+   --color-invalid: #ff4a4a;
+   --color-warning: #ffd700;
+   --color-highlight: #4cd2ff;
+   --color-white-50: #d9d9d9;
 
-  --breakpoint-lgx: 75rem; 
+   --breakpoint-lgx: 75rem;
 
-  --font-inter: 'Inter', sans-serif;
-  --font-inter-tight: 'Inter Tight', sans-serif;
+   --font-inter: 'Inter', sans-serif;
+   --font-inter-tight: 'Inter Tight', sans-serif;
 
-  --text-xs: 0.75rem;
-
+   --text-xs: 0.75rem;
 }
 
 @layer utilities {
-  .animate-border {
-    border: 3px solid #0000;
-    background: linear-gradient(var(--color-main-lighter), var(--color-main-lighter)) padding-box,
-      linear-gradient(var(--angle), var(--color-main-border), #ae44ab) border-box;
-    animation: 7s rotate linear infinite;
-    transition: all 0.3s ease;
-  }
-  .animate-border:hover {
-    animation: none;
-    border-color: #ae44ab;
-  }
+   .animate-border {
+      border: 3px solid #0000;
+      background:
+         linear-gradient(var(--color-main-lighter), var(--color-main-lighter)) padding-box,
+         linear-gradient(var(--angle), var(--color-main-border), #ae44ab) border-box;
+      animation: 7s rotate linear infinite;
+      transition: all 0.3s ease;
+   }
+   .animate-border:hover {
+      animation: none;
+      border-color: #ae44ab;
+   }
 
-  @keyframes rotate {
-    to {
-      --angle: 360deg;
-    }
-  }
+   @keyframes rotate {
+      to {
+         --angle: 360deg;
+      }
+   }
 
-  @property --angle {
-    syntax: "<angle>";
-    initial-value: 0deg;
-    inherits: false;
-  }
+   @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+   }
 
-  .scrollbar::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
+   .scrollbar::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+   }
 
-  .scrollbar::-webkit-scrollbar-track {
-    border-radius: 100vh;
-    background: #f6f7ed;
-  }
+   .scrollbar::-webkit-scrollbar-track {
+      border-radius: 100vh;
+      background: #f6f7ed;
+   }
 
-  .scrollbar::-webkit-scrollbar-thumb {
-    background: #e0cbcb; 
-    border-radius: 100vh;
-    border: 3px solid #f6f7ed;
-  }
+   .scrollbar::-webkit-scrollbar-thumb {
+      background: #e0cbcb;
+      border-radius: 100vh;
+      border: 3px solid #f6f7ed;
+   }
 
-  .scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #c0a0b9;
-  }
+   .scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #c0a0b9;
+   }
 
-  .selected {
-    @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)]
-  }
+   .selected {
+      @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)];
+   }
 
-  .shadow-tight {
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.20);
-  }
+   .shadow-tight {
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+   }
 
-  .font-outline {
-    @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)]
-  }
-  .font-outline-sm {
-    @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)]
-  }
-  .bg-triangles {
-    background:url(/osu/tris.png) no-repeat, url(/osu/tris2.png) no-repeat top right, var(--color-main)
-  }
-  .bg-dialog {
-    background:
-      linear-gradient(transparent, var(--color-main-lighter) 60px,var(--color-main-lighter) 100%),
-      url(/osu/tris.png) no-repeat, url(/osu/tris2.png) no-repeat top right, var(--color-main-lighter)
-  }
-  .bg-dialog-darker {
-    background:
-      linear-gradient(transparent, var(--color-main-darker) 60px,var(--color-main-darker) 100%),
-      url(/osu/tris.png) no-repeat, url(/osu/tris2.png) no-repeat top right, var(--color-main-darker)
-  }
-  .bg-dialog-after {
-    position: relative;
-    z-index: 1;
-  }
-  .bg-dialog-after::before {
-    content: "";
-    position: absolute;
-    inset: 0; /* або top: 0; left: 0; right: 0; bottom: 0; */
-    @apply rounded-xl;
-    background: 
-      linear-gradient(transparent, var(--color-main-lighter) 60px, var(--color-main-lighter) 100%),
-      url(/osu/tris.png) no-repeat,
-      url(/osu/tris2.png) no-repeat top right,
-      var(--color-main-lighter);
-    z-index: -1;
-  }
+   .font-outline {
+      @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)];
+   }
+   .font-outline-sm {
+      @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)];
+   }
+   .bg-triangles {
+      background:
+         url(/osu/tris.png) no-repeat,
+         url(/osu/tris2.png) no-repeat top right,
+         var(--color-main);
+   }
+   .bg-dialog {
+      background:
+         linear-gradient(transparent, var(--color-main-lighter) 60px, var(--color-main-lighter) 100%),
+         url(/osu/tris.png) no-repeat,
+         url(/osu/tris2.png) no-repeat top right,
+         var(--color-main-lighter);
+   }
+   .bg-dialog-darker {
+      background:
+         linear-gradient(transparent, var(--color-main-darker) 60px, var(--color-main-darker) 100%),
+         url(/osu/tris.png) no-repeat,
+         url(/osu/tris2.png) no-repeat top right,
+         var(--color-main-darker);
+   }
+   .bg-dialog-after {
+      position: relative;
+      z-index: 1;
+   }
+   .bg-dialog-after::before {
+      content: '';
+      position: absolute;
+      inset: 0; /* або top: 0; left: 0; right: 0; bottom: 0; */
+      @apply rounded-xl;
+      background:
+         linear-gradient(transparent, var(--color-main-lighter) 60px, var(--color-main-lighter) 100%),
+         url(/osu/tris.png) no-repeat,
+         url(/osu/tris2.png) no-repeat top right,
+         var(--color-main-lighter);
+      z-index: -1;
+   }
 
-  .writing-mode-vertical-lr {
-    writing-mode: vertical-lr;
-  }
-  .writing-mode-vertical-rl {
-    writing-mode: vertical-rl;
-  }
-  .text-shadow {
-    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  }
+   .writing-mode-vertical-lr {
+      writing-mode: vertical-lr;
+   }
+   .writing-mode-vertical-rl {
+      writing-mode: vertical-rl;
+   }
+   .text-shadow {
+      text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+   }
 }
 
 @plugin 'tailwind-scrollbar';

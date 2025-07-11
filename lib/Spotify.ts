@@ -1,158 +1,152 @@
 'use server'
 import { cookies } from 'next/headers'
-import { Song } from "@/types/types";
-import {conditions, hardConditions, applyAlwaysConditions} from '../utils/conditions';
-import { Playlist, Track } from '@/types/Spotify';
+import { Song } from '@/types/types'
+import { conditions, hardConditions, applyAlwaysConditions } from '../utils/conditions'
+import { Playlist, SpotifyError, TrackFull } from '@/types/Spotify'
+import axios, { AxiosError } from 'axios'
 
-export const findSong = async (song: Song) => {
+async function getServerToken(): Promise<string> {
    let token = (await cookies()).get('spotifyToken')?.value
-   if (!token) token = await revalidateSpotifyToken();
-
-   const query = `artist:${song.author} track:${song.title}`;
-   const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
-      headers: { Authorization: `Bearer ${token}` }
-   })
-   if (!response.ok) throw new Error(await response.text());
-   return await response.json();
+   if (!token) token = await revalidateSpotifyToken()
+   return token
+}
+async function getUserToken(): Promise<string> {
+   const userToken = (await cookies()).get('spotify_oauth_access_token')?.value
+   if (!userToken) throw new Error('No user access token found. Please log in to Spotify.')
+   return userToken
 }
 
-export const findSongQuery = async (song: Song) => {
-   let token = (await cookies()).get('spotifyToken')?.value
-   if (!token) token = await revalidateSpotifyToken();
+export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUserToken: boolean = false): Promise<T> {
+   const token = isUserToken ? await getUserToken() : await getServerToken()
 
-   const query = `${song.author} - ${song.title}`;
-   const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
-      headers: { Authorization: `Bearer ${token}` }
-   })
-   if (!response.ok) throw new Error(await response.text());
-   return await response.json(); 
+   try {
+      return await func(token)
+   } catch (error) {
+      const err = error as AxiosError<SpotifyError>
+      if (err.response?.data?.error.status === 429) {
+         const wait = parseInt(err.response?.headers?.['Retry-After'])
+         if (wait > 60) throw new Error(`Spotify rate limit: wait too long (${wait}s)`)
+         console.warn(`Rate limit exceeded. Waiting for ${wait} seconds...`)
+         await new Promise((resolve) => setTimeout(resolve, wait * 1000 + 1))
+         return await func(token)
+      }
+      console.error('Spotify error:', err)
+      return Promise.reject(new Error(err.response?.data?.error.message ?? err.message ?? 'Unexpected server error'))
+   }
 }
 
-export const searchSongWithConditions = async (song: Song): Promise<Track[] | null> => {
-   let modifiedSong = applyAlwaysConditions(song);
-   
+export const findSong = async (query: string): Promise<{ tracks: { items: [TrackFull] | [] } }> => {
+   return fetchSpotify(async (token) => {
+      const res = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
+         headers: { Authorization: `Bearer ${token}` },
+      })
+      return res.data
+   })
+}
+
+export const searchSongWithConditions = async (song: Song): Promise<[TrackFull] | null> => {
+   let modifiedSong = applyAlwaysConditions(song)
+
    for (const condition of conditions) {
-      const conditionSearch = condition(modifiedSong);
-      if (!conditionSearch) continue;
-      else modifiedSong = conditionSearch;
+      const conditionSearch = condition(modifiedSong)
+      if (!conditionSearch) continue
+      else modifiedSong = conditionSearch
 
-      const result = await findSong(modifiedSong);
-      if (result.tracks.items.length) return result.tracks.items;
-      console.warn(`Song not found: ${modifiedSong.author} - ${modifiedSong.title}`);
+      const result = await findSong(`artist:${modifiedSong.author} track:${modifiedSong.title}`)
+      if (result.tracks.items.length) return result.tracks.items
    }
 
    for (const condition of hardConditions) {
-      const hardSearch = condition(modifiedSong);
-      
-      const result = await findSongQuery(hardSearch);
-      if (result.tracks.items.length) return result.tracks.items;
-      console.warn(`Song not found after HARD: ${hardSearch.author} - ${hardSearch.title}`);
-   }
+      const hardSearch = condition(modifiedSong)
 
-   console.error(`!!! Song not found after all tries`);
+      const result = await findSong(`${hardSearch.author} - ${hardSearch.title}`)
+      if (result.tracks.items.length) return result.tracks.items
+      console.warn(`Song not found after HARD: ${hardSearch.author} - ${hardSearch.title}`)
+   }
    return null
 }
 
-export async function revalidateSpotifyToken(): Promise<string | undefined> {
+export async function revalidateSpotifyToken(): Promise<string> {
    const body = new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: process.env.AUTH_SPOTIFY_ID!,
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
-   });
+   })
 
-   try {
-      const response = await fetch('https://accounts.spotify.com/api/token', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+   const { data } = await axios.post<{
+      access_token: string
+      expires_in: number
+      token_type: string
+   }>('https://accounts.spotify.com/api/token', body.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+   })
+   console.log('spotify token request', data)
+
+   const storage = await cookies()
+   storage.set('spotifyToken', data.access_token, {
+      path: '/',
+      expires: new Date(Date.now() + data.expires_in * 1000),
+   })
+   return data.access_token
+}
+
+export async function getPlaylist(playlistId: string): Promise<Playlist | undefined> {
+   return fetchSpotify(async (token) => {
+      const res = await axios.get<Playlist>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+         headers: { Authorization: `Bearer ${token}` },
+      })
+      return res.data
+   })
+}
+
+export async function fetchMyProfile(): Promise<any | undefined> {
+   return fetchSpotify(async (token) => {
+      const res = await axios.get('https://api.spotify.com/v1/me', {
+         headers: { Authorization: `Bearer ${token}` },
+      })
+      return res.data
+   }, true)
+}
+
+export async function createPlaylist({
+   userId,
+   name,
+   description,
+   isPublic = false,
+   collaborative = false,
+}: {
+   userId: string
+   name: string
+   isPublic?: boolean
+   collaborative?: boolean
+   description: string
+}): Promise<Playlist | undefined> {
+   return fetchSpotify(async (token) => {
+      const res = await axios.post<Playlist>(
+         `https://api.spotify.com/v1/users/${userId}/playlists`,
+         {
+            name,
+            public: isPublic,
+            collaborative,
+            description,
          },
-         body: body.toString(),
-      });
-      if (!response.ok) {
-         const errorText = await response.text();
-         throw new Error(errorText);
-      }
-
-      const data: {
-         access_token: string;
-         expires_in: number;
-         token_type: string;
-      } = await response.json();
-      console.log(data);
-
-      const storage = await cookies();
-      storage.set('spotifyToken', data.access_token, { path: '/', expires: new Date(Date.now() + data.expires_in * 1000) });
-      return data.access_token;
-   } catch (error) {
-      console.error('Error fetching token:', error);
-   }
-}
-
-export async function getPlaylist(playlistId: string) {
-   let token = (await cookies()).get('spotifyToken')?.value
-   if (!token) token = await revalidateSpotifyToken();
-
-   const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-   })
-
-   if (!response.ok) throw new Error(await response.text());
-   return await response.json();
-}
-
-export async function fetchMyProfile() {
-   let token = (await cookies()).get('spotify_oauth_access_token')?.value
-   if (!token) {
-      console.error('No access token found');
-      return;
-   };
-
-   const response = await fetch('https://api.spotify.com/v1/me', {
-      method: "GET", headers: { Authorization: `Bearer ${token}` }
-   })
-   console.log(response);
-
-   if (!response.ok) throw new Error(await response.text());
-   return await response.json();
-}
-
-export async function createPlaylist({ userId, name, description, isPublic = false, collaborative = false }:
-   { userId: string, name: string, isPublic?: boolean, collaborative?: boolean, description: string }): Promise<Playlist | undefined> {
-   
-   let token = (await cookies()).get('spotify_oauth_access_token')?.value
-   if (!token) {
-      console.error('No access token found');
-      return;
-   };
-
-   const response = await fetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, public: isPublic, collaborative, description })
-   })
-
-   if (!response.ok) throw new Error(await response.text());
-   const data = await response.json();
-   return data;
+         { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
+      )
+      return res.data
+   }, true)
 }
 
 export async function AddItemsToPlaylist(playlistId: string, uris: string[]) {
-   let token = (await cookies()).get('spotify_oauth_access_token')?.value
-   if (!token) {
-      console.error('No access token found');
-      return;
-   };
-
-   if (uris.length > 100) throw new Error('Max 100 tracks per request, got '+uris.length);
-
-   const response = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uris, position: 0 })
-   })
-
-   if (!response.ok) throw new Error(await response.text());
-   return await response.json();
+   return fetchSpotify(async (token) => {
+      if (uris.length > 100) throw new Error('Max 100 tracks per request, got ' + uris.length)
+      if (uris.length === 0) throw new Error('No tracks provided')
+      const res = await axios.post(
+         `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+         { uris, position: 0 }, //? add to the beginning of the playlist
+         { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
+      )
+      return res.data
+   }, true)
 }
 
 export async function OAuthAuthorization(code: string) {
@@ -162,32 +156,29 @@ export async function OAuthAuthorization(code: string) {
       redirect_uri: process.env.NEXT_PUBLIC_URL! + '/auth/spotify/callback',
       client_id: process.env.AUTH_SPOTIFY_ID!,
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
-   });
+   })
 
    const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
          'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: body.toString()
-   });
+      body: body.toString(),
+   })
 
    if (!response.ok) throw new Error(await response.text())
-   const data = await response.json();
-   
-   const storage = await cookies();
-   storage.set('spotify_oauth_refresh_token', data.refresh_token, { maxAge: data.expires_in });
-   return data;
+   const data = await response.json()
+
+   const storage = await cookies()
+   storage.set('spotify_oauth_refresh_token', data.refresh_token, {
+      maxAge: data.expires_in,
+   })
+   return data
 }
 
 export async function fetchWithToken(url: string) {
-   let token = (await cookies()).get('spotifyToken')?.value
-   if (!token) token = await revalidateSpotifyToken();
-
-   const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` }
-   });
-
-   if (!response.ok) throw new Error(await response.text());
-   return await response.json();
+   return fetchSpotify(async (token) => {
+      const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
+      return res.data
+   })
 }

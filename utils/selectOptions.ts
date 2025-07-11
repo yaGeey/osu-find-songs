@@ -1,11 +1,11 @@
-import { CSSObject } from "@emotion/react";
+import { CSSObject } from '@emotion/react'
 
 export const sortOptions = [
-   // { value: 'sort-date', label: '' },
+   { value: 'sort-date', label: 'Default' },
    { value: 'sort-artist', label: 'By Artist' },
    { value: 'sort-bpm', label: 'By BPM' },
    { value: 'sort-creator', label: 'By Creator' },
-   { value: 'sort-date-mapped', label: 'By Date Mapped' },
+   // { value: 'sort-date-mapped', label: 'By Date Mapped' },
    { value: 'sort-date-updated', label: 'By Date Updated' },
    // { value: 'sort-dif', label: 'By Difficulty' },
    { value: 'sort-length', label: 'By Length' },
@@ -25,9 +25,7 @@ export const groupOptions = [
    { value: 'year', label: 'By Year' },
 ]
 
-export const filterOptions = [
-   { value: 'exact-spotify', label: 'Exact Spotify match' },
-]
+export const filterOptions = [{ value: 'exact-spotify', label: 'Exact Spotify match' }]
 
 export const languageOptions = [
    { value: 'en', label: 'English' },
@@ -47,4 +45,4 @@ export const selectStyles = {
       ...base,
       fontSize: '14px',
    }),
-};
+}
