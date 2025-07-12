@@ -48,9 +48,11 @@ export default function RootLayout({
 }>) {
    return (
       <html lang="en">
-         {process.env.NODE_ENV === 'development' && <head>
-            <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-         </head>}
+         {process.env.NODE_ENV === 'development' && (
+            <head>
+               <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+            </head>
+         )}
          <body
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-fuchsia-300 selection:text-fuchsia-900`}
          >
@@ -59,7 +61,7 @@ export default function RootLayout({
                {children}
                <MobileDeviceCheck />
             </Providers>
-            <Analytics />
+            {process.env.NODE_ENV !== 'development' && <Analytics />}
          </body>
       </html>
    )

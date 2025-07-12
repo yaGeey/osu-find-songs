@@ -85,7 +85,6 @@ export default function PLaylistPage() {
             if (!track.track) return [] //? odd error rarely occurs
             const res = await beatmapsSearch({
                q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
-               // sort: searchParams.get('sort'),
                m: searchParams.get('m'),
                s: searchParams.get('s'),
             })
@@ -93,7 +92,6 @@ export default function PLaylistPage() {
             return res
          },
          enabled: !!tracks,
-         staleTime: Infinity,
          onError: (error: any) => toast.error(`Error: ${error.message}`, { autoClose: false }),
       })),
    })

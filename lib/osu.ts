@@ -18,7 +18,7 @@ async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
          return await func(token)
       }
       console.error('Osu error:', err)
-      return Promise.reject(new Error(err.response?.data?.error ?? err.message ?? 'Unexpected server error'))
+      throw new Error(err.response?.data?.error ?? err.message ?? 'Unexpected server error')
    }
 }
 
