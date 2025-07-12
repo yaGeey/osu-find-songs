@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Inter_Tight } from 'next/font/google'
 import './globals.css'
 import Providers from './Providers'
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from '@vercel/analytics/next'
 
 // This ensures that the icon CSS is loaded immediately before attempting to render icons
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -59,6 +59,7 @@ export default function RootLayout({
                {children}
                <MobileDeviceCheck />
             </Providers>
+            <Analytics />
          </body>
       </html>
    )

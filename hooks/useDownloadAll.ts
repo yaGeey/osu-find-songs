@@ -28,6 +28,10 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
          .then((blob) => {
             download(blob, 'beatmaps.zip')
          })
+         .catch((error) => {
+            console.error('Download failed:', error)
+            setProgress(-1)
+         })
 
       toast.promise(promise, {
          success: 'Downloaded successfully',

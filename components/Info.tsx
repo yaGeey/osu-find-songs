@@ -100,7 +100,6 @@ export default function Info({ data, onClose, className }: Props) {
                         <span className="text-sm font-medium mb-0.5">{spotify[0].album.release_date.split('-')[0]}</span>
                      )}
                   </h1>
-                  {/* //TODO ! add links to authors spotify && osu authors search */}
                   <h2 className="text-base font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]">
                      {spotify?.length != 20 && osu ? (
                         <AuthorString artists={spotify[0].artists} beatmapset={osu} />
