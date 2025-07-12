@@ -69,11 +69,10 @@ export default function FromOsu() {
          queryKey: ['spotifyChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await axios.post<Track[][]>('/api/batch/spotify', localChunk)
+            const res = await axios.post<(null | Track[])[]>('/api/batch/spotify', localChunk)
             addTimeSpotify(performance.now() - t0)
             return res.data
          },
-         cacheTime: 0,
       })),
    })
 
@@ -82,7 +81,7 @@ export default function FromOsu() {
          queryKey: ['osuChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await axios.get<BeatmapSet[]>(`/api/batch/osu`, {
+            const res = await axios.get<BeatmapSet[] | null>(`/api/batch/osu`, {
                params: {
                   id: localChunk.map((s) => s.id),
                },
@@ -91,9 +90,18 @@ export default function FromOsu() {
             addTimeOsu(performance.now() - t0)
             return res.data
          },
-         cacheTime: 0,
       })),
    })
+
+   // Re-fetch osu and spotify queries if any of them has null data
+   useEffect(() => {
+      osuQueries.forEach((query) => {
+         if (query.data?.some((bs) => !bs)) query.refetch()
+      })
+      spotifyQueries.forEach((query) => {
+         if (query.data?.some((tracks) => !tracks)) query.refetch()
+      })
+   }, [])
 
    // Approximate loading time left
    const {
@@ -114,7 +122,13 @@ export default function FromOsu() {
          spotifyQuery: spotifyQueries[i],
          osuQuery: osuQueries[i],
       }))
-   }, [songs, osuQueries.filter((q) => q.isLoading).length, spotifyQueries.filter((q) => q.isLoading).length])
+   }, [
+      songs,
+      osuQueries.filter((q) => q.isLoading).length,
+      spotifyQueries.filter((q) => q.isLoading).length,
+      osuQueries.map((q) => q.dataUpdatedAt).join(','),
+      spotifyQueries.map((q) => q.dataUpdatedAt).join(','),
+   ])
    const isLoading = combined.some((q) => q.spotifyQuery.isLoading || q.osuQuery.isLoading)
 
    // Grouping and sorting

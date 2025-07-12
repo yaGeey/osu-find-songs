@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { ToastContainer, toast } from 'react-toastify'
+import { getServerToken } from '@/lib/Spotify'
 
 // prettier-ignore
 export default function SelectPage() {
@@ -31,8 +32,10 @@ export default function SelectPage() {
       }
    }, [])
 
-   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
       toast.loading('Loading beatmaps...', { delay: 1000 })
+      await getServerToken()
+      
       const files = e.target.files
       if (files && files?.length != 0) {
          const songsMap = new Map<string, Song>()

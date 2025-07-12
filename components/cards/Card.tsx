@@ -55,7 +55,7 @@ function Card({
          className={tw(
             'last:rounded-b-lg first:hover:pt-0 hover:py-2 transition-all duration-300 ease-in-out',
             selected && 'first:pt-0 py-2',
-            isSpotifyLoading && 'pointer-events-none',
+            (isSpotifyLoading || error || spotify === null ) && 'pointer-events-none',
          )}
       >
          <div
@@ -67,7 +67,7 @@ function Card({
             onClick={handleClick}
          >
             {isOsuLoading && isSpotifyLoading && <Loading />}
-            {error && <ErrorBackdrop msg={error} />}
+            {error || spotify === null && <ErrorBackdrop msg={error} />}
             {(local.image || osu?.covers.card) && (
                <div className="relative w-[150px] h-[85.5px]">
                   <Image
@@ -91,10 +91,10 @@ function Card({
                         {getSortValue(sortFn, data)}
                      </span>
                   )}
-                  {isOsuLoading && !isSpotifyLoading && (
+                  {!osu && !isSpotifyLoading && (
                      <div className="relative w-[30px] h-[30px] flex justify-center items-center">
                         <Image src="icons/osu.svg" width={30} height={30} alt="osu" className="animation-in fade-in blur-[1px]" />
-                        <Spinner radius={33} color="#ff87c6" stroke={3} visible={true} className="absolute" />
+                        {isOsuLoading && <Spinner radius={33} color="#ff87c6" stroke={3} visible={true} className="absolute" />}
                      </div>
                   )}
                   {spotify && spotify.length == 1 && (

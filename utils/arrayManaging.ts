@@ -8,13 +8,14 @@ export const filterFn = (filters: string[]) => (a: CombinedSingleSimple) => {
    return filters.every((filter) => {
       switch (filter) {
          case 'exact-spotify':
+            if (!a.spotify) return false
             return a.spotify.length !== 20
       }
    })
 }
 
 export const searchFilterFn = (search: string) => (a: CombinedSingleSimple) => {
-   if (!search.length) return true
+   if (!search.length || !a.osu) return true
    const str = search.toLowerCase()
    return (
       a.local.title.toLowerCase().includes(str) ||
@@ -87,12 +88,13 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
    // Grouping
    // TODO sort grouping titles UI
    if (groupFn === 'year') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.osu.submitted_date?.split('-')[0]!)
+      groupedArray = Object.groupBy(combinedArray, (q) => q.osu?.submitted_date?.split('-')[0] ?? 'Unknown')
    } else if (groupFn === 'genre') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.osu.genre.name!)
+      groupedArray = Object.groupBy(combinedArray, (q) => q.osu?.genre.name ?? 'Unknown')
    } else if (groupFn === 'length') {
       groupedArray = Object.groupBy(combinedArray, (q) => {
-         const length = q.osu.beatmaps[0].total_length!
+         if (!q.osu) return 'Unknown'
+         const length = q.osu.beatmaps[0].total_length
          if (length < 60) return '< 1 minute'
          if (length < 120) return '1 - 2 minutes'
          if (length < 300) return '2 - 5 minutes'
@@ -100,10 +102,11 @@ export function groupArray(groupFn: string, sortOrder: string, sortFn: string, c
          return '> 10 minutes'
       })
    } else if (groupFn === 'artist') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.osu.artist!)
+      groupedArray = Object.groupBy(combinedArray, (q) => q.osu?.artist ?? 'Unknown')
    } else if (groupFn === 'bpm') {
       groupedArray = Object.groupBy(combinedArray, (q) => {
-         const bpm = q.osu.bpm!
+         if (!q.osu) return 'Unknown'
+         const bpm = q.osu.bpm
          if (bpm < 100) return '< 100 bpm'
          if (bpm < 200) return '100 - 200 bpm'
          if (bpm < 300) return '200 - 300 bpm'

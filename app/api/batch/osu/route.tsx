@@ -1,25 +1,18 @@
 import { getBeatmap } from '@/lib/osu'
 import { BeatmapSet } from '@/types/Osu'
 import axios from 'axios'
-const BATCH_SIZE = 50
+export const revalidate = 0;
 
 export async function GET(req: Request) {
    const { searchParams } = new URL(req.url)
    const ids = searchParams.getAll('id')
 
-   if (!ids.length || ids.length > BATCH_SIZE)
-      return new Response(JSON.stringify({ error: `No IDs provided or more than ${BATCH_SIZE}` }), {
-         status: 400,
-         headers: { 'Content-Type': 'application/json' },
-      })
+   const promises = await Promise.allSettled(ids.map((id) => getBeatmap(id)))
+   const results = promises.map((r) => (r.status === 'fulfilled' && r.value ? r.value : null))
 
-   try {
-      const results = await Promise.allSettled(ids.map((id) => getBeatmap(id)))
-      const successful = results
-         .filter((r): r is PromiseFulfilledResult<BeatmapSet> => r.status === 'fulfilled' && r.value !== null)
-         .map((r) => r.value)
-      const filtered = successful.filter(Boolean)
-      const simplified = filtered.map((bs) => ({
+   const simplified = results.map((bs) => {
+      if (!bs) return null
+      return {
          artist: bs.artist,
          covers: bs.covers,
          bpm: bs.bpm,
@@ -54,24 +47,11 @@ export async function GET(req: Request) {
             ar: b.ar,
             hp: b.drain,
          })),
-      }))
-
-      return new Response(JSON.stringify(simplified), {
-         status: 200,
-         headers: { 'Content-Type': 'application/json' },
-      })
-   } catch (err) {
-      if (axios.isAxiosError(err)) {
-         console.error('Axios error in Osu batch processing:', err)
-         return new Response(err.response?.data.error ?? err.message ?? 'Unexpected server error', {
-            status: err.response?.status || 500,
-            headers: { 'Content-Type': 'application/json' },
-         })
       }
-      console.error('Unknown error in Osu batch processing:', err)
-      return new Response('Unknown server error', {
-         status: 500,
-         headers: { 'Content-Type': 'application/json' },
-      })
-   }
+   })
+
+   return new Response(JSON.stringify(simplified), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+   })
 }

@@ -101,7 +101,7 @@ export default function Info({ data, onClose, className }: Props) {
                      )}
                   </h1>
                   <h2 className="text-base font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]">
-                     {spotify?.length != 20 && osu ? (
+                     {spotify && spotify?.length != 20 && osu ? (
                         <AuthorString artists={spotify[0].artists} beatmapset={osu} />
                      ) : (
                         <span>{osu?.artist}</span>

@@ -28,8 +28,8 @@ export type SongDataQueried = {
 }
 export type CombinedQueried = {
    local: Song[]
-   spotifyQuery: UseQueryResult<Track[][], Error>
-   osuQuery: UseQueryResult<BeatmapSet[], Error>
+   spotifyQuery: UseQueryResult<(Track[] | null)[], Error>
+   osuQuery: UseQueryResult<BeatmapSet[] | null, Error>
 }
 export type Combined = {
    local: Song[]
@@ -48,8 +48,8 @@ export type CombinedSingle = { local: Song, error?: string } & WithLoading<Beatm
 // TODO fix types
 export type CombinedSingleSimple = {
    local: Song
-   spotify: Track[]
-   osu: BeatmapSet
+   spotify?: Track[] | null
+   osu?: BeatmapSet | null
    isSpotifyLoading: boolean
    isOsuLoading: boolean
    error?: string
