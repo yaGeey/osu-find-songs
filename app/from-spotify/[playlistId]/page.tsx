@@ -11,19 +11,21 @@ import { beatmapsSearch } from '@/lib/osu'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
-import Modal from "@/components/Modal";
-import { BeatmapSet } from "@/types/Osu";
-import OsuCardSet from "@/components/cards/OsuCardSet";
-import { ToastContainer } from 'react-toastify';
-import Filters from "./Filters";
-import Search from "./Search";
-import Progress from "@/components/state/Progress";
-import BgImage from "@/components/BgImage";
-import { LinearProgress } from "@mui/material";
-import { sortBeatmapsMatrix } from "@/utils/sortBeatmapsMatrix";
-import { uniqueArray, uniqueBeatmapsetMatrix } from "@/utils/arrayManaging";
-import useDownloadAll from "@/hooks/useDownloadAll";
+import Modal from '@/components/Modal'
+import { BeatmapSet } from '@/types/Osu'
+import OsuCardSet from '@/components/cards/OsuCardSet'
+import { toast, ToastContainer } from 'react-toastify'
+import Filters from './Filters'
+import Search from './Search'
+import Progress from '@/components/state/Progress'
+import BgImage from '@/components/BgImage'
+import { LinearProgress } from '@mui/material'
+import { sortBeatmapsMatrix } from '@/utils/sortBeatmapsMatrix'
+import { uniqueArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
+import useDownloadAll from '@/hooks/useDownloadAll'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import useTimeLeft from '@/hooks/useTimeLeft'
+import { on } from 'events'
 
 export default function PLaylistPage() {
    const params = useParams()
@@ -33,7 +35,6 @@ export default function PLaylistPage() {
    const [queriesDict, setQueriesDict] = useState<{ [key: string]: string }>({})
    const [hasQueryChanged, setHasQueryChanged] = useState(false)
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
-   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([])
    const [searchType, setSearchType] = useState<'local' | 'api'>('api')
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
@@ -48,7 +49,6 @@ export default function PLaylistPage() {
       fetchNextPage,
       hasNextPage,
       isFetchingNextPage,
-      refetch,
    } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
       queryFn: async ({ pageParam = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100` }) =>
@@ -56,6 +56,11 @@ export default function PLaylistPage() {
       getNextPageParam: (lastPage) => (lastPage.next ? lastPage.next : undefined),
       getPreviousPageParam: (firstPage) => (firstPage.previous ? firstPage.previous : undefined),
       initialPageParam: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100`,
+      throwOnError: (error, query) => {
+         toast.error(`Error: ${error.message}`, { autoClose: false, closeButton: false })
+         return false
+      },
+      retry: 0,
    })
    useEffect(() => {
       if (hasNextPage && !isFetchingNextPage) fetchNextPage()
@@ -84,14 +89,16 @@ export default function PLaylistPage() {
                m: searchParams.get('m'),
                s: searchParams.get('s'),
             })
-            setTimePerOneAcc((prev) => [...prev, performance.now() - t0])
+            addTimeLeft(performance.now() - t0)
             return res
          },
          enabled: !!tracks,
          staleTime: Infinity,
+         onError: (error: any) => toast.error(`Error: ${error.message}`, { autoClose: false }),
       })),
    })
    const isLoading = useMemo(() => beatmapsetQueries.some((q) => q.isLoading), [beatmapsetQueries])
+   const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // setting data for display
    useEffect(() => {
@@ -104,7 +111,7 @@ export default function PLaylistPage() {
    useEffect(() => {
       if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('m') && !searchParams.get('s')) return
       else setHasQueryChanged(true)
-      setTimePerOneAcc([])
+      resetTimeLeft()
 
       let time = 0
       setTimeToSearch(time)
@@ -132,32 +139,34 @@ export default function PLaylistPage() {
          }
       }
       if (searchType == 'local') console.log('local search')
-      // }, [searchParams.toString()]);
-   }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')]);
-
-   const msLeft = ((timePerOneAcc.map((item, i) => item - timePerOneAcc[i - 1]).slice(1).reduce((a, b) => a + b, 0) / timePerOneAcc.length) * (beatmapsetQueries.filter(q => !q.isFetched).length));
-   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : '';
+   }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
 
    const { current, progress, handleDownloadAll } = useDownloadAll(beatmapsetQueries)
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
          <BgImage brightness={8} image="/bg.svg" />
-         <div className={tw('fixed top-0 h-0.6 z-100000 w-screen text-main-lighter', timeToSearch ? 'block' : 'hidden')}>
-            <LinearProgress variant="determinate" value={(timeToSearch! * 100) / 2000} color="inherit" />
-         </div>
+
+         {/* search timeout progress */}
+         <Progress isVisible={!!timeToSearch} value={(timeToSearch! * 100) / 2000} color="text-main-lighter" />
 
          {/* fetching spotify progress */}
-         <Progress isLoading={isLoading} value={(beatmapsetQueries.filter(q => !q.isLoading).length * 100) / tracks.length} />
-         {isLoading && msLeft > 5000 && <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
-            {beatmapsetQueries.filter(q => !q.isLoading).length}/{tracks.length} | {timeLeft} left
-         </div>}
+         <Progress
+            isVisible={isLoading}
+            value={(beatmapsetQueries.filter((q) => !q.isLoading).length * 100) / tracks.length}
+            isError={beatmapsetQueries.some((q) => q.isError)}
+         >
+            {msLeft > 5000 && (
+               <span>
+                  {beatmapsetQueries.filter((q) => !q.isLoading).length}/{tracks.length} | {timeLeft} left
+               </span>
+            )}
+         </Progress>
 
          {/* download all progress */}
-         {progress !== null && <div className="fixed top-0 h-0.6 z-100000 w-screen text-success block text-xs text-end">
-            <LinearProgress variant="determinate" value={progress} color="inherit" />
-            <span className="bg-success/20 text-xs px-1 rounded-bl-sm min-w-[120px] text-highlight">{current}</span>
-         </div>}
+         <Progress isVisible={progress !== null} value={progress || 0} isError={progress === -1} color="text-success">
+            {current}
+         </Progress>
 
          <header
             className={tw(
@@ -225,13 +234,13 @@ export default function PLaylistPage() {
          <Modal
             isOpen={isModalVisible}
             onOkay={() => {
-               setIsModalVisible(false);
-               setIsModalDownloadingVisible(true);
-               handleDownloadAll();
+               setIsModalVisible(false)
+               setIsModalDownloadingVisible(true)
+               handleDownloadAll()
             }}
             okBtn="Download"
             onClose={() => {
-               setIsModalVisible(false);
+               setIsModalVisible(false)
             }}
             closeBtn="Close"
             state="info"

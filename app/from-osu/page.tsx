@@ -29,6 +29,7 @@ import { Tooltip } from 'react-tooltip'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Virtuoso } from 'react-virtuoso'
+import useTimeLeft from '@/hooks/useTimeLeft'
 const Select = dynamic(() => import('react-select'), { ssr: false })
 
 const CHUNK_SIZE = 10 // TODO make it dynamic depending on the songs length
@@ -53,7 +54,6 @@ export default function FromOsu() {
    const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
-   const [timePerOneAcc, setTimePerOneAcc] = useState<number[]>([]) // TODO implement
 
    const isLoggedWithSpotify = useMemo(() => {
       return Cookies.get('spotify_oauth_access_token') !== undefined
@@ -68,7 +68,9 @@ export default function FromOsu() {
       queries: chunkedLocal.map((localChunk) => ({
          queryKey: ['spotifyChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
+            const t0 = performance.now()
             const res = await axios.post<Track[][]>('/api/batch/spotify', localChunk)
+            addTimeSpotify(performance.now() - t0)
             return res.data
          },
          cacheTime: 0,
@@ -79,17 +81,31 @@ export default function FromOsu() {
       queries: chunkedLocal.map((localChunk) => ({
          queryKey: ['osuChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
+            const t0 = performance.now()
             const res = await axios.get<BeatmapSet[]>(`/api/batch/osu`, {
                params: {
                   id: localChunk.map((s) => s.id),
                },
                paramsSerializer: { indexes: null },
             })
+            addTimeOsu(performance.now() - t0)
             return res.data
          },
          cacheTime: 0,
       })),
    })
+
+   // Approximate loading time left
+   const {
+      addTimeLeft: addTimeSpotify,
+      timeLeft: timeLeftSpotify,
+      msLeft: msLeftSpotify,
+   } = useTimeLeft(spotifyQueries.filter((q) => !q.isFetched).length)
+   const {
+      addTimeLeft: addTimeOsu,
+      timeLeft: timeLeftOsu,
+      msLeft: msLeftOsu,
+   } = useTimeLeft(osuQueries.filter((q) => !q.isFetched).length)
 
    // Combine the arrays
    const combined = useMemo(() => {
@@ -125,16 +141,6 @@ export default function FromOsu() {
       else setInfo({ ...props })
    }
 
-   // TODO to function / component
-   const msLeft =
-      (timePerOneAcc
-         .map((item, i) => item - timePerOneAcc[i - 1])
-         .slice(1)
-         .reduce((a, b) => a + b, 0) /
-         timePerOneAcc.length) *
-      osuQueries.filter((q) => !q.isFetched).length
-   const timeLeft = msLeft ? new Date(msLeft).toISOString().slice(14, 19) : ''
-
    // for virtual list
    // TODO розібратися
    type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
@@ -160,19 +166,18 @@ export default function FromOsu() {
       <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
          <DynamicBg src={info?.local.image} />
          <Progress
-            isLoading={isLoading}
+            isVisible={isLoading}
             value={
                ((combined.filter((q) => !q.osuQuery.isLoading).length +
                   combined.filter((q) => !q.spotifyQuery.isLoading).length) *
                   100) /
                (combined.length * 2)
             }
-         />
-         {isLoading && msLeft > 5000 && (
-            <div className="absolute top-1 right-0 z-1000 bg-highlight/30 text-xs px-1 rounded-bl-sm min-w-[120px] text-end">
-               {osuQueries.filter((q) => !q.isLoading).length}/{songs.length} | {timeLeft} left
-            </div>
-         )}
+         >
+            {msLeftOsu > msLeftSpotify
+               ? `${osuQueries.filter((q) => !q.isLoading).length}/${songs.length} | ${timeLeftOsu} left`
+               : `${spotifyQueries.filter((q) => !q.isLoading).length}/${songs.length} | ${timeLeftSpotify} left`}
+         </Progress>
 
          <header className="bg-triangles border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
