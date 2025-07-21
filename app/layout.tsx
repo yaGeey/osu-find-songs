@@ -3,6 +3,7 @@ import { Inter, Inter_Tight } from 'next/font/google'
 import './globals.css'
 import Providers from './Providers'
 import { Analytics } from '@vercel/analytics/next'
+import { HighlightInit } from '@highlight-run/next/client'
 
 // This ensures that the icon CSS is loaded immediately before attempting to render icons
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -41,28 +42,37 @@ export const metadata: Metadata = {
    },
 }
 
-export default function RootLayout({
-   children,
-}: Readonly<{
-   children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
    return (
-      <html lang="en">
-         {process.env.NODE_ENV === 'development' && (
-            <head>
-               <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-            </head>
-         )}
-         <body
-            className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-fuchsia-300 selection:text-fuchsia-900`}
-         >
-            <Providers>
-               <MobileDeviceCheck />
-               {children}
-               <MobileDeviceCheck />
-            </Providers>
-            {process.env.NODE_ENV !== 'development' && <Analytics />}
-         </body>
-      </html>
+      <>
+         <HighlightInit
+            excludedHostnames={['localhost']}
+            projectId={'ng2zzy0g'}
+            serviceName="my-nextjs-frontend"
+            tracingOrigins
+            networkRecording={{
+               enabled: true,
+               recordHeadersAndBody: true,
+               urlBlocklist: [],
+            }}
+         />
+         <html lang="en">
+            {process.env.NODE_ENV === 'development' && (
+               <head>
+                  <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+               </head>
+            )}
+            <body
+               className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-fuchsia-300 selection:text-fuchsia-900`}
+            >
+               <Providers>
+                  <MobileDeviceCheck />
+                  {children}
+                  <MobileDeviceCheck />
+               </Providers>
+               {process.env.NODE_ENV !== 'development' && <Analytics />}
+            </body>
+         </html>
+      </>
    )
 }
