@@ -1,7 +1,5 @@
-import { getBeatmap } from '@/lib/osu'
-import { BeatmapSet } from '@/types/Osu'
-import axios from 'axios'
-export const revalidate = 0;
+import { getBeatmap } from '@/lib/Osu'
+export const revalidate = 0
 
 export async function GET(req: Request) {
    const { searchParams } = new URL(req.url)

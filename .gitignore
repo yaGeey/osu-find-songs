@@ -43,4 +43,4 @@ app/**/*test.*
 app/**/test/*
 TODO.txt
 /.vscode/
-*/*test.*
+test.js

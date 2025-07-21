@@ -1,16 +1,16 @@
 'use client'
 import { Track } from '@/types/Spotify'
 import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from '@/lib/Spotify'
-import { useMutation, type UseQueryResult } from '@tanstack/react-query'
-import React, { useContext, useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import React, { useState } from 'react'
 import Modal from '@/components/Modal'
-import { Button } from './Buttons'
+import { Button } from '@/components/buttons/Buttons'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
-import ExternalLink from '../ExternalLink'
+import ExternalLink from '@/components/ExternalLink'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
    isDisabled: boolean

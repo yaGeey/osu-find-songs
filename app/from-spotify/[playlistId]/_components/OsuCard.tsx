@@ -8,8 +8,8 @@ import { useNoVideoAxios } from '@/utils/osuDownload'
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef } from 'react'
-import ImageFallback from '../ImageFallback'
-import { getRating } from '@/utils/sortBeatmapsMatrix'
+import ImageFallback from '@/components/ImageFallback'
+import { getRating } from '@/app/from-spotify/[playlistId]/_utils/sortBeatmapsMatrix'
 
 export default function OsuCard({
    beatmapset,
@@ -139,18 +139,25 @@ export default function OsuCard({
                      </div>
                   </a>
 
-            {/* download buttons */}
-            <div className={tw("absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden", onHover && 'group-hover/card:flex')}>
-               <FontAwesomeIcon
-                  icon={beatmapset.video ? faFileVideo : faDownload}
-                  onClick={() => mutation.mutate()}
-                  className="cursor-pointer"
-                  data-tooltip-id='tooltip'
-                  data-tooltip-content='Download without video'
-                  data-tooltip-delay-show={400}
-               />
-            </div>
-            <Tooltip id='tooltip' place="top" style={{fontSize: '11px', padding: '0 0.25rem', zIndex:100000}}/></>}
+                  {/* download buttons */}
+                  <div
+                     className={tw(
+                        'absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
+                        onHover && 'group-hover/card:flex',
+                     )}
+                  >
+                     <FontAwesomeIcon
+                        icon={beatmapset.video ? faFileVideo : faDownload}
+                        onClick={() => mutation.mutate()}
+                        className="cursor-pointer"
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Download without video"
+                        data-tooltip-delay-show={400}
+                     />
+                  </div>
+                  <Tooltip id="tooltip" place="top" style={{ fontSize: '11px', padding: '0 0.25rem', zIndex: 100000 }} />
+               </>
+            }
          </div>
       </>
    )

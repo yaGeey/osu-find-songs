@@ -24,6 +24,7 @@ Pick any **public Spotify playlist** and the app will try to match each track to
 ### Try it out!
 
 For **minimal usage** I suggest throw your osu songs folder at app, wait for a couple of minutes and get freshly new Spotify playlist to listen.
+
 I hope you find this tool useful and fun to use. I really put soul in it.
 Thanks for checking it out — and even bigger thanks if you decide to give it a try!💗
 And even bigger thanks if you consider to star the repo!
@@ -31,7 +32,7 @@ And even bigger thanks if you consider to star the repo!
 ---
 
 ### Tech stack
-Full Next JS with Tailwind with type safety (I guess), axios + tanstack query
-**APIs used**: osu api, spotify api with users oAuth, wiki api, youtube (scraping lib)
-**Optimization**: list virtualization, batching queries on apps api
+- Full Next JS with Tailwind with type safety (I guess), axios + tanstack query
+- **APIs used**: osu api, spotify api with users oAuth, wiki api, youtube (scraping lib)
+- **Optimization**: list virtualization, batching queries on apps api
 etc. Sadly ChatGPT can't read all my files, and I don't have CLI AI tools to write all my tech stack 😼

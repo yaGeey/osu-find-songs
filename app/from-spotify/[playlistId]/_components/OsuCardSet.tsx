@@ -4,7 +4,7 @@ import OsuCard from './OsuCard'
 import { twMerge as tw } from 'tailwind-merge'
 import ReactDom from 'react-dom'
 import { useEffect, useRef, useState } from 'react'
-import SwitchSort from '../switches/SwitchSort'
+import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 // TODO tooltip when in osu card set popup broke styles (Temp fixed - disable popup)

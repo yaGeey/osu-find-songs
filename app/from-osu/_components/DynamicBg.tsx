@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import BgImage from './BgImage'
+import BgImage from '../../../components/BgImage'
 import { twMerge as tw } from 'tailwind-merge'
 
 export default function DynamicBg({ src }: { src?: string }) {

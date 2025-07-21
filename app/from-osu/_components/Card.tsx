@@ -1,10 +1,10 @@
 import { CombinedSingle, CombinedSingleSimple } from '@/types/types'
 import Image from 'next/image'
-import Loading from '../state/Loading'
+import Loading from '../../../components/state/Loading'
 import { twMerge as tw } from 'tailwind-merge'
 import React from 'react'
 import Spinner from 'react-spinner-material'
-import ErrorBackdrop from '../state/ErrorBackdrop'
+import ErrorBackdrop from '../../../components/state/ErrorBackdrop'
 
 const getSortValue = (sortFn: string, c: CombinedSingleSimple) => {
    if (!c.osu || !c.spotify) return null
@@ -55,7 +55,7 @@ function Card({
          className={tw(
             'last:rounded-b-lg first:hover:pt-0 hover:py-2 transition-all duration-300 ease-in-out',
             selected && 'first:pt-0 py-2',
-            (isSpotifyLoading || error || spotify === null ) && 'pointer-events-none',
+            (isSpotifyLoading || error || spotify === null) && 'pointer-events-none',
          )}
       >
          <div
@@ -67,7 +67,7 @@ function Card({
             onClick={handleClick}
          >
             {isOsuLoading && isSpotifyLoading && <Loading />}
-            {error || spotify === null && <ErrorBackdrop msg={error} />}
+            {error || (spotify === null && <ErrorBackdrop msg={error} />)}
             {(local.image || osu?.covers.card) && (
                <div className="relative w-[150px] h-[85.5px]">
                   <Image

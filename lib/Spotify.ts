@@ -1,7 +1,7 @@
 'use server'
 import { cookies } from 'next/headers'
 import { Song } from '@/types/types'
-import { conditions, hardConditions, applyAlwaysConditions } from '../utils/conditions'
+import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spotifySearchConditions'
 import { Playlist, SpotifyError, TrackFull } from '@/types/Spotify'
 import axios, { AxiosError } from 'axios'
 

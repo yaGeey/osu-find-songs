@@ -43,7 +43,7 @@ type WithLoading<T, LoadingKey extends string, DataKey extends string> =
    | ({ [K in LoadingKey]: true } & { [K in DataKey]: undefined })
 
 // add error field
-export type CombinedSingle = { local: Song, error?: string } & WithLoading<BeatmapSet, 'isOsuLoading', 'osu'> &
+export type CombinedSingle = { local: Song; error?: string } & WithLoading<BeatmapSet, 'isOsuLoading', 'osu'> &
    WithLoading<Track[], 'isSpotifyLoading', 'spotify'>
 // TODO fix types
 export type CombinedSingleSimple = {
