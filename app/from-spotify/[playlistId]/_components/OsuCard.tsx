@@ -151,7 +151,7 @@ export default function OsuCard({
                         onClick={() => mutation.mutate()}
                         className="cursor-pointer"
                         data-tooltip-id="tooltip"
-                        data-tooltip-content="Download without video"
+                        data-tooltip-content={beatmapset.video ? 'Download with video' : 'Download without video'}
                         data-tooltip-delay-show={400}
                      />
                   </div>

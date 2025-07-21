@@ -6,17 +6,18 @@ import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
 import { useEffect, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { parseAsInteger, useQueryState } from 'nuqs'
-import { Tooltip } from 'react-tooltip'
 // TODO If =1 then res: 1 - 1.99
 
 export default function Filters({
    onChange,
    foundString,
    onSortButtonClick,
+   disabled = false,
 }: {
    onChange: (sortBy: string, searchType: 'local' | 'api', mode: string) => void
    foundString?: string
    onSortButtonClick?: () => void
+   disabled?: boolean
 }) {
    const [q, setQ] = useQueryState('q', { defaultValue: '' })
    const [m, setM] = useQueryState('m', { defaultValue: '' })
@@ -109,6 +110,7 @@ export default function Filters({
                }}
                defaultOption={sort.split('_')[0]}
                defaultSort={sort.split('_')[1] as 'asc' | 'desc'}
+               disabled={disabled}
             />
             {/* <button onClick={onSortButtonClick}>Sort locally</button> */}
          </section>

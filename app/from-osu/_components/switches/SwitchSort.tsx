@@ -9,12 +9,14 @@ export default function SwitchSort({
    onChange,
    defaultOption = null,
    defaultSort = 'desc',
+   disabled = false,
    ...props
 }: {
    onChange: (value: string | null, sort: 'asc' | 'desc') => void
    options: string[]
    defaultOption?: string | null
    defaultSort?: string
+   disabled?: boolean
 }) {
    const [selection, setSelection] = useState<string | null>(defaultOption)
    const [sort, setSort] = useState<'asc' | 'desc'>(defaultSort as 'asc' | 'desc')
@@ -28,7 +30,10 @@ export default function SwitchSort({
          data-tooltip-id="sort-tooltip"
          data-tooltip-content="Will result in a refetch"
          data-tooltip-delay-show={500}
-         className="bg-darker/80 font-inter border-2 border-[#733F3F] text white h-[26px] p-1 pl-7 rounded-full flex items-center gap-5 px-2.5 select-none"
+         className={tw(
+            'bg-darker/80 font-inter border-2 border-[#733F3F] text white h-[26px] p-1 pl-7 rounded-full flex items-center gap-5 px-2.5 select-none',
+            disabled && 'brightness-60 pointer-events-none',
+         )}
       >
          {options.map((option, i) => (
             <button

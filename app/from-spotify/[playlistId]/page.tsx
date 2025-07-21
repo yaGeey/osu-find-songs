@@ -47,6 +47,7 @@ export default function PLaylistPage() {
       fetchNextPage,
       hasNextPage,
       isFetchingNextPage,
+      isLoading: isTracksLoading,
    } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
       queryFn: async ({ pageParam = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100` }) =>
@@ -93,7 +94,7 @@ export default function PLaylistPage() {
          onError: (error: any) => toast.error(`Error: ${error.message}`, { autoClose: false }),
       })),
    })
-   const isLoading = useMemo(() => beatmapsetQueries.some((q) => q.isLoading), [beatmapsetQueries])
+   const isLoading = useMemo(() => beatmapsetQueries.some((q) => q.isLoading) || isTracksLoading, [beatmapsetQueries, isTracksLoading])
    const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // setting data for display
@@ -192,6 +193,7 @@ export default function PLaylistPage() {
                      setQueriesDict({ sort: val, m: mode })
                      setSearchType(searchTypeRes)
                   }}
+                  disabled={isLoading}
                />
 
                <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
