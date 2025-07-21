@@ -7,7 +7,7 @@ import { useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-qu
 import { fetchWithToken } from '@/lib/Spotify'
 import { PlaylistPage } from '@/types/Spotify'
 import { Button } from '@/components/buttons/Buttons'
-import { beatmapsSearch } from '@/lib/Osu'
+import { beatmapsSearch } from '@/lib/osu'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'

@@ -1,4 +1,4 @@
-import { getBeatmap } from '@/lib/Osu'
+import { getBeatmap } from '@/lib/osu'
 export const revalidate = 0
 
 export async function GET(req: Request) {
