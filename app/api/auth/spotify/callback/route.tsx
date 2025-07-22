@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
 
       const nextResponse = NextResponse.redirect(new URL('/from-osu/select', req.url))
       nextResponse.cookies.set('spotify_oauth_access_token', data.access_token, {
-         httpOnly: process.env.NODE_ENV === 'production',
          secure: process.env.NODE_ENV === 'production',
          maxAge: data.expires_in,
       })
