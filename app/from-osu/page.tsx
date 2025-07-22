@@ -301,6 +301,7 @@ export default function FromOsu() {
             <Virtuoso
                key={virtualListItems.length}
                data={virtualListItems}
+               //  TODO components={{}}
                itemContent={(index, item) => (
                   // TODO without wrapper no transition effect, but even with this padding top don't work.. why? and how virtuoso work
                   //? padding не робе, бо весь список симулюється через нього або translate-y

@@ -39,14 +39,14 @@ export default function OsuCard({
          <div
             ref={ref}
             className={tw(
-               'group/card select-none relative h-26 font-inter rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0',
+               'group/card select-none relative h-26 font-inter overflow-hidden rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0',
                className,
             )}
          >
             {
                <>
                   {/* IMAGES */}
-                  <div className="relative w-[100px] h-full rounded-l-2xl overflow-hidden z-0">
+                  <div className="relative w-[100px] h-full overflow-hidden z-0">
                      <ImageFallback
                         src={beatmapset.covers.list}
                         alt="list"
@@ -56,7 +56,7 @@ export default function OsuCard({
                         loading="lazy"
                      />
                   </div>
-                  <div className="relative flex-grow flex justify-end rounded-r-2xl overflow-hidden">
+                  <div className="relative flex-grow flex justify-end overflow-hidden">
                      <ImageFallback
                         src={beatmapset.covers.card}
                         alt="cover"
@@ -65,19 +65,19 @@ export default function OsuCard({
                         className="z-10 w-max-[286px] h-auto"
                         loading="lazy"
                      />
-                     <div className="absolute top-0 right-0 w-[289px] h-full bg-gradient-to-r from-main to-main/70 rounded-r-2xl z-15"></div>
+                     <div className="absolute top-0 right-0 w-[289px] h-full bg-gradient-to-r from-main to-main/70 z-15"></div>
                   </div>
 
-                  <div className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full bg-main rounded-2xl z-1"></div>
+                  <div className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full bg-main z-1"></div>
                   <a
                      target="_blank"
                      href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
                      className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white"
                   >
                      {/* INFORMATION */}
-                     <div>
-                        <h2 className="font-semibold text-[17px] truncate font-outline-sm">{beatmapset.title}</h2>
-                        <h3 className="font-medium text-sm -mt-1 font-outline-sm">from {beatmapset.artist}</h3>
+                     <div className="truncate font-outline-sm">
+                        <h2 className="font-semibold text-[17px]">{beatmapset.title}</h2>
+                        <h3 className="font-medium text-sm -mt-1">from {beatmapset.artist}</h3>
                      </div>
                      <h4 className="font-inter-tight text-xs">
                         created by <span className="text-highlight">{beatmapset.creator}</span>
