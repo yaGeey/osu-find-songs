@@ -1,7 +1,7 @@
 'use server'
 import { BeatmapSet } from '@/types/Osu'
 import { cookies } from 'next/headers'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
    let token = (await cookies()).get('osuToken')?.value
@@ -9,16 +9,19 @@ async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
 
    try {
       return await func(token)
-   } catch (error) {
-      const err = error as AxiosError<any>
-      if (err.response?.data?.error === 'Too Many Attempts.') {
-         // TODO test
-         console.warn(`OSU: Too many attempts, retrying in 1s...`)
-         await new Promise((resolve) => setTimeout(resolve, 1000))
-         return await func(token)
+   } catch (err) {
+      if (axios.isAxiosError<{ error: string }>(err)) {
+         if (err.response?.data.error === 'Too Many Attempts.') {
+            console.warn(`OSU: Too many attempts, retrying in 1s...`)
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+            return await func(token)
+         }
+         console.error('osu err data:', err.response?.data)
+         console.error(err)
+         throw new Error(err.response?.data.error ?? err.message ?? 'Unexpected server error')
       }
-      console.error('Osu error:', err)
-      throw new Error(err.response?.data?.error ?? err.message ?? 'Unexpected server error')
+      console.error('osu unexpected:', err)
+      throw new Error('Unexpected server error')
    }
 }
 

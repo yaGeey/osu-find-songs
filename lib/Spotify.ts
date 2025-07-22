@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { Song } from '@/types/types'
 import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spotifySearchConditions'
 import { Playlist, SpotifyError, TrackFull } from '@/types/Spotify'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 
 export async function getServerToken(): Promise<string> {
    let token = (await cookies()).get('spotifyToken')?.value
@@ -20,19 +20,21 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUse
    const token = isUserToken ? await getUserToken() : await getServerToken()
 
    try {
-      // if (Math.random() > 0.5) throw new Error('errrororo')
       return await func(token)
-   } catch (error) {
-      const err = error as AxiosError<SpotifyError>
-      if (err.response?.data?.error.status === 429) {
-         const wait = parseInt(err.response?.headers?.['Retry-After'])
-         if (wait > 60 || isNaN(wait)) throw new Error(`Spotify rate limit: wait too long (${wait}s)`)
-         console.warn(`Rate limit exceeded. Waiting for ${wait} seconds...`)
-         await new Promise((resolve) => setTimeout(resolve, wait * 1000 + 1))
-         return await func(token)
+   } catch (err) {
+      if (axios.isAxiosError<SpotifyError>(err)) {
+         if (err.response?.data.error.status === 429) {
+            const wait = parseInt(err.response?.headers?.['Retry-After'])
+            if (wait > 60 || isNaN(wait)) throw new Error(`Spotify rate limit: wait too long (${wait}s)`)
+            console.warn(`Rate limit exceeded. Waiting for ${wait} seconds...`)
+            await new Promise((resolve) => setTimeout(resolve, wait * 1000 + 1))
+            return await func(token)
+         }
+         console.error('Spotify', err)
+         throw new Error(err.response?.data?.error.message ?? err.message)
       }
-      console.error('Spotify error:', err)
-      throw new Error(err.response?.data?.error.message ?? err.message ?? 'Unexpected server error')
+      console.error('Unexpected spotify error', err)
+      throw new Error('Unexpected server error')
    }
 }
 
