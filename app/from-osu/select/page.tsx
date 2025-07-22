@@ -32,44 +32,77 @@ export default function SelectPage() {
       }
    }, [])
 
+   function readFileAsText(file: File): Promise<string> {
+      return new Promise((resolve, reject) => {
+         const reader = new FileReader()
+         reader.onload = () => resolve(reader.result as string)
+         reader.onerror = () => reject(reader.error)
+         reader.readAsText(file)
+      })
+   }
+
    async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-      toast.loading('Loading beatmaps...', { delay: 1000 })
       await getServerToken()
-      
+   
       const files = e.target.files
-      if (files && files?.length != 0) {
-         const songsMap = new Map<string, Song>()
-         Array.from(files).forEach((file) => {
-            let song = file.webkitRelativePath.split('/').slice(1, -1)[0].split(' ')
-
-            // check if beatmapset folder
-            const id = song.length > 0 && !isNaN(parseInt(song[0])) ? song.shift() : null
-            if (!id) return
-            // if (songsMap) return;
-
-            // getting bg image
-            const potentialImage = file.webkitRelativePath.split('/')[2]
-            let image
-            if (potentialImage.includes('png') || potentialImage.includes('jpg')) {
-               image = URL.createObjectURL(file)
-            }
-            if (!image) return
-
-            song = song.join(' ').split(' - ')
-            const songKey = `${song[0]} - ${song[1]}`
-            songsMap.set(songKey, {
-               author: song[0],
-               title: song[1],
-               text: songKey,
-               image,
-               id,
-            })
-         })
-         setSongs(Array.from(songsMap.values()))
-         router.push('/from-osu')
-      } else {
-         alert('Please select a valid osu! beatmaps directory')
+      if (!files || files.length === 0) throw new Error('No files selected')
+      
+      const songs: Song[] = []
+      const fileList = Array.from(files)
+      
+      // grouping files by folders
+      const folders = new Map<string, File[]>()
+      for (const file of fileList) {
+         const parts = file.webkitRelativePath.split('/')
+         const folderName = parts[1]
+         if (!folders.has(folderName)) {
+            folders.set(folderName, [])
+         }
+         folders.get(folderName)!.push(file)
       }
+
+      // getting data
+      for (const [folderName, files] of folders) {
+         const songParts = folderName.split(' ')
+
+         // check if folder is map folder
+         const id = songParts.length > 0 && !isNaN(parseInt(songParts[0])) ? songParts.shift() : null
+         if (!id) continue
+
+         const osuFile = files.find(f => f.name.endsWith('.osu'))
+         if (!osuFile) continue
+
+         // getting file content -> bg filename
+         const content = await readFileAsText(osuFile)
+         const lines = content.split('\n') 
+         let bgFileName: null | string = null
+
+         lines.forEach((line, i) => {
+            if (!bgFileName && line.trim().startsWith('//Background and Video events')) {
+               const bgLine = lines[i + 1]
+               const match = bgLine.match(/"(.*?)"/)
+               if (match) bgFileName = match[1]
+            }
+         })
+         if (!bgFileName) continue
+         
+         // searching bg file
+         const imageFile = files.find(f => f.name === bgFileName)
+         if (!imageFile) continue
+         const image = URL.createObjectURL(imageFile)
+
+         const songName = songParts.join(' ').split(' - ')
+         const songKey = `${songName[0]} - ${songName[1]}`
+         songs.push({
+            author: songName[0],
+            title: songName[1],
+            text: songKey,
+            image,
+            id,
+         })
+      }
+      setSongs(songs)
+      router.push('/from-osu')
    }
 
    return (
@@ -86,7 +119,19 @@ export default function SelectPage() {
                <input directory=""
                   webkitdirectory=""
                   type="file"
-                  onChange={handleFileChange}
+                  onChange={(e) => {
+                     toast.promise(handleFileChange(e), {
+                        pending: 'Loading beatmaps...',
+                        error: {
+                           render({ data }) {
+                              console.error(data)
+                              return 'Please select a valid osu! beatmaps directory'
+                           },
+                           autoClose: false,
+                           hideProgressBar: true,
+                        },
+                     })
+                  }}
                   className="opacity-0 absolute top-0 left-0 w-full h-full"
                />
             </div>
