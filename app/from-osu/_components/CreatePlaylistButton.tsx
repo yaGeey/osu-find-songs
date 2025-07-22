@@ -56,58 +56,67 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
          return
       }
 
-      handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading')
-      const profile = await fetchMyProfile()
-      if (!profile) {
-         handleModal(<h1>Failed to get profile data</h1>, 'error')
-         return
-      }
+      try {
+         handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading')
+         let profile
+         try {
+            profile = await fetchMyProfile()
+         } catch (err) {
+            console.error(err)
+            throw new Error('Failed to fetch profile')
+         }
 
-      handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading')
-      const playlist = await createPlaylist({
-         userId: profile.id,
-         name: 'osu! to Spotify',
-         description: `Generated playlist by ${process.env.NEXT_PUBLIC_URL} at ${new Date().toLocaleString()}`,
-      })
-      if (!playlist) {
-         handleModal(<h1>Failed to create playlist</h1>, 'error')
-         return
-      }
+         handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading')
+         let playlist
+         try {
+            playlist = await createPlaylist({
+               userId: profile.id,
+               name: 'osu! to Spotify',
+               description: `Generated playlist by ${process.env.NEXT_PUBLIC_URL} at ${new Date().toLocaleString()}`,
+            })
+         } catch (err) {
+            console.error(err)
+            throw new Error('Failed to create playlist')
+         }
 
-      handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading')
+         handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading')
 
-      // TODO sort by popularity?
-      const filteredErrors = data.filter(Boolean)
-      const strictSearchRes = filteredErrors.filter((track) => track.length !== 20)
-      const tracks = strictSearchRes.map((tracks) => tracks[0])
+         // TODO sort by popularity?
+         const filteredErrors = data.filter(Boolean)
+         const strictSearchRes = filteredErrors.filter((track) => track.length !== 20)
+         const tracks = strictSearchRes.map((tracks) => tracks[0])
 
-      const promises = []
-      const chunkSize = 100
-      for (let i = 0; i < tracks.length; i += chunkSize) {
-         const chunk = tracks.slice(i, i + chunkSize)
-         promises.push(
-            mutation.mutateAsync({
-               playlistId: playlist?.id,
-               uris: chunk.map((track) => track.uri),
-            }),
-         )
-      }
-
-      Promise.all(promises)
-         .then(() => {
-            handleModal(
-               <>
-                  <h1>Success! Visit your new playlist:</h1>
-                  <ExternalLink href={playlist.external_urls.spotify} className="text-black">
-                     {playlist.external_urls.spotify}
-                  </ExternalLink>
-               </>,
-               'success',
+         const promises = []
+         const chunkSize = 100
+         for (let i = 0; i < tracks.length; i += chunkSize) {
+            const chunk = tracks.slice(i, i + chunkSize)
+            promises.push(
+               mutation.mutateAsync({
+                  playlistId: playlist!.id,
+                  uris: chunk.map((track) => track.uri),
+               }),
             )
-         })
-         .catch(() => {
-            handleModal(<h1>Failed to add tracks to playlist</h1>, 'error')
-         })
+         }
+
+         Promise.all(promises)
+            .then(() => {
+               handleModal(
+                  <>
+                     <h1>Success! Visit your new playlist:</h1>
+                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black">
+                        {playlist!.external_urls.spotify}
+                     </ExternalLink>
+                  </>,
+                  'success',
+               )
+            })
+            .catch((err) => {
+               console.error(err)
+               handleModal(<h1>Failed to add tracks to playlist</h1>, 'error')
+            })
+      } catch (error) {
+         handleModal(<h1>{error instanceof Error ? error.message : 'An unexpected error occurred'}</h1>, 'error')
+      }
    }
 
    return (

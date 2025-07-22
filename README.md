@@ -1,12 +1,13 @@
-
 ### 🔗 https://osufindsongs.vercel.app
-This is my pet project I built to connect **osu** with **Spotify**. It features two main tools:
 
+This is my pet project I built to connect **osu** with **Spotify**. It features two main tools:
 
 ---
 
 <p align="center">
-   <strong style="font-size: 20px;">From osu! to Spotify</strong>
+  <strong style="font-size: 20px;">From osu! to Spotify</strong>
+</p>
+<p align="center">
   <img src="./public/from-osu.png" width="500"/>
 </p>
 
@@ -16,6 +17,8 @@ Just point to your `Songs/` folder, and the app will scan all your `.osu` files 
 
 <p align="center">
    <strong style="font-size: 20px;">From Spotify to osu!</strong>
+</p>
+<p align="center">
   <img src="./public/from-spotify.png" width="500"/>
 </p>
 
@@ -36,7 +39,8 @@ ThunderBirdo featured my app in [his video](https://www.youtube.com/watch?v=0uZ4
 ---
 
 ### Tech stack
+
 - Full Next JS with Tailwind with type safety (I guess), axios + tanstack query
 - **APIs used**: osu api, spotify api with users oAuth, wiki api, youtube (scraping lib)
 - **Optimization**: list virtualization, batching queries on apps api
-etc. Sadly ChatGPT can't read all my files, and I don't have CLI AI tools to write all my tech stack 😼
+  etc. Sadly ChatGPT can't read all my files, and I don't have CLI AI tools to write all my tech stack 😼
