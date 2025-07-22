@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { CombinedSingleSimple } from '@/types/types'
-import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn } from '../../../components/buttons/Buttons'
+import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn, Button } from '../../../components/buttons/Buttons'
 import { Spotify } from 'react-spotify-embed'
 import axios from 'axios'
 import { HTMLAttributes, Ref, use, useEffect, useRef, useState } from 'react'
@@ -75,7 +75,7 @@ export default function Info({ data, onClose, className }: Props) {
          )}
       >
          <div
-            className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all"
+            className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all z-100"
             onClick={onClose}
          >
             <Image src="/icons/close.svg" layout="fill" alt="close" />
