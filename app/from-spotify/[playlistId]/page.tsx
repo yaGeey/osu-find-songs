@@ -58,7 +58,11 @@ export default function PLaylistPage() {
       getPreviousPageParam: (firstPage) => (firstPage.previous ? firstPage.previous : undefined),
       initialPageParam: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100`,
       throwOnError: (error, query) => {
-         toast.error(`Error: ${error.message}`, { autoClose: false, closeButton: false })
+         if (error.message.includes('An error occurred in the Server Components render.'))
+            alert(
+               "The playlist is either not public, or you're trying to use a daily playlist that Spotify generates only for you.",
+            )
+         else toast.error(`Error: ${error.message}`, { autoClose: false, closeButton: false })
          return false
       },
       retry: 0,
