@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import axios, { AxiosError } from 'axios'
 
 export async function GET(req: NextRequest) {
    const searchParams = req.nextUrl.searchParams
@@ -12,34 +13,26 @@ export async function GET(req: NextRequest) {
       client_id: process.env.AUTH_SPOTIFY_ID!,
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
    })
+   
+   try {
+      const { data } = await axios.post('https://accounts.spotify.com/api/token', body.toString(), {
+         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      })
 
-   const response = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: {
-         'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
-   })
-
-   if (!response.ok) {
-      const error = await response.json()
-      console.error('Error fetching token:', error)
-      return NextResponse.redirect(new URL('/error', req.url))
+      const nextResponse = NextResponse.redirect(new URL('/from-osu/select', req.url))
+      nextResponse.cookies.set('spotify_oauth_access_token', data.access_token, {
+         httpOnly: process.env.NODE_ENV === 'production',
+         secure: process.env.NODE_ENV === 'production',
+         maxAge: data.expires_in,
+      })
+      return nextResponse
+   } catch (error) {
+      if (axios.isAxiosError(error)) {
+         console.error('Spotify token exchange error:', error.response?.data)
+      } else {
+         console.error('An unexpected error occurred:', error)
+      }
+      console.error('body', body.toString())
+      return NextResponse.json(error, { status: (error as AxiosError).response?.status || 500 })
    }
-
-   const data = await response.json()
-
-   if (data.error) {
-      console.error('Error in token response:', data.error)
-      return NextResponse.redirect(new URL('/error', req.url))
-   }
-
-   const nextResponse = NextResponse.redirect(new URL('/from-osu/select', req.url))
-   nextResponse.cookies.set('spotify_oauth_access_token', data.access_token, {
-      // httpOnly: true,
-      // secure: process.env.NODE_ENV === 'production',
-      maxAge: data.expires_in,
-   })
-
-   return nextResponse
 }

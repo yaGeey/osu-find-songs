@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import axios from 'axios'
 
 export async function POST(req: NextRequest) {
    const body = new URLSearchParams({
@@ -8,20 +9,13 @@ export async function POST(req: NextRequest) {
    })
 
    try {
-      const response = await fetch('https://accounts.spotify.com/api/token', {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-         },
-         body: body.toString(),
-      })
-      if (!response.ok) return NextResponse.json(response)
-
-      const data: {
+      const {data} = await axios.post<{
          access_token: string
          expires_in: number
          token_type: string
-      } = await response.json()
+      }>('https://accounts.spotify.com/api/token', body.toString(), {
+         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      })
 
       const nextRes = NextResponse.next()
       nextRes.cookies.set('spotifyToken', data.access_token, {
