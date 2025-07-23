@@ -20,7 +20,7 @@ export default function HomeBtn() {
             okBtn="Redirect"
             state="warning"
          >
-            You are about to redirect to the landing page
+            <h1 className='font-semibold'>You are about to redirect to the landing page</h1>
          </Modal>
       </>
    )

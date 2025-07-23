@@ -160,7 +160,7 @@ export default function PLaylistPage() {
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
-         <BgImage brightness={8} image="/bg.svg" />
+         <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}
          <Progress isVisible={!!timeToSearch} value={(timeToSearch! * 100) / 2000} color="text-main-lighter" />
@@ -202,7 +202,7 @@ export default function PLaylistPage() {
          </header>
 
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
-            <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1900px]">
+            <div className=" min-h-[calc(100vh-3.5rem)] [@media(min-width:980px)]:w-4/5 w-full  max-w-[1900px]">
                <Filters
                   foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                   onChange={(val, searchTypeRes, mode) => {

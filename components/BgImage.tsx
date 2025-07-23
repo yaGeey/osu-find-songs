@@ -10,25 +10,11 @@ const links = [
    'https://i.imgur.com/7Ya0zny.jpeg',
 ]
 
-export default function BgImage({
-   image,
-   brightness = 4,
-   className,
-}: {
-   image?: string
-   brightness?: number
-   className?: string
-}) {
+export default function BgImage({ image, className }: { image?: string; brightness?: number; className?: string }) {
    const [isLoaded, setIsLoaded] = useState(false)
    const [number] = useState(() => Math.floor(Math.random() * links.length))
    return (
-      <div
-         className={tw(
-            'fixed -z-10 top-0 left-0 w-full h-full brightness-[.4]',
-            brightness && `brightness-[.${brightness}]`,
-            className,
-         )}
-      >
+      <div className={tw('fixed -z-10 top-0 left-0 w-full h-full brightness-[.4]', className)}>
          <Image
             // src={image || links[number]}
             src={image || '/bg.svg'}
