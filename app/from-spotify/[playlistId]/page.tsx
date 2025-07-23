@@ -25,7 +25,7 @@ import { uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
 import useDownloadAll from '@/hooks/useDownloadAll'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import useTimeLeft from '@/hooks/useTimeLeft'
-import { VirtuosoGrid } from 'react-virtuoso'
+import VirtuosoCards from './_components/VirtuosoCards'
 
 export default function PLaylistPage() {
    const params = useParams()
@@ -157,63 +157,6 @@ export default function PLaylistPage() {
          ),
       [filteredBeatmapsets, searchParams],
    )
-   const gridComponents = {
-      List: React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(({ children, ...props }, ref) => (
-         <div
-            ref={ref}
-            {...props}
-            className="flex flex-wrap gap-4 p-4 bg-darker justify-center"
-            style={{ alignContent: 'flex-start' }} // обов’язково!
-         >
-            {children}
-         </div>
-      )),
-      Item: (props: React.HTMLProps<HTMLDivElement>) => (
-         <div {...props} className={tw('w-[386px] flex-grow animate-in fade-in duration-500 shadow-sm', props.className)}>
-            {props.children}
-         </div>
-      ),
-   }
-
-   const GridContainer = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
-      ({ style, children, ...props }, ref) => {
-         return (
-            <div
-               ref={ref}
-               {...props}
-               style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '1rem', // gap: 16px
-                  padding: '1rem', // p-4
-                  ...style,
-               }}
-            >
-               {children}
-            </div>
-         )
-      },
-   )
-
-   // 2. Створюємо компонент для обгортки кожного елемента (де буде flex-grow)
-   const ItemContainer = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
-      ({ children, style, ...props }, ref) => {
-         return (
-            <div
-               ref={ref}
-               {...props}
-               style={{
-                  flexGrow: 1,
-                  ...style, // зберегти результат розрахунків virtuoso при перерахунці при зміні розміру viewport
-                  // Ви можете додати тут max-width або flex-basis для кращого контролю
-                  minWidth: '400px',
-               }}
-            >
-               {children}
-            </div>
-         )
-      },
-   )
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
@@ -242,7 +185,7 @@ export default function PLaylistPage() {
 
          <header
             className={tw(
-               'min-w-[800px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker',
+               'min-w-[700px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker',
             )}
          >
             <section className="absolute left-4 flex items-center gap-4">
@@ -261,9 +204,7 @@ export default function PLaylistPage() {
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:980px)]:w-4/5 w-full ">
                <Filters
-                  foundString={
-                     beatmapsets.length ? beatmapsets.filter((a) => !!a && a.length).length + '/' + beatmapsets.length : ''
-                  }
+                  foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                   onChange={(val, searchTypeRes, mode) => {
                      setQueriesDict({ sort: val, m: mode })
                      setSearchType(searchTypeRes)
@@ -271,79 +212,9 @@ export default function PLaylistPage() {
                   disabled={isLoading}
                />
 
-               {/* TODO */}
                {isLoading || maps.length < 45 ? (
                   <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto max-h-[calc(100vh-3.5rem-127px)] scrollbar">
-                     {uniqueBeatmapsetMatrix(filteredBeatmapsets.filter((data) => data && data.length))
-                        .sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'))
-                        .map((data, i) => {
-                           if (data.length > 1 && data.length < 18)
-                              return (
-                                 <OsuCardSet
-                                    key={data[0].id + i}
-                                    beatmapsets={data}
-                                    sortQuery={searchParams.get('sort') || 'relevance_asc'}
-                                    className="flex-grow animate-in fade-in duration-1000"
-                                 />
-                              )
-                           else
-                              return (
-                                 <OsuCard
-                                    key={data[0].id}
-                                    beatmapset={data[0]}
-                                    className="flex-grow animate-in fade-in duration-1000 shadow-sm"
-                                 />
-                              )
-                        })}
-                  </div>
-               ) : (
-                  <VirtuosoGrid
-                     className="scrollbar"
-                     style={{ height: 'calc(100vh - 3.5rem - 127px)' }} // Virtuoso потребує контейнера з визначеною висотою
-                     data={maps}
-                     components={{
-                        List: GridContainer,
-                        Item: ItemContainer,
-                        Header: () => <div className="h-4" />,
-                        Footer: () => <div className="h-4" />,
-                     }}
-                     overscan={250}
-                     totalCount={maps.length}
-                     itemContent={(index, data) => {
-                        // Логіка рендерингу OsuCardSet або OsuCard
-                        if (data.length > 1 && data.length < 18) {
-                           return (
-                              <OsuCardSet
-                                 key={data[0].id + index}
-                                 beatmapsets={data}
-                                 sortQuery={searchParams.get('sort') || 'relevance_asc'}
-                                 className="w-full animate-in fade-in duration-500" // ItemContainer - flex-grow -> w-full
-                              />
-                           )
-                        } else {
-                           return (
-                              <div className="h-[105px]">
-                                 <OsuCard
-                                    key={data[0].id}
-                                    beatmapset={data[0]}
-                                    className="w-full animate-in fade-in duration-500 shadow-sm"
-                                 />
-                              </div>
-                           )
-                        }
-                     }}
-                  />
-               )}
-               {!isLoading && !maps.length && (
-                  <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
-                     No results found
-                     <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
-                  </div>
-               )}
-               {/* <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto">
-                  {uniqueBeatmapsetMatrix(filteredBeatmapsets.filter((data) => data && data.length))
-                     .sort((a, b) => sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'))
-                     .map((data, i) => {
+                     {maps.map((data, i) => {
                         if (data.length > 1 && data.length < 18)
                            return (
                               <OsuCardSet
@@ -362,13 +233,16 @@ export default function PLaylistPage() {
                               />
                            )
                      })}
-                  {!filteredBeatmapsets.filter((data) => data && data.length).length && !isLoading && (
-                     <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
-                        No results found
-                        <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
-                     </div>
-                  )}
-               </div> */}
+                  </div>
+               ) : (
+                  <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
+               )}
+               {!isLoading && !maps.length && (
+                  <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
+                     No results found
+                     <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
+                  </div>
+               )}
             </div>
          </main>
 
