@@ -2,7 +2,7 @@
 import { cookies } from 'next/headers'
 import { Song } from '@/types/types'
 import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spotifySearchConditions'
-import { Playlist, SpotifyError, TrackFull } from '@/types/Spotify'
+import { Playlist, SpotifyAuthResponse, SpotifyError, TrackFull } from '@/types/Spotify'
 import axios from 'axios'
 
 export async function getServerToken(): Promise<string> {
@@ -11,26 +11,26 @@ export async function getServerToken(): Promise<string> {
    return token
 }
 async function getUserToken(): Promise<string> {
-   const userToken = (await cookies()).get('spotify_oauth_access_token')?.value
-   if (!userToken) throw new Error('No user access token found. Please log in to Spotify.')
-   return userToken
+   let token = (await cookies()).get('spotify_oauth_access_token')?.value
+   if (!token) token = await refreshToken()
+   return token
 }
 
 export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUserToken: boolean = false): Promise<T> {
-   const token = isUserToken ? await getUserToken() : await getServerToken()
-
+   let token
    try {
+      token = isUserToken ? await getUserToken() : await getServerToken()
       return await func(token)
    } catch (err) {
       if (axios.isAxiosError<SpotifyError>(err)) {
-         if (err.response?.data.error.status === 429) {
+         if (err.response?.data.error.status === 429 && token) {
             const wait = parseInt(err.response?.headers?.['Retry-After'])
             if (wait > 60 || isNaN(wait)) throw new Error(`Spotify rate limit: wait too long (${wait}s)`)
             console.warn(`Rate limit exceeded. Waiting for ${wait} seconds...`)
             await new Promise((resolve) => setTimeout(resolve, wait * 1000 + 1))
             return await func(token)
          }
-         console.error('Spotify', err)
+         console.error('Spotify', err.toJSON())
          throw new Error(err.response?.data?.error.message ?? err.message)
       }
       console.error('Unexpected spotify error', err)
@@ -69,6 +69,26 @@ export const searchSongWithConditions = async (song: Song): Promise<[TrackFull] 
    return null
 }
 
+export async function refreshToken(): Promise<string> {
+   const body = new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: process.env.SPOTIFY_REFRESH_TOKEN!,
+      client_id: process.env.AUTH_SPOTIFY_ID!,
+      client_secret: process.env.AUTH_SPOTIFY_SECRET!,
+   })
+   const { data } = await axios.post<SpotifyAuthResponse>('https://accounts.spotify.com/api/token', body, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+   })
+   console.log('refresh_token NEW', data.refresh_token)
+
+   const storage = await cookies()
+   storage.set('spotify_oauth_access_token', data.access_token, {
+      path: '/',
+      expires: new Date(Date.now() + data.expires_in * 1000),
+   })
+   return data.access_token
+}
+
 export async function revalidateSpotifyToken(): Promise<string> {
    const body = new URLSearchParams({
       grant_type: 'client_credentials',
@@ -76,11 +96,7 @@ export async function revalidateSpotifyToken(): Promise<string> {
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
    })
 
-   const { data } = await axios.post<{
-      access_token: string
-      expires_in: number
-      token_type: string
-   }>('https://accounts.spotify.com/api/token', body.toString(), {
+   const { data } = await axios.post<SpotifyAuthResponse>('https://accounts.spotify.com/api/token', body.toString(), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
    })
    console.log('spotify token request', data)

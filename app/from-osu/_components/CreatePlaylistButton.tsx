@@ -1,6 +1,6 @@
 'use client'
 import { Track } from '@/types/Spotify'
-import { AddItemsToPlaylist, createPlaylist, fetchMyProfile } from '@/lib/Spotify'
+import { AddItemsToPlaylist, createPlaylist, fetchMyProfile, fetchSpotify, getServerToken } from '@/lib/Spotify'
 import { useMutation } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import Modal from '@/components/Modal'
@@ -52,12 +52,12 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
    async function handleCreatePlaylist() {
       setIsModalOpen(true)
       if (!Cookies.get('spotify_oauth_access_token')) {
-         handleModal(<h1>You must be logged in your Spotify account to continue!</h1>, 'warning', navigateToAuth, 'Login')
-         return
+         // handleModal(<h1>You must be logged in your Spotify account to continue!</h1>, 'warning', navigateToAuth, 'Login')
+         // return
       }
 
       try {
-         handleModal(<h1 className="animate-pulse">Fetching profile...</h1>, 'loading')
+         handleModal(<h1 className="animate-pulse font-semibold">Getting profile...</h1>, 'loading')
          let profile
          try {
             profile = await fetchMyProfile()
@@ -66,7 +66,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             throw new Error('Failed to fetch profile')
          }
 
-         handleModal(<h1 className="animate-pulse">Creating playlist...</h1>, 'loading')
+         handleModal(<h1 className="animate-pulse font-semibold">Creating playlist...</h1>, 'loading')
          let playlist
          try {
             playlist = await createPlaylist({
@@ -79,7 +79,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             throw new Error('Failed to create playlist')
          }
 
-         handleModal(<h1 className="animate-pulse">Putting tracks in your playlist...</h1>, 'loading')
+         handleModal(<h1 className="animate-pulse font-semibold">Putting tracks in your playlist...</h1>, 'loading')
 
          // TODO sort by popularity?
          const filteredErrors = data.filter(Boolean)
@@ -102,8 +102,11 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             .then(() => {
                handleModal(
                   <>
-                     <h1>Success! Visit your new playlist:</h1>
-                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black">
+                     <h1 className="text-lg font-semibold">Success!</h1>
+                     <p>
+                        ❤️ Like the playlist to save it to your library, <br /> 🔁 or copy tracks with Ctrl+A, C, then V in your playlist.
+                     </p>
+                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black animate-pulse">
                         {playlist!.external_urls.spotify}
                      </ExternalLink>
                   </>,
@@ -123,7 +126,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
       <>
          <Button
             {...props}
-            disabled={isDisabled}
+            // disabled={isDisabled}
             onClick={() => handleCreatePlaylist()}
             data-tooltip-id="tooltip-1"
             data-tooltip-content="Create playlist on your Spotify account and populate it with tracks with filter 'Exact Spotify match'"
