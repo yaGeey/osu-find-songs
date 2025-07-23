@@ -2,6 +2,7 @@
 import { BeatmapSet } from '@/types/Osu'
 import { cookies } from 'next/headers'
 import axios from 'axios'
+import { axiosErrorHandler, unexpectedErrorHandler } from './errorHandlers'
 
 async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
    let token
@@ -16,11 +17,9 @@ async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
             await new Promise((resolve) => setTimeout(resolve, 1000))
             return await func(token)
          }
-         console.error('OSU Err:', err.toJSON())
-         throw new Error(err.response?.data.error ?? err.message ?? 'Unexpected server error')
-      }
-      console.error('OSU unexpected:', err)
-      throw new Error('Unexpected server error')
+         axiosErrorHandler(err, 'OSU')
+      } else unexpectedErrorHandler(err, 'OSU')
+      throw err
    }
 }
 

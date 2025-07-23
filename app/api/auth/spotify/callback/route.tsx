@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import axios, { AxiosError } from 'axios'
+import { handleError } from '@/lib/errorHandlers'
 
 export async function GET(req: NextRequest) {
    const searchParams = req.nextUrl.searchParams
@@ -26,12 +27,7 @@ export async function GET(req: NextRequest) {
       })
       return nextResponse
    } catch (error) {
-      if (axios.isAxiosError(error)) {
-         console.error('Spotify token exchange error:', error.response?.data)
-      } else {
-         console.error('An unexpected error occurred:', error)
-      }
-      console.error('body', body.toString())
+      handleError(error, 'Spotify OAuth Callback')
       return NextResponse.json(error, { status: (error as AxiosError).response?.status || 500 })
    }
 }

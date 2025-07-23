@@ -4,6 +4,8 @@ import { Song } from '@/types/types'
 import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spotifySearchConditions'
 import { Playlist, SpotifyAuthResponse, SpotifyError, TrackFull } from '@/types/Spotify'
 import axios from 'axios'
+import { axiosErrorHandler, unexpectedErrorHandler } from './errorHandlers'
+import { H } from '@highlight-run/next/client'
 
 export async function getServerToken(): Promise<string> {
    let token = (await cookies()).get('spotifyToken')?.value
@@ -17,7 +19,7 @@ async function getUserToken(): Promise<string> {
 }
 
 export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUserToken: boolean = false): Promise<T> {
-   let token
+   let token: string | undefined
    try {
       token = isUserToken ? await getUserToken() : await getServerToken()
       return await func(token)
@@ -30,11 +32,9 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUse
             await new Promise((resolve) => setTimeout(resolve, wait * 1000 + 1))
             return await func(token)
          }
-         console.error('Spotify', err.toJSON())
-         throw new Error(err.response?.data?.error.message ?? err.message)
-      }
-      console.error('Unexpected spotify error', err)
-      throw new Error('Unexpected server error')
+         axiosErrorHandler(err, 'Spotify')
+      } else unexpectedErrorHandler(err, 'Spotify')
+      throw err
    }
 }
 
@@ -111,10 +111,11 @@ export async function revalidateSpotifyToken(): Promise<string> {
 
 export async function getPlaylist(playlistId: string): Promise<Playlist | undefined> {
    return fetchSpotify(async (token) => {
-      const res = await axios.get<Playlist>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      const { data } = await axios.get<Playlist>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
          headers: { Authorization: `Bearer ${token}` },
       })
-      return res.data
+      H.track('get_playlist', data)
+      return data
    })
 }
 
@@ -141,7 +142,7 @@ export async function createPlaylist({
    description: string
 }): Promise<Playlist | undefined> {
    return fetchSpotify(async (token) => {
-      const res = await axios.post<Playlist>(
+      const { data } = await axios.post<Playlist>(
          `https://api.spotify.com/v1/users/${userId}/playlists`,
          {
             name,
@@ -151,7 +152,8 @@ export async function createPlaylist({
          },
          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
       )
-      return res.data
+      H.track('create_playlist', data)
+      return data
    }, true)
 }
 
