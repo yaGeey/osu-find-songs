@@ -52,7 +52,7 @@ export default function Filters({
          )}
       >
          {/* Main filters */}
-         <div className="flex items-center justify-between text-[15px]">
+         <div className="flex [@media(min-width:640px)]:items-center justify-between text-[15px] [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
             <section className="flex items-center gap-4">
                <h4>Star rating</h4>
                <FilterSelector
@@ -62,7 +62,7 @@ export default function Filters({
                   onChange={(val, filter) => createQueryString('star', filter, val)}
                />
             </section>
-            <div className="flex items-center gap-4  text-[15px]">
+            <div className="flex items-center gap-4 text-[15px]">
                <h4>Mode</h4>
                <SwitchFullDict
                   className="font-inter"
@@ -75,7 +75,10 @@ export default function Filters({
                   onChange={(val) => setM(val)}
                />
             </div>
-            <button className="selected bg-darker rounded-full px-4 py-1.5" onClick={() => setUnfolded((p) => !p)}>
+            <button
+               className="selected bg-darker rounded-full px-4 py-1.5 [@media(max-width:640px)]:hidden"
+               onClick={() => setUnfolded((p) => !p)}
+            >
                More filters{' '}
                {unfolded ? (
                   <span className="writing-mode-vertical-lr">&lt;</span>
@@ -114,7 +117,7 @@ export default function Filters({
             />
             {/* <button onClick={onSortButtonClick}>Sort locally</button> */}
          </section>
-         {foundString && (
+         {foundString && !disabled && (
             <div className="absolute animate-in fade-in right-4 bottom-2 text-white/70 font-outline-sm tracking-wider text-sm hidden lg:block">
                {foundString} <span className="text-sm">found</span>
             </div>
