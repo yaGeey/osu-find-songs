@@ -4,23 +4,22 @@ import { cookies } from 'next/headers'
 import axios from 'axios'
 
 async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
-   let token = (await cookies()).get('osuToken')?.value
-   if (!token) token = await revalidateOsuToken()
-
+   let token
    try {
+      token = (await cookies()).get('osuToken')?.value
+      if (!token) token = await revalidateOsuToken()
       return await func(token)
    } catch (err) {
       if (axios.isAxiosError<{ error: string }>(err)) {
-         if (err.response?.data.error === 'Too Many Attempts.') {
+         if (err.response?.data.error === 'Too Many Attempts.' && token) {
             console.warn(`OSU: Too many attempts, retrying in 1s...`)
             await new Promise((resolve) => setTimeout(resolve, 1000))
             return await func(token)
          }
-         console.error('osu err data:', err.response?.data)
-         console.error(err)
+         console.error('OSU Err:', err.toJSON())
          throw new Error(err.response?.data.error ?? err.message ?? 'Unexpected server error')
       }
-      console.error('osu unexpected:', err)
+      console.error('OSU unexpected:', err)
       throw new Error('Unexpected server error')
    }
 }
