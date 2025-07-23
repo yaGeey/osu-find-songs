@@ -5,11 +5,10 @@ import BgImage from '@/components/BgImage'
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
-import { faStar } from '@fortawesome/free-regular-svg-icons'
+import { faStar, faCircleQuestion } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-const GH_REPO = 'https://api.github.com/repos/yaGeey/osu-find-songs'
 
 export default function LandingPage() {
    useEffect(() => {
@@ -21,7 +20,7 @@ export default function LandingPage() {
    const { data: lastUpdated } = useQuery({
       queryKey: ['lastUpdated'],
       queryFn: async () => {
-         const { data } = await axios(`${GH_REPO}/commits?per_page=1`)
+         const { data } = await axios(`https://api.github.com/repos/yaGeey/osu-find-songs/commits?per_page=1`)
          return {
             date: new Date(data[0].commit.author.date).toLocaleString('en-US', {
                dateStyle: 'short',
@@ -34,7 +33,7 @@ export default function LandingPage() {
    const { data: stargazeCount } = useQuery({
       queryKey: ['stargazeCount'],
       queryFn: async () => {
-         const { data } = await axios(GH_REPO)
+         const { data } = await axios('https://api.github.com/repos/yaGeey/osu-find-songs')
          return data.stargazers_count
       },
    })
@@ -44,7 +43,15 @@ export default function LandingPage() {
          <div className="bg-dialog relative flex flex-col justify-center items-center bg-main-lighter rounded-2xl p-10 shadow-lg border-4 border-main-border">
             <Image src="/icon.png" width={75} height={75} alt="logo" />
             <h1 className="text-3xl  mt-3">Welcome to osu! find songs</h1>
-            <h2 className="text-2xl ">Choose one of the options</h2>
+            <h2 className="text-2xl ">
+               Choose one of the options
+               <a
+                  href="https://www.reddit.com/r/osugame/comments/1m5ruu2/i_fixed_a_web_app_that_allows_users_to_find_songs/"
+                  target="_blank"
+               >
+                  <FontAwesomeIcon icon={faCircleQuestion} className="ml-1.5 text-base mb-1" />
+               </a>
+            </h2>
             <div className="flex gap-4 mt-10 w-full">
                <Link href="/from-osu/select">
                   <Button className="text-black bg-gradient-to-l from-[#1DB954] to-[#FF66AA] font-medium">
@@ -59,7 +66,7 @@ export default function LandingPage() {
             </div>
             {lastUpdated && stargazeCount && (
                <div className="absolute bottom-0 w-full flex px-2 justify-center text-xs text-main-border/80">
-                  <a href={GH_REPO} target="_blank">
+                  <a href="https://github.com/yaGeey/osu-find-songs" target="_blank">
                      GitHub
                      <FontAwesomeIcon icon={faStar} className="text-[10px] mx-0.5" />
                      {stargazeCount} · Last updated: {lastUpdated.date}
