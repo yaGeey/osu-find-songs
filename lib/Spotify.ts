@@ -5,7 +5,7 @@ import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spot
 import { Playlist, SpotifyAuthResponse, SpotifyError, TrackFull } from '@/types/Spotify'
 import axios from 'axios'
 import { axiosErrorHandler, unexpectedErrorHandler } from './errorHandlers'
-import { H } from '@highlight-run/next/client'
+// import { H } from '@highlight-run/next/server'
 
 export async function getServerToken(): Promise<string> {
    let token = (await cookies()).get('spotifyToken')?.value
@@ -114,7 +114,7 @@ export async function getPlaylist(playlistId: string): Promise<Playlist | undefi
       const { data } = await axios.get<Playlist>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
          headers: { Authorization: `Bearer ${token}` },
       })
-      H.track('get_playlist', data)
+      // H.log('get_playlist', 'log')
       return data
    })
 }
@@ -152,7 +152,7 @@ export async function createPlaylist({
          },
          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
       )
-      H.track('create_playlist', data)
+      // H.log('create_playlist', 'log')
       return data
    }, true)
 }
