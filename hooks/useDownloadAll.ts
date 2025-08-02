@@ -23,7 +23,7 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
             const blob = await getNoVideoAxios(beatmapset.id)
             count++
             setText(`Downloading... (${count}/${validQueries.length})`)
-            setProgress(Math.max((count / validQueries.length) * 100 - 1, 0))
+            setProgress((count / validQueries.length) * 99)
             return { filename, blob }
          }),
       )
@@ -36,7 +36,8 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
          })
          .then((blob) => {
             download(blob, 'beatmaps.zip')
-            setProgress(100)
+            setProgress(null)
+            setText(null)
          })
          .catch((error) => {
             console.error('Download failed:', error)
@@ -47,14 +48,6 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
       toast.promise(promise, {
          success: 'Downloaded successfully',
          error: 'Download failed',
-      })
-      promise.then(() => {
-         setText(null)
-         setProgress(null)
-         // if (isModalDownloadingVisible) {
-         //    setIsModalDownloadingVisible(false)
-         //    setIsModalDownloadedVisible(true)
-         // }
       })
    }
 

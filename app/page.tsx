@@ -69,7 +69,7 @@ export default function LandingPage() {
                   <a href="https://github.com/yaGeey/osu-find-songs" target="_blank">
                      GitHub
                      <FontAwesomeIcon icon={faStar} className="text-[10px] mx-0.5" />
-                     {stargazeCount} · Last updated: {lastUpdated.date}
+                     {stargazeCount} · Last update: {lastUpdated.date}
                      <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px] ml-1" />
                   </a>
                </div>
