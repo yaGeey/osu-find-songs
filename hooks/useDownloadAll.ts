@@ -7,29 +7,40 @@ import { toast } from 'react-toastify'
 
 export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Error>[]) {
    const [progress, setProgress] = useState<null | number>(null)
-   const [current, setCurrent] = useState<null | string>(null)
+   const [text, setText] = useState<null | string>(null)
 
    // download maps
-   function handleDownloadAll() {
+   async function handleDownloadAll() {
       const zip = new JSZip()
       setProgress(0)
-      beatmapsetQueries.forEach((q) => {
-         if (!q.data || !q.data.beatmapsets.length) return
-         const beatmapset: BeatmapSet = q.data?.beatmapsets[0]
 
-         const filename = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
-         zip.file(filename, getNoVideoAxios(beatmapset.id))
-      })
+      const validQueries = beatmapsetQueries.filter((q) => q.data && q.data.beatmapsets.length > 0)
+      let count = 0
+      const downloadedFiles = await Promise.all(
+         validQueries.map(async (q) => {
+            const beatmapset: BeatmapSet = q.data?.beatmapsets[0]
+            const filename = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
+            const blob = await getNoVideoAxios(beatmapset.id)
+            count++
+            setText(`Downloading... (${count}/${validQueries.length})`)
+            setProgress(Math.max((count / validQueries.length) * 100 - 1, 0))
+            return { filename, blob }
+         }),
+      )
+
+      setText('Creating zip...')
+      downloadedFiles.forEach(({ filename, blob }) => zip.file(filename, blob))
       const promise = zip
          .generateAsync({ type: 'blob' }, (metadata) => {
-            setProgress(metadata.percent)
-            setCurrent(metadata.currentFile)
+            setText(`Creating zip... (${Math.round(metadata.percent)}%)`)
          })
          .then((blob) => {
             download(blob, 'beatmaps.zip')
+            setProgress(100)
          })
          .catch((error) => {
             console.error('Download failed:', error)
+            toast.error('Download failed')
             setProgress(-1)
          })
 
@@ -38,7 +49,7 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
          error: 'Download failed',
       })
       promise.then(() => {
-         setCurrent(null)
+         setText(null)
          setProgress(null)
          // if (isModalDownloadingVisible) {
          //    setIsModalDownloadingVisible(false)
@@ -47,5 +58,5 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
       })
    }
 
-   return { progress, current, handleDownloadAll }
+   return { progress, text, handleDownloadAll }
 }

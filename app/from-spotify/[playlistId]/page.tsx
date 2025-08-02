@@ -147,7 +147,7 @@ export default function PLaylistPage() {
       if (searchType == 'local') console.log('local search')
    }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
 
-   const { current, progress, handleDownloadAll } = useDownloadAll(beatmapsetQueries)
+   const { text, progress, handleDownloadAll } = useDownloadAll(beatmapsetQueries)
 
    // preparing data for display
    const maps = useMemo(
@@ -180,7 +180,7 @@ export default function PLaylistPage() {
 
          {/* download all progress */}
          <Progress isVisible={progress !== null} value={progress || 0} isError={progress === -1} color="text-success">
-            {current}
+            {text}
          </Progress>
 
          <header
@@ -194,7 +194,7 @@ export default function PLaylistPage() {
                   <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
                </a>
             </section>
-            <Button onClick={() => setIsModalVisible(true)} className="text-white py-1 w-45">
+            <Button onClick={() => setIsModalVisible(true)} className="text-white py-1 w-45" disabled={isLoading}>
                Download all
                <FontAwesomeIcon icon={faDownload} className="ml-2" />
             </Button>
