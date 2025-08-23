@@ -17,7 +17,7 @@ export default function Telemetry() {
             page: window.location.pathname,
          })
       }
-      if (process.env.NODE_ENV == 'development') func()
+      if (process.env.NODE_ENV !== 'development') func()
    }, [pathname])
    return null
 }
