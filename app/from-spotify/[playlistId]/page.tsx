@@ -21,16 +21,19 @@ import Search from './_components/Search'
 import Progress from '@/components/state/Progress'
 import BgImage from '@/components/BgImage'
 import { sortBeatmapsMatrix } from './_utils/sortBeatmapsMatrix'
-import { uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
+import { chunkArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
 import useDownloadAll from '@/hooks/useDownloadAll'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
+import axios from 'axios'
+const CHUNK_SIZE = 10
 
 export default function PLaylistPage() {
    const params = useParams()
    const searchParams = useSearchParams()
    const { playlistId } = params
+   const queryClient = useQueryClient()
 
    const [queriesDict, setQueriesDict] = useState<{ [key: string]: string }>({})
    const [hasQueryChanged, setHasQueryChanged] = useState(false)
@@ -71,25 +74,18 @@ export default function PLaylistPage() {
       if (hasNextPage && !isFetchingNextPage) fetchNextPage()
    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-   const queryClient = useQueryClient()
-   useEffect(() => {
-      //? ...we are cancelling the query on mount and the refetching it
-      // console.log('cancelling query', playlistId);
-      // queryClient.cancelQueries({ queryKey: ['spotify-playlist', playlistId] })
-      // refetch();
-   }, [])
-
    const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || []
+   // const chunked = chunkArray(tracks, CHUNK_SIZE)
 
    // beatmapset search
    const beatmapsetQueries = useQueries({
-      queries: tracks.map((track) => ({
-         queryKey: ['beatmapset', track.track ? track.track.artists[0].name : 'err', track.track ? track.track.name : 'err'],
+      queries: tracks.map((item) => ({
+         queryKey: ['beatmapset', item.track ? item.track.artists[0].name : 'err', item.track ? item.track.name : 'err'],
          queryFn: async () => {
             const t0 = performance.now()
-            if (!track.track) return [] //? odd error rarely occurs
+            if (!item.track) return [] //? odd error rarely occurs
             const res = await beatmapsSearch({
-               q: `artist=${track.track.artists[0].name} title=${track.track.name} ${searchParams.get('q') || ''}`,
+               q: `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}`,
                m: searchParams.get('m'),
                s: searchParams.get('s'),
             })
@@ -100,6 +96,7 @@ export default function PLaylistPage() {
          onError: (error: any) => toast.error(`Error: ${error.message}`, { autoClose: false }),
       })),
    })
+
    const isLoading = useMemo(
       () => beatmapsetQueries.some((q) => q.isLoading) || isTracksLoading,
       [beatmapsetQueries, isTracksLoading],

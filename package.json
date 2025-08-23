@@ -20,6 +20,7 @@
       "@gsap/react": "^2.1.2",
       "@highlight-run/next": "^7.9.34",
       "@mui/material": "^6.4.7",
+      "@neondatabase/serverless": "^1.0.1",
       "@tanstack/query-sync-storage-persister": "^5.66.0",
       "@tanstack/react-query": "^5.66.0",
       "@tanstack/react-query-devtools": "^5.66.0",

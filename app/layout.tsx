@@ -9,6 +9,7 @@ import { HighlightInit } from '@highlight-run/next/client'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import MobileDeviceCheck from '@/components/MobileDeviceCheck'
+import Telemetry from '@/components/Temeltry'
 // Prevent fontawesome from dynamically adding its css since we did it manually above
 config.autoAddCss = false
 
@@ -67,8 +68,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             >
                <Providers>
                   <MobileDeviceCheck />
+                  <Telemetry />
                   {children}
-                  <MobileDeviceCheck />
                </Providers>
                {process.env.NODE_ENV !== 'development' && <Analytics />}
             </body>
