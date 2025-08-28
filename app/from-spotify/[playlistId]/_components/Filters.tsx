@@ -46,10 +46,7 @@ export default function Filters({
 
    return (
       <div
-         className={tw(
-            'bg-main-darker z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap',
-            unfolded && 'pb-5',
-         )}
+         className={tw('bg-[#BE6E6E] z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border ', unfolded && 'pb-5')}
       >
          {/* Main filters */}
          <div className="flex [@media(min-width:640px)]:items-center justify-between text-[15px] [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
@@ -151,14 +148,14 @@ export default function Filters({
                         onChange={(val, filter) => createQueryString('bpm', filter, val)}
                      />
                   </section>
-                  <section className="flex items-center justify-between">
+                  {/* <section className="flex items-center justify-between">
                      <h4>Source</h4>
                      <Switch
                         options={['movie', 'video game', 'series', 'event']}
                         onChange={(val) => createQueryString('source', '=', val)}
                         disabled
                      />
-                  </section>
+                  </section> */}
                </div>
 
                <div className="flex flex-col gap-2.5 w-[300px]">

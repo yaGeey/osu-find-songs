@@ -156,7 +156,7 @@ export default function PLaylistPage() {
    )
 
    return (
-      <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar">
+      <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar-none">
          <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}

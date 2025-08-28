@@ -30,7 +30,7 @@
    --color-main-lighter: #eb9090;
    --color-main-darker-0: var(--color-main-darker-0);
    --color-main-darker: #ad6666;
-   --color-darker: #905959;
+   --color-darker: #885555;
    --color-main-border: #733f3f;
    --color-light: #ffa3a3;
    --color-main-gray: #282828;
@@ -84,19 +84,19 @@
    }
 
    .scrollbar::-webkit-scrollbar-track {
-      border-radius: 100vh;
-      background: #f6f7ed;
-   }
+   border-radius: 100vh;
+   background: #f8dede
+}
 
-   .scrollbar::-webkit-scrollbar-thumb {
-      background: #e0cbcb;
-      border-radius: 100vh;
-      border: 3px solid #f6f7ed;
-   }
+.scrollbar::-webkit-scrollbar-thumb {
+   background: #d3a2a2;
+   border-radius: 100vh;
+   border: 3px solid #f8dede;
+}
 
-   .scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #c0a0b9;
-   }
+.scrollbar::-webkit-scrollbar-thumb:hover {
+   background: #d48a8a;
+}
 
    .selected {
       @apply text-highlight [text-shadow:_0_4px_4px_rgba(0,0,0,0.25)];
