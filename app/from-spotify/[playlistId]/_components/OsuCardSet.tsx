@@ -7,30 +7,9 @@ import { useEffect, useRef, useState } from 'react'
 import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { useAudioStore } from '@/hooks/useAudioStore'
+import sortFn from '../_utils/sortBeatmaps'
 // TODO tooltip when in osu card set popup broke styles (Temp fixed - disable popup)
-
-const sortFn = (sortQuery: string) => (a: BeatmapSet, b: BeatmapSet) => {
-   if (!sortQuery) return 0
-   const [sort, order] = sortQuery.split('_')
-
-   const sign = order === 'asc' ? 1 : -1
-   if (sort === 'title') return sign * a.title.localeCompare(b.title)
-   if (sort === 'artist') return sign * a.artist.localeCompare(b.artist)
-   if (sort === 'difficulty')
-      return (
-         sign *
-         (Math.max(...a.beatmaps.map((beatmap) => beatmap.difficulty_rating)) -
-            Math.max(...b.beatmaps.map((beatmap) => beatmap.difficulty_rating)))
-      )
-   if (sort === 'ranked') {
-      if (!a.ranked_date) return 1
-      if (!b.ranked_date) return -1
-      return sign * (new Date(a.ranked_date).getTime() - new Date(b.ranked_date).getTime())
-   }
-   if (sort === 'plays') return sign * (a.play_count - b.play_count)
-   if (sort === 'favorites') return sign * (a.favourite_count - b.favourite_count)
-   return 0
-}
 
 export default function OsuCardSet({
    beatmapsets,
@@ -45,6 +24,10 @@ export default function OsuCardSet({
    const [sortFnString, setSortFnString] = useState('')
    const ref = useRef<HTMLDivElement>(null)
 
+   const onClose = () => {
+      useAudioStore.getState().stop()
+      setIsDialogOpen(false)
+   }
    return (
       <>
          <div
@@ -65,11 +48,12 @@ export default function OsuCardSet({
          </div>
          {isDialogOpen &&
             ReactDom.createPortal(
-               <div className={`fixed top-0 left-0 w-screen h-screen bg-black/40 z-1000`}>
+               <div className={`fixed top-0 left-0 w-screen h-screen bg-black/40 z-1000`} onClick={onClose}>
                   <div
                      className={
                         'overflow-hidden absolute w-2/3 min-w-[750px] min-h-[500px] h-4/5 bg-main rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'
                      }
+                     onClick={(e) => e.stopPropagation()}
                   >
                      <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-darker w-full border-b-2 border-main-border">
                         <h4>Sort by</h4>
@@ -82,7 +66,7 @@ export default function OsuCardSet({
                         <FontAwesomeIcon
                            icon={faXmark}
                            className="cursor-pointer bg-invalid p-2 px-2.5 rounded-full absolute right-4"
-                           onClick={() => setIsDialogOpen(false)}
+                           onClick={onClose}
                         />
                      </div>
                      <div className="h-full bg-darker overflow-y-auto scrollbar">
@@ -92,7 +76,6 @@ export default function OsuCardSet({
                            ))}
                         </div>
                      </div>
-                     <button onClick={() => setIsDialogOpen(false)}>Close modal</button>
                   </div>
                </div>,
                document.body,

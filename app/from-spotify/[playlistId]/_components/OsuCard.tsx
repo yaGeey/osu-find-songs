@@ -2,14 +2,15 @@ import { BeatmapSet } from '@/types/Osu'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faThumbsUp } from '@fortawesome/free-regular-svg-icons'
-import { faDownload, faFileVideo } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faFileVideo, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
-import { useRef } from 'react'
+import { use, useEffect, useRef, useState } from 'react'
 import ImageFallback from '@/components/ImageFallback'
 import { getRating } from '@/app/from-spotify/[playlistId]/_utils/sortBeatmapsMatrix'
+import { useAudioStore } from '@/hooks/useAudioStore'
 
 export default function OsuCard({
    beatmapset,
@@ -21,6 +22,7 @@ export default function OsuCard({
    className?: string
 }) {
    const ref = useRef<HTMLDivElement>(null)
+   const { currentUrl, play, stop } = useAudioStore()
 
    // Dates tooltip text
    const dates = {
@@ -46,7 +48,24 @@ export default function OsuCard({
             {
                <>
                   {/* IMAGES */}
-                  <div className="relative w-[100px] h-full overflow-hidden z-0">
+                  <button
+                     className="relative w-[100px] h-full overflow-hidden z-0 group"
+                     onClick={() => {
+                        if (currentUrl === beatmapset.preview_url) stop()
+                        else play(beatmapset.preview_url)
+                     }}
+                  >
+                     {currentUrl === beatmapset.preview_url ? (
+                        <FontAwesomeIcon
+                           icon={faPause}
+                           className="text-4xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_3px_3px_rgba(0,0,0,1)] z-20"
+                        />
+                     ) : (
+                        <FontAwesomeIcon
+                           icon={faPlay}
+                           className="text-4xl group-hover:visible invisible absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_3px_3px_rgba(0,0,0,1)] z-20"
+                        />
+                     )}
                      <ImageFallback
                         src={beatmapset.covers.list}
                         alt="list"
@@ -55,7 +74,7 @@ export default function OsuCard({
                         sizes="100%"
                         loading="lazy"
                      />
-                  </div>
+                  </button>
                   <div className="relative flex-grow flex justify-end overflow-hidden">
                      <ImageFallback
                         src={beatmapset.covers.card}
