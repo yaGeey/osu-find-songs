@@ -27,7 +27,8 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
 import axios from 'axios'
-const CHUNK_SIZE = 10
+import Loading from '@/components/state/Loading'
+const CHUNK_SIZE = 100
 
 export default function PLaylistPage() {
    const params = useParams()
@@ -35,16 +36,13 @@ export default function PLaylistPage() {
    const { playlistId } = params
    const queryClient = useQueryClient()
 
-   const [queriesDict, setQueriesDict] = useState<{ [key: string]: string }>({})
    const [hasQueryChanged, setHasQueryChanged] = useState(false)
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
    const [searchType, setSearchType] = useState<'local' | 'api'>('api')
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
 
-   const [isModalVisible, setIsModalVisible] = useState(false)
-   const [isModalDownloadingVisible, setIsModalDownloadingVisible] = useState(false)
-   const [isModalDownloadedVisible, setIsModalDownloadedVisible] = useState(false)
+   const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
 
    // fetching playlist
    const {
@@ -75,22 +73,24 @@ export default function PLaylistPage() {
    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
    const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || []
-   // const chunked = chunkArray(tracks, CHUNK_SIZE)
 
    // beatmapset search
+   const chunked = chunkArray(tracks, CHUNK_SIZE)
    const beatmapsetQueries = useQueries({
-      queries: tracks.map((item) => ({
-         queryKey: ['beatmapset', item.track ? item.track.artists[0].name : 'err', item.track ? item.track.name : 'err'],
+      queries: chunked.map((chunk) => ({
+         queryKey: ['search-from-spotify', chunk[0].track.id ?? 'err'],
          queryFn: async () => {
             const t0 = performance.now()
-            if (!item.track) return [] //? odd error rarely occurs
-            const res = await beatmapsSearch({
-               q: `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}`,
+            // if (!item.track) return [] //? odd error rarely occurs
+            const { data } = await axios.post<BeatmapSet[][]>(`/api/batch/osu-search`, {
+               qs: chunk.map(
+                  (item) => `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}`,
+               ),
                m: searchParams.get('m'),
                s: searchParams.get('s'),
             })
             addTimeLeft(performance.now() - t0)
-            return res
+            return data
          },
          enabled: !!tracks,
          onError: (error: any) => toast.error(`Error: ${error.message}`, { autoClose: false }),
@@ -105,7 +105,7 @@ export default function PLaylistPage() {
 
    // setting data for display
    useEffect(() => {
-      const data = beatmapsetQueries.map((q) => q.data?.beatmapsets)
+      const data = beatmapsetQueries.map((q) => q.data as BeatmapSet[][]).flat()
       setBeatmapsets(data)
       setFilteredBeatmapsets(data)
    }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length])
@@ -144,8 +144,6 @@ export default function PLaylistPage() {
       if (searchType == 'local') console.log('local search')
    }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
 
-   const { text, progress, handleDownloadAll } = useDownloadAll(beatmapsetQueries)
-
    // preparing data for display
    const maps = useMemo(
       () =>
@@ -154,6 +152,7 @@ export default function PLaylistPage() {
          ),
       [filteredBeatmapsets, searchParams],
    )
+   const { text, progress, handleDownloadAll } = useDownloadAll(maps)
 
    return (
       <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar-none">
@@ -191,7 +190,7 @@ export default function PLaylistPage() {
                   <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
                </a>
             </section>
-            <Button onClick={() => setIsModalVisible(true)} className="text-white py-1 w-45" disabled={isLoading}>
+            <Button onClick={() => setModal({ type: 'confirm-download' })} className="text-white py-1 w-45" disabled={isLoading}>
                Download all
                <FontAwesomeIcon icon={faDownload} className="ml-2" />
             </Button>
@@ -202,14 +201,11 @@ export default function PLaylistPage() {
             <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1900px]">
                <Filters
                   foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
-                  onChange={(val, searchTypeRes, mode) => {
-                     setQueriesDict({ sort: val, m: mode })
-                     setSearchType(searchTypeRes)
-                  }}
+                  onChange={(val, searchTypeRes, mode) => setSearchType(searchTypeRes)}
                   disabled={isLoading}
                />
 
-               {isLoading || maps.length < 45 ? (
+               {!isLoading && maps.length < 45 ? (
                   <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto max-h-[calc(100vh-3.5rem-127px)] scrollbar">
                      {maps.map((data, i) => {
                         if (data.length > 1 && data.length < 18)
@@ -240,21 +236,19 @@ export default function PLaylistPage() {
                      <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
                   </div>
                )}
+               {isLoading && maps.length && <Loading />}
             </div>
          </main>
 
          {/* modals */}
          <Modal
-            isOpen={isModalVisible}
+            isOpen={modal?.type === 'confirm-download'}
             onOkay={() => {
-               setIsModalVisible(false)
-               setIsModalDownloadingVisible(true)
+               setModal({ type: 'downloading' })
                handleDownloadAll()
             }}
             okBtn="Download"
-            onClose={() => {
-               setIsModalVisible(false)
-            }}
+            onClose={() => setModal(null)}
             closeBtn="Close"
             state="info"
          >
@@ -264,16 +258,10 @@ export default function PLaylistPage() {
             </p>
             {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
          </Modal>
-         <Modal isOpen={isModalDownloadingVisible} onOkay={() => setIsModalDownloadingVisible(false)} okBtn="Got it" state="info">
+         <Modal isOpen={modal?.type === 'downloading' && progress !== null} onOkay={() => setModal(null)} okBtn="Got it" state="info">
             Please wait, this may take some time. Don't close this page
          </Modal>
-         <Modal
-            isOpen={isModalDownloadedVisible}
-            onOkay={() => setIsModalDownloadedVisible(false)}
-            okBtn="Close"
-            state="success"
-            dialog
-         >
+         <Modal isOpen={modal?.type === 'downloading' && progress === null} onOkay={() => setModal(null)} okBtn="Close" state="success" dialog>
             Downloaded successfully
          </Modal>
          <ToastContainer />

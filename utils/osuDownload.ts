@@ -1,9 +1,10 @@
 // https://github.com/eligrey/FileSaver.js/issues/796 - xhr download progress
 // TODO: xhr requests download progress add
 // TODO with videos error fetching download
-import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
+import axios from 'axios'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { createParallelAction } from './serverActionsParallel'
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -29,6 +30,12 @@ export const getNoVideoAxios = async (id: number) => {
    })
    return res.data
 }
+export const getNoVideoParallel = createParallelAction(async (id: number) => {
+   const res = await axios.get(`https://catboy.best/d/${id}`, {
+      responseType: 'blob',
+   })
+   return res.data
+})
 export const useNoVideoAxios = (id: number, filename: string) => {
    return useMutation({
       mutationFn: async () => {

@@ -1,11 +1,11 @@
 import { BeatmapSet } from '@/types/Osu'
-import { download, getNoVideoAxios } from '@/utils/osuDownload'
-import { UseQueryResult } from '@tanstack/react-query'
+import { getWindowsFriendlyLocalTime } from '@/utils/dates'
+import { download, getNoVideoAxios, getNoVideoParallel } from '@/utils/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 
-export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Error>[]) {
+export default function useDownloadAll(maps: BeatmapSet[][]) {
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
 
@@ -13,17 +13,19 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
    async function handleDownloadAll() {
       const zip = new JSZip()
       setProgress(0)
-
-      const validQueries = beatmapsetQueries.filter((q) => q.data && q.data.beatmapsets.length > 0)
       let count = 0
+
+      const valid = maps.filter((set) => set.length)
       const downloadedFiles = await Promise.all(
-         validQueries.map(async (q) => {
-            const beatmapset: BeatmapSet = q.data?.beatmapsets[0]
-            const filename = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
-            const blob = await getNoVideoAxios(beatmapset.id)
+         valid.map(async (set) => {
+            const b: BeatmapSet = set[0]
+            const filename = `${b.id} ${b.artist} - ${b.title}.osz`
+            // TODO add paralleling
+            const blob = await getNoVideoAxios(b.id)
             count++
-            setText(`Downloading... (${count}/${validQueries.length})`)
-            setProgress((count / validQueries.length) * 99)
+            setText(`Downloading... (${count}/${valid.length})`)
+            setProgress((count / valid.length) * 99)
+            console.log(`Downloaded ${filename}`)
             return { filename, blob }
          }),
       )
@@ -35,7 +37,7 @@ export default function useDownloadAll(beatmapsetQueries: UseQueryResult<any, Er
             setText(`Creating zip... (${Math.round(metadata.percent)}%)`)
          })
          .then((blob) => {
-            download(blob, 'beatmaps.zip')
+            download(blob, `beatmaps-${getWindowsFriendlyLocalTime()}.zip`)
             setProgress(null)
             setText(null)
          })

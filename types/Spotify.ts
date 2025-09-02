@@ -115,7 +115,7 @@ export type PageItem = {
    }
    is_local: boolean
    primary_color: string | null
-   track: Track
+   track: TrackFull
    video_thumbnail: {
       url: string
    }
