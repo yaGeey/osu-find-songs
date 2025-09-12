@@ -105,7 +105,7 @@ export default function PLaylistPage() {
 
    // setting data for display
    useEffect(() => {
-      const data = beatmapsetQueries.map((q) => q.data as BeatmapSet[][]).flat()
+      const data = beatmapsetQueries.filter(q => q.data !== undefined).map((q) => q.data).flat()
       setBeatmapsets(data)
       setFilteredBeatmapsets(data)
    }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length])

@@ -1,4 +1,5 @@
 // TODO подивись уроки по zustand
+import { toast } from 'react-toastify'
 import { create } from 'zustand'
 
 type AudioStore = {
@@ -13,11 +14,15 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
    audio: null,
 
    play: (url) => {
-      const { audio } = get()
+      const { audio, currentUrl } = get()
+      if (currentUrl === url) return
       if (audio) audio.pause()
 
       const newAudio = new Audio(url)
-      newAudio.play()
+      newAudio.play().catch((error) => {
+         toast.error('Playback failed:', error)
+         set({ currentUrl: null, audio: null })
+      })
       newAudio.onended = () => set({ currentUrl: null, audio: null })
 
       set({ currentUrl: url, audio: newAudio })
