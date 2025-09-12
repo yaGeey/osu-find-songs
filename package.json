@@ -5,6 +5,7 @@
    "scripts": {
       "dev": "next dev --turbopack",
       "build": "next build",
+      "postbuild": "node upload-sourcemaps.js",
       "start": "next start",
       "lint": "next lint",
       "test": "jest"

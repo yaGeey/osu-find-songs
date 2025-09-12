@@ -48,8 +48,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <>
          <HighlightInit
             excludedHostnames={['localhost']}
-            projectId={'ng2zzy0g'}
-            serviceName="my-nextjs-frontend"
+            projectId={process.env.HIGHLIGHT_PROJECT_ID!}
+            serviceName={process.env.HIGHLIGHT_APP_NAME!}
             tracingOrigins
             networkRecording={{
                enabled: true,
@@ -77,3 +77,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </>
    )
 }
+// $env:NODE_OPTIONS="--experimental-fetch"; npm run build
+// npx @highlight-run/sourcemap-uploader upload --apiKey "d1v1o2regv3s75f7if10" --appVersion "my-nextjs-frontend" --path .next --basePath /var/task/.next/
