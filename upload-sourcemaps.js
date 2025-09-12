@@ -1,9 +1,7 @@
 import path from "path"
 import { execSync } from "child_process"
 
-const projectRoot = process.cwd()
-const nextBuildDir = path.join(projectRoot, ".next")
-
+const nextBuildDir = path.resolve('.next')
 const appVersion = `${process.env.HIGHLIGHT_APP_NAME}-${process.env.VERCEL_GIT_COMMIT_SHA}`
 
 const cmd = `npx @highlight-run/sourcemap-uploader upload --apiKey "${process.env.HIGHLIGHT_API_KEY}" --appVersion "${appVersion}" --path "${nextBuildDir}" --basePath /var/task/.next`
