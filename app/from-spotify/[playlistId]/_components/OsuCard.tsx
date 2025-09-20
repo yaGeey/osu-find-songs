@@ -1,7 +1,7 @@
 import { BeatmapSet } from '@/types/Osu'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHeart, faCirclePlay, faCircleCheck, faThumbsUp } from '@fortawesome/free-regular-svg-icons'
+import { faHeart, faCirclePlay, faCircleCheck, faStar } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
@@ -9,7 +9,6 @@ import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
 import { use, useEffect, useRef, useState } from 'react'
 import ImageFallback from '@/components/ImageFallback'
-import { getRating } from '@/app/from-spotify/[playlistId]/_utils/sortBeatmapsMatrix'
 import { useAudioStore } from '@/hooks/useAudioStore'
 
 export default function OsuCard({
@@ -106,8 +105,8 @@ export default function OsuCard({
                         <span className="-ml-1.75 -mb-0.25">{beatmapset.favourite_count}</span>
                         <FontAwesomeIcon icon={faCirclePlay} />
                         <span className="-ml-1.75 -mb-0.25">{beatmapset.play_count.toLocaleString(undefined)}</span>
-                        <FontAwesomeIcon icon={faThumbsUp} />
-                        <span className="-ml-1.75 -mb-0.25">{getRating(beatmapset)}%</span>
+                        <FontAwesomeIcon icon={faStar} />
+                        <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
                         <FontAwesomeIcon icon={faCircleCheck} />
                         <span className="-ml-1.75 -mb-0.25" data-tooltip-id="tooltip" data-tooltip-content={dateString}>
                            {new Date(
