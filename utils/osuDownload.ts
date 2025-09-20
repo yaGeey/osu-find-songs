@@ -5,6 +5,7 @@ import axios from 'axios'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { createParallelAction } from './serverActionsParallel'
+import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -36,9 +37,19 @@ export const getNoVideoParallel = createParallelAction(async (id: number) => {
    })
    return res.data
 })
+
+const sendTemeletry = async (mapId: string) => {
+   try {
+      const sessionId = localStorage.getItem('sessionId')
+      if (!sessionId) return
+      await sendMapDownloadTelemetry({ sessionId, mapId, playlistId: window.location.pathname.split('/')[2]! })
+   } catch (err) {}
+}
+
 export const useNoVideoAxios = (id: number, filename: string) => {
    return useMutation({
       mutationFn: async () => {
+         await sendTemeletry(id.toString())
          const res = await axios.get(`https://catboy.best/d/${id}`, {
             responseType: 'blob',
          })

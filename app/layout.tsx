@@ -9,7 +9,7 @@ import { HighlightInit } from '@highlight-run/next/client'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import MobileDeviceCheck from '@/components/MobileDeviceCheck'
-import Telemetry from '@/components/Temeltry'
+import Telemetry from '@/components/Telemetry'
 // Prevent fontawesome from dynamically adding its css since we did it manually above
 config.autoAddCss = false
 
