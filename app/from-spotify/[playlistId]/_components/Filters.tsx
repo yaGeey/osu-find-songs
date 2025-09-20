@@ -46,7 +46,10 @@ export default function Filters({
 
    return (
       <div
-         className={tw('bg-[#BE6E6E] z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border ', unfolded && 'pb-5')}
+         className={tw(
+            'bg-[#BE6E6E] z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border ',
+            unfolded && 'pb-5',
+         )}
       >
          {/* Main filters */}
          <div className="flex [@media(min-width:640px)]:items-center justify-between text-[15px] [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
@@ -104,7 +107,7 @@ export default function Filters({
          <section className="flex items-center gap-4 mt-3 text-[15px]">
             <h4>Sort by</h4>
             <SwitchSort
-               options={['title', 'artist', 'difficulty', 'ranked', 'rating', 'plays', 'favorites', 'relevance']}
+               options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites', 'date added']}
                onChange={(val, sort) => {
                   if (val) setSort(`${val}_${sort}`)
                }}
