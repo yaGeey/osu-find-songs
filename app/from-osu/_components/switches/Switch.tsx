@@ -42,7 +42,7 @@ export default function Switch({
          onClick={() => isDisabled && setIsDisabled(false)}
       >
          <CursorBtn setIsDisabled={setIsDisabled} isDisabled={isDisabled} />
-         <div className="bg-darker/80 text white h-full p-1 rounded-full flex items-center gap-2.5 px-2.5 select-none flex-1 justify-between">
+         <div className="bg-main-darker/80 text white h-full p-1 rounded-full flex items-center gap-2.5 px-2.5 select-none flex-1 justify-between">
             <button
                className={tw(
                   'cursor-pointer mb-0.5 hover:selected transition-all',

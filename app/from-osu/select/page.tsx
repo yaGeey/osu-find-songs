@@ -95,11 +95,11 @@ export default function SelectPage() {
       <>
          <BgImage />
          <div className="absolute mx-auto top-1/2 -translate-y-1/2 left-0 right-0 w-fit font-inter">
-            <div className="bg-dialog-after animate-border bg-main-lighter px-10 py-6  p-3 rounded-xl select-none cursor-pointer shadow-md hover:shadow-lg hover:brightness-110 transition-all duration-300 flex flex-col justify-center items-center">
+            <div className="overflow-hidden animate-border rounded-2xl px-10 py-7 shadow-lg select-none cursor-pointer hover:shadow-lg hover:brightness-110 transition-all duration-300 flex flex-col justify-center items-center">
                <h1 className="font-medium text-xl">
-                  Click to browse your <span className="font-bold">osu!</span> beatmaps folder
+                  Click to browse your osu! beatmaps folder
                </h1>
-               <em className="text-black/80 ">C:/Users/.../AppData/Local/osu!/Songs</em>
+               <span className="text-main-border">C:/Users/.../AppData/Local/osu!/Songs</span>
                <h3 className="text-sm mt-2">⚠️ This may take some time depending on the number of beatmaps ⚠️</h3>
                {/* @ts-expect-error */}
                <input directory=""

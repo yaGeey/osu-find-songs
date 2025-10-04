@@ -4,11 +4,11 @@ import Image from 'next/image'
 export default function YtVideo({ data }: { data: Video }) {
    return (
       <a
-         className="relative w-[49%] h-[160px] rounded-lg border-main border-4 hover:brightness-110 transition-all shadow-md"
+         className="relative w-[49%] h-[160px] rounded-lg border-main-dark border-4 hover:brightness-110 transition-all shadow-sm font-inter-tight"
          href={`https://www.youtube.com/watch?v=${data.videoId}`}
          target="_blank"
       >
-         <div className="absolute w-[254px] bg-light/85 text-black flex flex-col p-1 pb-0.5 rounded-t-sm">
+         <div className="absolute w-full bg-main-lightest/85 text-black flex flex-col p-1 pb-0.5 rounded-t-sm tracking-tight border-b-2 border-main-dark/70">
             <span className="truncate font-semibold text-[15px]">{data.name}</span>
             <span className="truncate text-[13px]">{data.artist.name}</span>
          </div>

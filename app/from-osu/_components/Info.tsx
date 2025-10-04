@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import { CombinedSingleSimple } from '@/types/types'
-import { YoutubeBtn, SpotifyBtn, OtherBtn, OsuBtn, Button } from '../../../components/buttons/Buttons'
+import { Button } from '../../../components/buttons/Buttons'
 import { Spotify } from 'react-spotify-embed'
 import axios from 'axios'
 import { HTMLAttributes, Ref, use, useEffect, useRef, useState } from 'react'
@@ -69,8 +69,8 @@ export default function Info({ data, onClose, className }: Props) {
          ref={container}
          id="info-card"
          className={tw(
-            'relative opacity-90 animate-in slide-in-from-left flex flex-col border-[5px] border-main-border p-4 rounded-xl text-white min-w-[600px] max-w-[600px] h-[600px]',
-            '[background:linear-gradient(transparent,_var(--color-main)_75px,var(--color-main)_100%),url(/osu/tris2.png)_no-repeat_top_right,var(--color-main)]',
+            'relative opacity-95 animate-in slide-in-from-left flex flex-col border-5 border-l-0 rounded-xl rounded-l-none border-main-border p-4  text-white min-w-[600px] max-w-[600px] min-h-[300px] h-[550px]',
+            'bg-triangles-faded-right [--color-dialog:var(--color-main)]',
             className,
          )}
       >
@@ -92,7 +92,7 @@ export default function Info({ data, onClose, className }: Props) {
                   className="rounded-md [box-shadow:0px_4px_4px_rgba(0,0,0,0.25)]"
                />
             </div>
-            <div className="flex flex-col justify-between text-ellipsis">
+            <div className="flex flex-col justify-between text-ellipsis w-full">
                <div>
                   <h1 className="flex items-end gap-1.5 font-outline-sm">
                      <span className="text-2xl font-semibold">{local.title}</span>
@@ -100,7 +100,7 @@ export default function Info({ data, onClose, className }: Props) {
                         <span className="text-sm font-medium mb-0.5">{spotify[0].album.release_date.split('-')[0]}</span>
                      )}
                   </h1>
-                  <h2 className="text-base font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]">
+                  <h2 className="font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]/[19px]">
                      {spotify && spotify?.length != 20 && osu ? (
                         <AuthorString artists={spotify[0].artists} beatmapset={osu} />
                      ) : (
@@ -109,18 +109,18 @@ export default function Info({ data, onClose, className }: Props) {
                      {!osu && <span>{local.author}</span>}
                   </h2>
                </div>
-               <div className="flex justify-between items-end">
+               <div className="flex items-end">
                   {spotify && spotify?.length != 20 && spotify[0].album.name != local.title && (
-                     <h3 className="font-medium line-clamp-2 hover:underline font-outline-sm pr-8 text-[15px]">
+                     <h3 className="font-medium line-clamp-2 hover:underline font-outline-sm flex-grow text-[15px]/[19px]">
                         <a href={spotify[0].album.external_urls.spotify}>{spotify[0].album.name}</a>
                      </h3>
                   )}
                   {wikiQuery.data?.content && (
-                     <div className="relative font-outline-sm overflow-hidden h-8 w-4/5 px-1 bg-white/20 rounded-lg flex-grow">
-                        <p className="text-xs pr-24 text-justify">{wikiQuery.data?.content}</p>
-                        <div className="w-7 h-full absolute bg-gradient-to-r from-transparent to-white top-1/2 -translate-y-1/2 right-26"></div>
+                     <div className="relative font-outline-sm overflow-hidden h-7.5 w-55 px-1 bg-white/20 rounded-lg flex-grow border-1 border-main-darker/50">
+                        <p className="text-[11px]/[11px] line-clamp-2 pr-24 text-justify mt-1 ">{wikiQuery.data?.content}</p>
+                        <div className="w-7 h-full absolute bg-gradient-to-r from-transparent to-gray-50 top-1/2 -translate-y-1/2 right-20.5"></div>
                         <a
-                           className="absolute top-1/2 -translate-y-1/2 right-0 bg-white text-black text-sm rounded-r-lg p-1.5"
+                           className="absolute top-1/2 -translate-y-1/2 right-0 bg-gray-50 text-black rounded-r-lg h-full flex items-center px-1 font-inter-tight text-xs"
                            href={wikiQuery.data?.url}
                            target="_blank"
                         >
@@ -134,12 +134,26 @@ export default function Info({ data, onClose, className }: Props) {
          </div>
 
          <div className="flex w-full items-end gap-4 mt-4 align-s">
-            <SpotifyBtn
+            <Button
                onClick={() => setSelection('spotify')}
                disabled={spotify ? false : true}
-               className={selection == 'spotify' ? 'selection' : ''}
-            />
-            <YoutubeBtn onClick={() => setSelection('youtube')} className={selection == 'youtube' ? 'selection' : ''} />
+               className={tw(
+                  selection == 'spotify' && 'brightness-85 hover:brightness-100',
+                  'p-0 w-[102px] h-[31px] bg-brand-spotify border-2 border-[#159A44]',
+               )}
+            >
+               <Image src="/SpotifyFull.svg" width={83} height={23} alt="spotify" />
+            </Button>
+            <Button
+               onClick={() => setSelection('youtube')}
+               disabled={spotify ? false : true}
+               className={tw(
+                  selection == 'youtube' && 'brightness-85 hover:brightness-100',
+                  'p-0 w-[102px] h-[31px] bg-[#FFD7D7] border-2 border-main-lightest ',
+               )}
+            >
+               <Image src="/youtubeFull.svg" width={78} height={17} alt="youtube" />
+            </Button>
             <ExternalLink
                href={`https://osu.ppy.sh/beatmapsets/${osu?.id}`}
                className="justify-end flex-1 mr-0.5"
@@ -150,7 +164,7 @@ export default function Info({ data, onClose, className }: Props) {
          </div>
 
          {selection === 'spotify' && (
-            <li className="relative scrollbar flex flex-col gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-[#159A44] overflow-auto">
+            <li className="relative scrollbar flex flex-col gap-2 mt-3 bg-main-darker w-full h-full p-2 rounded-lg border-4 border-[#159A44] overflow-auto">
                {spotify?.length == 20 && (
                   <div className="flex gap-2">
                      <span className="text-5xl text-red-500 font-bold">!</span>
@@ -169,7 +183,7 @@ export default function Info({ data, onClose, className }: Props) {
             </li>
          )}
          {selection === 'youtube' && (
-            <li className="relative scrollbar flex flex-wrap gap-2 mt-3 bg-[#0909094D] box-border w-full h-full p-2 rounded-lg border-[4px] border-light overflow-auto">
+            <li className="relative scrollbar flex flex-wrap gap-2 mt-3 bg-main-darker box-border w-full h-full p-2 rounded-lg border-4 border-main-lightest overflow-auto">
                {yt.isLoading && <Loading />}
                {yt.data?.map((media: Media, i: number) => {
                   if (Cookies.get('showYouTubeEmbeds') == 'true') {
@@ -183,6 +197,7 @@ export default function Info({ data, onClose, className }: Props) {
                               allowFullScreen
                            ></iframe>
                         )
+                     if (media.type === 'SONG') return <YtSongEmbed key={i} song={media} />
                   } else {
                      if (media.type === 'VIDEO') return <YtVideo key={i} data={media} />
                      if (media.type === 'SONG') return <YtSongEmbed key={i} song={media} />

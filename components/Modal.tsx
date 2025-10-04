@@ -27,7 +27,7 @@ export default function Modal({
       <div className={`fixed top-0 left-0 w-screen h-screen bg-black/30 z-10000 text-center`}>
          <div
             className={tw(
-               'bg-main-lighter bg-dialog text-black text-balance max-w-[540px] border-4 rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3.5 transition-all shadow-2xl flex flex-col',
+               'bg-main-light bg-triangles-faded text-black text-balance max-w-[540px] border-4 rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3.5 transition-all shadow-2xl flex flex-col',
                state === 'error' && 'border-invalid',
                state === 'success' && 'border-success',
                state === 'warning' && 'border-yellow-400',
@@ -40,7 +40,7 @@ export default function Modal({
                {state !== 'loading' && okBtn && (
                   <Button
                      onClick={onOkay}
-                     className={tw('h-[35px]', dialog ? 'bg-main-darker' : 'bg-success font-medium shadow-none')}
+                     className={tw('h-[35px]', dialog ? 'bg-main-dark' : 'bg-success font-medium shadow-none')}
                      textClassName="font-outline"
                   >
                      {okBtn}
@@ -49,7 +49,7 @@ export default function Modal({
                {state !== 'loading' && closeBtn && (
                   <Button
                      onClick={onClose}
-                     className={tw('h-[35px]', dialog ? 'bg-main-darker' : 'bg-invalid font-medium shadow-none')}
+                     className={tw('h-[35px]', dialog ? 'bg-main-dark' : 'bg-error font-medium shadow-none')}
                      textClassName="font-outline"
                   >
                      {closeBtn}

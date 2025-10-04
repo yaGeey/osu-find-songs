@@ -51,11 +51,11 @@ export default function OsuCardSet({
                <div className={`fixed top-0 left-0 w-screen h-screen bg-black/40 z-1000`} onClick={onClose}>
                   <div
                      className={
-                        'overflow-hidden absolute w-2/3 min-w-[750px] min-h-[500px] h-4/5 bg-main rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'
+                        'overflow-hidden absolute w-2/3 min-w-[750px] min-h-[500px] h-4/5 bg-main-darker rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'
                      }
                      onClick={(e) => e.stopPropagation()}
                   >
-                     <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-darker w-full border-b-2 border-main-border">
+                     <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-dark w-full border-b-2 border-main-border">
                         <h4>Sort by</h4>
                         <SwitchSort
                            options={['title', 'artist', 'difficulty', 'ranked', 'plays', 'favorites', 'relevance']}
@@ -65,11 +65,11 @@ export default function OsuCardSet({
                         />
                         <FontAwesomeIcon
                            icon={faXmark}
-                           className="cursor-pointer bg-invalid p-2 px-2.5 rounded-full absolute right-4"
+                           className="cursor-pointer bg-error p-2 px-2.5 rounded-full absolute right-4"
                            onClick={onClose}
                         />
                      </div>
-                     <div className="h-full bg-darker overflow-y-auto scrollbar">
+                     <div className="h-full bg-main-darker overflow-y-auto scrollbar">
                         <div className="items flex p-4 gap-4 flex-wrap pb-20">
                            {beatmapsets.sort(sortFn(sortFnString)).map((beatmapset, i) => (
                               <OsuCard key={i} beatmapset={beatmapset} className="flex-grow animate-in fade-in shadow-sm" />

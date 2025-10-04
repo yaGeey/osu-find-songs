@@ -4,7 +4,7 @@ import Image from 'next/image'
 export default function SpotifyEmbed({ track }: { track: Track }) {
    return (
       <a
-         className="bg-main border-4 border-main-darker rounded-lg flex items-center hover:brightness-110 transition-all"
+         className="bg-main border-2 border-main-border rounded-lg flex items-center hover:brightness-110 transition-all shadow-sm"
          href={track.external_urls.spotify}
          target="_blank"
       >

@@ -22,7 +22,7 @@ export default function SelectPage() {
    return (
       <div className="flex flex-col justify-center items-center h-screen font-inter">
          <BgImage />
-         <div className="bg-dialog flex flex-col justify-center items-center bg-main-lighter rounded-2xl px-10 py-7 shadow-lg border-4 border-main-border">
+         <div className="bg-triangles-faded flex flex-col justify-center items-center rounded-2xl px-10 py-7 shadow-lg border-4 border-main-border">
             <div className="flex flex-col gap-4 justify-center items-center">
                <h1 className="text-2xl text-black font-medium">Select a public Spotify playlist</h1>
                <em className="text-black/80 ">Right-click the playlist → Share → Copy link to playlist</em>

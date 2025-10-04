@@ -40,10 +40,10 @@ export default function LandingPage() {
    return (
       <div className="flex flex-col justify-center items-center h-screen">
          <BgImage />
-         <div className="bg-dialog relative flex flex-col justify-center items-center bg-main-lighter rounded-2xl p-10 shadow-lg border-4 border-main-border">
-            <Image src="/icon.png" width={75} height={75} alt="logo" />
-            <h1 className="text-3xl  mt-3">Welcome to osu! find songs</h1>
-            <h2 className="text-2xl ">
+         <div className="bg-triangles-faded relative flex flex-col justify-center items-center rounded-2xl p-10 shadow-lg border-4 border-main-border">
+            <Image src="/icon.png" width={75} height={75} alt="logo" className="drop-shadow-sm" />
+            <h1 className="text-3xl mt-3">Welcome to osu! find songs</h1>
+            <h2 className="text-2xl">
                Choose one of the options
                <a
                   href="https://www.reddit.com/r/osugame/comments/1m5ruu2/i_fixed_a_web_app_that_allows_users_to_find_songs/"
@@ -54,22 +54,22 @@ export default function LandingPage() {
             </h2>
             <div className="flex gap-4 mt-10 w-full">
                <Link href="/from-osu/select">
-                  <Button className="text-black bg-gradient-to-l from-[#1DB954] to-[#FF66AA] font-medium">
+                  <Button className="text-black bg-gradient-to-l from-brand-spotify to-brand-osu font-medium">
                      Beatmaps to Spotify
                   </Button>
                </Link>
                <Link href="/from-spotify/select">
-                  <Button className="text-black bg-gradient-to-r from-[#1DB954] to-[#FF66AA] font-medium">
+                  <Button className="text-black bg-gradient-to-r from-brand-spotify to-brand-osu  font-medium">
                      Spotify playlist to beatmaps
                   </Button>
                </Link>
             </div>
             {lastUpdated && stargazeCount && (
-               <div className="absolute bottom-0 w-full flex px-2 justify-center text-xs text-main-border/80">
+               <div className="absolute bottom-0 w-full flex px-2 justify-center text-xs text-main-border/80 animate-in fade-in duration-500">
                   <a href="https://github.com/yaGeey/osu-find-songs" target="_blank">
                      GitHub
                      <FontAwesomeIcon icon={faStar} className="text-[10px] mx-0.5" />
-                     {stargazeCount} · Last update: {lastUpdated.date}
+                     {stargazeCount} · Last update: {lastUpdated.date.split(', ')[0]}{' '}
                      <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px] ml-1" />
                   </a>
                </div>

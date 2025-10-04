@@ -10,7 +10,6 @@ import { useQueries } from '@tanstack/react-query'
 import { Track } from '@/types/Spotify'
 import { BeatmapSet } from '@/types/Osu'
 import { groupOptions, sortOptions, selectStyles } from '@/utils/selectOptions'
-import './page.css'
 import { useSongContext } from '@/contexts/SongContext'
 import SettingsPopup from '@/components/SettingsPopup'
 import { useRouter } from 'next/navigation'
@@ -175,7 +174,7 @@ export default function FromOsu() {
    }, [groupedDict, selectedGroup, filters, search])
 
    return (
-      <div className="overflow-y-hidden max-h-screen min-w-[600px] min-h-[670px]">
+      <div className="overflow-hidden">
          <DynamicBg src={info?.local.image} />
          <Progress
             isVisible={isLoading}
@@ -191,7 +190,7 @@ export default function FromOsu() {
                : `${spotifyQueries.filter((q) => !q.isLoading).length}/${songs.length} | ${timeLeftSpotify} left`}
          </Progress>
 
-         <header className="bg-triangles border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
+         <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
                <HomeBtn />
                <Image
@@ -249,7 +248,7 @@ export default function FromOsu() {
                data-tooltip-id={isLoading ? 'tooltip' : undefined}
                data-tooltip-content="Wait for the beatmaps data to load"
             >
-               <label className="text-md font-semibold tracking-wider hidden lgx:block" htmlFor="sort-select">
+               <label className="text-md font-semibold hidden lgx:block" htmlFor="sort-select">
                   Sort
                </label>
                <Select
@@ -328,7 +327,7 @@ export default function FromOsu() {
                className="scrollbar w-full"
                style={{ height: 'calc(100dvh - 108px)' }} // 108px = header + footer height. doesn't changing
                overscan={300}
-               defaultItemHeight={85} //  why do I need this?
+               defaultItemHeight={85}
             />
          </main>
 

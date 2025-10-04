@@ -31,7 +31,7 @@ export default function SwitchSort({
          data-tooltip-content="Will result in a refetch"
          data-tooltip-delay-show={500}
          className={tw(
-            'bg-darker/80 font-inter border-2 border-[#733F3F] text white h-[26px] p-1 pl-7 rounded-full flex items-center gap-5 px-2.5 select-none',
+            'bg-main-subtle font-inter border-2 border-main-border pl-7 rounded-full flex items-center gap-2.5 px-2.5 select-none',
             disabled && 'brightness-60 pointer-events-none',
          )}
       >
@@ -50,8 +50,8 @@ export default function SwitchSort({
             >
                {option}
                <div className="text-xs ml-1 ">
-                  {sort === 'desc' && selection === option && <FontAwesomeIcon icon={faSortDown} className="mt-1" />}
-                  {sort === 'asc' && selection === option && <FontAwesomeIcon icon={faSortUp} className="mt-1" />}
+                  {sort === 'desc' && selection === option && <FontAwesomeIcon icon={faSortDown} className="mt-0" />}
+                  {sort === 'asc' && selection === option && <FontAwesomeIcon icon={faSortUp} className="mt-1.5" />}
                   {selection !== option && <FontAwesomeIcon icon={faSortDown} className="opacity-0" />}
                </div>
             </button>

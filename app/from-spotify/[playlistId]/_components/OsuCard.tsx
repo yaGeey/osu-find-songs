@@ -93,14 +93,14 @@ export default function OsuCard({
                      className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white"
                   >
                      {/* INFORMATION */}
-                     <div className="truncate font-outline-sm">
+                     <div className="truncate drop-shadow-xs/30">
                         <h2 className="font-semibold text-[17px]">{beatmapset.title}</h2>
                         <h3 className="font-medium text-sm -mt-1">from {beatmapset.artist}</h3>
                      </div>
                      <h4 className="font-inter-tight text-xs">
-                        created by <span className="text-highlight">{beatmapset.creator}</span>
+                        <span className='drop-shadow-xs/20'>created by</span> <span className="selected">{beatmapset.creator}</span>
                      </h4>
-                     <div className="flex gap-2.5 text-main-gray text-[11px] items-center">
+                     <div className="flex gap-2.5 text-main-gray text-[11px] items-center ">
                         <FontAwesomeIcon icon={faHeart} />
                         <span className="-ml-1.75 -mb-0.25">{beatmapset.favourite_count}</span>
                         <FontAwesomeIcon icon={faCirclePlay} />
@@ -123,7 +123,7 @@ export default function OsuCard({
                               beatmapset.status === 'approved' && 'bg-[#B3FF66',
                               beatmapset.status === 'qualified' && 'bg-[#FFD966]',
                               beatmapset.status === 'loved' && 'bg-[#FF66AB]',
-                              beatmapset.status === 'graveyard' && 'bg-main-gray text-main-lighter',
+                              beatmapset.status === 'graveyard' && 'bg-main-gray text-main-light',
                            )}
                         >
                            {beatmapset.status.toUpperCase()}
@@ -160,7 +160,7 @@ export default function OsuCard({
                   {/* download buttons */}
                   <div
                      className={tw(
-                        'absolute top-0 right-0 h-full w-7 bg-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
+                        'absolute top-0 right-0 h-full w-7 bg-main-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
                         onHover && 'group-hover/card:flex',
                      )}
                   >

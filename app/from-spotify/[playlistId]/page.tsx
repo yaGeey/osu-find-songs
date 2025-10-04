@@ -155,7 +155,7 @@ export default function PLaylistPage() {
    const { text, progress, handleDownloadAll } = useDownloadAll(maps)
 
    return (
-      <div className="max-h-screen min-w-[800px] min-h-[670px] font-inter overflow-y-auto scrollbar-none">
+      <div className="min-w-[685px] font-inter overflow-hidden">
          <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}
@@ -181,7 +181,7 @@ export default function PLaylistPage() {
 
          <header
             className={tw(
-               'min-w-[700px] bg-triangles fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-darker',
+               'min-w-[685px] bg-triangles [--color-dialog:var(--color-main])]  fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-main-darker',
             )}
          >
             <section className="absolute left-4 flex items-center gap-4">
@@ -198,7 +198,7 @@ export default function PLaylistPage() {
          </header>
 
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
-            <div className=" min-h-[calc(100vh-3.5rem)] bg-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1900px]">
+            <div className=" min-h-[calc(100vh-3.5rem)] bg-main-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1900px]">
                <Filters
                   foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                   onChange={(val, searchTypeRes, mode) => setSearchType(searchTypeRes)}
@@ -206,7 +206,7 @@ export default function PLaylistPage() {
                />
 
                {!isLoading && maps.length < 45 ? (
-                  <div className="flex p-4 gap-4 flex-wrap bg-darker overflow-y-auto max-h-[calc(100vh-3.5rem-127px)] scrollbar">
+                  <div className="flex p-4 gap-4 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100vh-3.5rem-127px)] scrollbar">
                      {maps.map((data, i) => {
                         if (data.length > 1 && data.length < 18)
                            return (
@@ -254,14 +254,25 @@ export default function PLaylistPage() {
          >
             <p className="text-balance text-center">
                If there is more than one beatmap set for a song, the first one based on your search{' '}
-               <span className="text-highlight font-outline">filters</span> will be downloaded
+               <span className="text-accent font-outline">filters</span> will be downloaded
             </p>
             {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
          </Modal>
-         <Modal isOpen={modal?.type === 'downloading' && progress !== null} onOkay={() => setModal(null)} okBtn="Got it" state="info">
+         <Modal
+            isOpen={modal?.type === 'downloading' && progress !== null}
+            onOkay={() => setModal(null)}
+            okBtn="Got it"
+            state="info"
+         >
             Please wait, this may take some time. Don't close this page
          </Modal>
-         <Modal isOpen={modal?.type === 'downloading' && progress === null} onOkay={() => setModal(null)} okBtn="Close" state="success" dialog>
+         <Modal
+            isOpen={modal?.type === 'downloading' && progress === null}
+            onOkay={() => setModal(null)}
+            okBtn="Close"
+            state="success"
+            dialog
+         >
             Downloaded successfully
          </Modal>
          <ToastContainer />

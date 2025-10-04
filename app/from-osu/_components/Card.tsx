@@ -60,7 +60,7 @@ function Card({
       >
          <div
             className={tw(
-               'bg-dialog-darker select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:opacity-85',
+               'bg-triangles-faded-right [--color-dialog:var(--color-main-dark)] select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:opacity-85',
                selected && 'opacity-85 sm:mr-20 rounded-lg',
                className,
             )}
@@ -69,7 +69,7 @@ function Card({
             {isOsuLoading && isSpotifyLoading && <Loading />}
             {(error || spotify === null) && <ErrorBackdrop msg={error} />}
             {(local.image || osu?.covers.card) && (
-               <div className="relative w-[150px] h-[85.5px]">
+               <div className="relative w-[150px] h-[86px]">
                   <Image
                      src={local.image || osu?.covers.card || ''}
                      alt={local.title || 'alt'}
@@ -79,7 +79,7 @@ function Card({
                </div>
             )}
             <div className="flex justify-between items-center w-full py-2 px-4">
-               <div className="w-fit max-w-[250px] ">
+               <div className="w-fit max-w-[250px] -mt-0.5">
                   <h1 className="text-lg font-outline-sm">{local.title || osu?.title}</h1>
                   <h2 className="text-white/85 text-sm font-outline-sm">{local.author || osu?.artist}</h2>
                </div>

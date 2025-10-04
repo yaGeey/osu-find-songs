@@ -38,14 +38,14 @@ export default function FilterSelector({ onChange, disabled = false, max, min, s
    return (
       <div
          className={tw(
-            'bg-white-50 border-2 border-[#733F3F] rounded-full flex items-center gap-1 h-[26px] px-1.5',
+            'bg-white-50 border-2 border-main-border rounded-full flex items-center gap-1 h-[26px] px-1.5',
             isDisabled && 'brightness-60 cursor-pointer',
          )}
          onClick={() => isDisabled && setIsDisabled(false)}
       >
          <CursorBtn setIsDisabled={setIsDisabled} isDisabled={isDisabled} />
 
-         <div className="bg-darker/80 text white h-full p-1 rounded-full flex items-center gap-1.5 px-1.5 select-none">
+         <div className="bg-main-subtle text white h-full p-1 rounded-full flex items-center gap-1.5 px-1.5 select-none">
             <button
                className={tw(
                   'cursor-pointer mb-0.5 hover:selected transition-all',

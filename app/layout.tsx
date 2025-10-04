@@ -64,7 +64,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                </head>
             )}
             <body
-               className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-fuchsia-300 selection:text-fuchsia-900`}
+               className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
             >
                <Providers>
                   <MobileDeviceCheck />
@@ -77,5 +77,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </>
    )
 }
-// $env:NODE_OPTIONS="--experimental-fetch"; npm run build
-// npx @highlight-run/sourcemap-uploader upload --apiKey "d1v1o2regv3s75f7if10" --appVersion "my-nextjs-frontend" --path .next --basePath /var/task/.next/

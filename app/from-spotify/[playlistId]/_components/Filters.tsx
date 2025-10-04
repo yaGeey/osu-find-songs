@@ -47,22 +47,13 @@ export default function Filters({
    return (
       <div
          className={tw(
-            'bg-[#BE6E6E] z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border ',
+            'bg-main-dark z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border ',
             unfolded && 'pb-5',
          )}
       >
          {/* Main filters */}
-         <div className="flex [@media(min-width:640px)]:items-center justify-between text-[15px] [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:gap-3">
-            <section className="flex items-center gap-4">
-               <h4>Star rating</h4>
-               <FilterSelector
-                  min={0}
-                  max={10}
-                  type="number"
-                  onChange={(val, filter) => createQueryString('star', filter, val)}
-               />
-            </section>
-            <div className="flex items-center gap-4 text-[15px]">
+         <div className="flex justify-between text-[15px]">
+            <div className="flex items-center gap-6.5 text-[15px]">
                <h4>Mode</h4>
                <SwitchFullDict
                   className="font-inter"
@@ -75,22 +66,31 @@ export default function Filters({
                   onChange={(val) => setM(val)}
                />
             </div>
+            <section className="flex items-center gap-4">
+               <h4>Star rating</h4>
+               <FilterSelector
+                  min={0}
+                  max={10}
+                  type="number"
+                  onChange={(val, filter) => createQueryString('star', filter, val)}
+               />
+            </section>
             <button
-               className="selected bg-darker rounded-full px-4 py-1.5 [@media(max-width:640px)]:hidden"
+               className="selected bg-main-dark-vivid border-2 border-main-border rounded-full px-3 h-[26px] [@media(max-width:800px)]:hidden"
                onClick={() => setUnfolded((p) => !p)}
             >
                More filters{' '}
                {unfolded ? (
-                  <span className="writing-mode-vertical-lr">&lt;</span>
+                  <span className="[writing-mode:vertical-lr]">&lt;</span>
                ) : (
-                  <span className="writing-mode-vertical-rl">&gt;</span>
+                  <span className="[writing-mode:vertical-rl]">&gt;</span>
                )}
             </button>
          </div>
-         <section className="flex items-center gap-4 mt-3 text-[15px]">
+         <section className="flex items-center gap-7.5 mt-3 text-[15px]">
             <h4>State</h4>
             <SwitchFullDict
-               className="ml-3.5 font-inter"
+               className="font-inter"
                required
                defaultValue="has leaderboard"
                options={{
@@ -125,7 +125,7 @@ export default function Filters({
 
          {/* Additional filters */}
          {unfolded && (
-            <div className="flex items-start justify-evenly lgx:justify-between mt-6 text-[15px]">
+            <div className="flex items-start justify-evenly lgx:justify-between mt-6 text-[15px] [@media(max-width:800px)]:hidden">
                <div className="flex flex-col gap-2.5 w-[290px]">
                   <div>
                      <h2 className="font-medium text-base">Song characteristics</h2>
