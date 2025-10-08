@@ -3,13 +3,12 @@ import { BeatmapSet } from '@/types/Osu'
 import OsuCard from './OsuCard'
 import { twMerge as tw } from 'tailwind-merge'
 import ReactDom from 'react-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useAudioStore } from '@/hooks/useAudioStore'
 import sortFn from '../_utils/sortBeatmaps'
-// TODO tooltip when in osu card set popup broke styles (Temp fixed - disable popup)
 
 export default function OsuCardSet({
    beatmapsets,
@@ -28,6 +27,8 @@ export default function OsuCardSet({
       useAudioStore.getState().stop()
       setIsDialogOpen(false)
    }
+
+   const maps = useMemo(() => beatmapsets.sort(sortFn(sortFnString)), [beatmapsets, sortFnString])
    return (
       <>
          <div
@@ -58,11 +59,10 @@ export default function OsuCardSet({
                      <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-dark w-full border-b-2 border-main-border">
                         <h4>Sort by</h4>
                         <SwitchSort
-                           // prettier-ignore
-                           options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites', 'date added']}
+                           options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites']}
                            onChange={(val, sort) => setSortFnString(val + '_' + sort)}
-                           defaultOption={sortQuery.split('_')[0]}
-                           defaultSort={sortQuery.split('_')[1]}
+                           defaultOption={sortQuery.split('_')[0] || 'plays'}
+                           defaultSort={sortQuery.split('_')[1] || 'desc'}
                         />
                         <FontAwesomeIcon
                            icon={faXmark}
@@ -72,7 +72,7 @@ export default function OsuCardSet({
                      </div>
                      <div className="h-full bg-main-darker overflow-y-auto scrollbar">
                         <div className="items flex p-4 gap-4 flex-wrap pb-20">
-                           {beatmapsets.sort(sortFn(sortFnString)).map((beatmapset, i) => (
+                           {maps.map((beatmapset, i) => (
                               <OsuCard
                                  key={beatmapset.id}
                                  beatmapset={beatmapset}

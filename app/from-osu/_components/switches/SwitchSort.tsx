@@ -49,8 +49,8 @@ export default function SwitchSort({
                }}
             >
                {option}
-               <div className="text-xs ml-1 ">
-                  {sort === 'desc' && selection === option && <FontAwesomeIcon icon={faSortDown} className="mt-0" />}
+               <div className="text-xs/[5px] ml-1 ">
+                  {sort === 'desc' && selection === option && <FontAwesomeIcon icon={faSortDown} className="mt-0.5" />}
                   {sort === 'asc' && selection === option && <FontAwesomeIcon icon={faSortUp} className="mt-1.5" />}
                   {selection !== option && <FontAwesomeIcon icon={faSortDown} className="opacity-0" />}
                </div>
