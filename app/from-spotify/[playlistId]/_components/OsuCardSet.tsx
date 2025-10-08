@@ -73,7 +73,11 @@ export default function OsuCardSet({
                      <div className="h-full bg-main-darker overflow-y-auto scrollbar">
                         <div className="items flex p-4 gap-4 flex-wrap pb-20">
                            {beatmapsets.sort(sortFn(sortFnString)).map((beatmapset, i) => (
-                              <OsuCard key={i} beatmapset={beatmapset} className="flex-grow animate-in fade-in shadow-sm" />
+                              <OsuCard
+                                 key={beatmapset.id}
+                                 beatmapset={beatmapset}
+                                 className="flex-grow animate-in fade-in shadow-sm"
+                              />
                            ))}
                         </div>
                      </div>
