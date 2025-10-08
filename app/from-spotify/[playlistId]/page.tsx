@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
 import OsuCard from './_components/OsuCard'
-import { useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-query'
+import { QueryFunctionContext, useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-query'
 import { fetchWithToken } from '@/lib/Spotify'
 import { PlaylistPage } from '@/types/Spotify'
 import { Button } from '@/components/buttons/Buttons'
@@ -86,7 +86,7 @@ export default function PLaylistPage() {
    const beatmapsetQueries = useQueries({
       queries: chunked.map((chunk) => ({
          queryKey: ['search-from-spotify', chunk?.[0]?.track?.id ?? 'err'],
-         queryFn: async ({ signal }) => {
+         queryFn: async ({ signal }: QueryFunctionContext) => {
             const t0 = performance.now()
             // if (!item.track) return [] //? odd error rarely occurs
             const body = {
