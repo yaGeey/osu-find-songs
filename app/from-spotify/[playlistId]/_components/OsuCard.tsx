@@ -110,7 +110,11 @@ export default function OsuCard({
                         <FontAwesomeIcon icon={faStar} />
                         <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
                         <FontAwesomeIcon icon={faCircleCheck} />
-                        <span className="-ml-1.75 -mb-0.25" data-tooltip-id="tooltip" data-tooltip-content={dateString}>
+                        <span
+                           className="-ml-1.75 -mb-0.25"
+                           data-tooltip-id={'tooltip' + beatmapset.id}
+                           data-tooltip-content={dateString}
+                        >
                            {new Date(
                               beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date,
                            ).toLocaleDateString()}
@@ -143,7 +147,7 @@ export default function OsuCard({
                                           .map((beatmap, j) => (
                                              <div
                                                 style={getColor(beatmap.difficulty_rating)}
-                                                data-tooltip-id="tooltip"
+                                                data-tooltip-id={'tooltip' + beatmapset.id}
                                                 data-tooltip-content={`${beatmap.mode} | ${beatmap.difficulty_rating} - ${beatmap.version}`}
                                                 key={j}
                                                 className="h-[15px] w-[8px] rounded-full drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.15)]"
@@ -170,7 +174,7 @@ export default function OsuCard({
                         icon={beatmapset.video ? faFileVideo : faDownload}
                         onClick={() => mutation.mutate()}
                         className="cursor-pointer"
-                        data-tooltip-id="tooltip"
+                        data-tooltip-id={'tooltip' + beatmapset.id}
                         data-tooltip-content={beatmapset.video ? 'Download with video' : 'Download without video'}
                         data-tooltip-delay-show={400}
                      />
