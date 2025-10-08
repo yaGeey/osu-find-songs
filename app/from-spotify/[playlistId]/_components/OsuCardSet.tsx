@@ -41,7 +41,7 @@ export default function OsuCardSet({
                   beatmapset={beatmapset}
                   onHover={false}
                   className={tw(
-                     'first:z-99 w-full not-first:absolute even:top-[5px] last:top-[10px] even:opacity-35 last:opacity-10 pointer-events-none group-hover:even:top-[7px] group-hover:last:top-[14px]',
+                     'first:z-2 w-full not-first:absolute even:top-[5px] last:top-[10px] even:opacity-35 last:opacity-10 pointer-events-none group-hover:even:top-[7px] group-hover:last:top-[14px]',
                   )}
                />
             ))}
@@ -58,7 +58,8 @@ export default function OsuCardSet({
                      <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-dark w-full border-b-2 border-main-border">
                         <h4>Sort by</h4>
                         <SwitchSort
-                           options={['title', 'artist', 'difficulty', 'ranked', 'plays', 'favorites', 'relevance']}
+                           // prettier-ignore
+                           options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites', 'date added']}
                            onChange={(val, sort) => setSortFnString(val + '_' + sort)}
                            defaultOption={sortQuery.split('_')[0]}
                            defaultSort={sortQuery.split('_')[1]}

@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { createParallelAction } from './serverActionsParallel'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
+import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -46,7 +47,7 @@ const sendTemeletry = async (mapId: string) => {
    } catch (err) {}
 }
 
-export const useNoVideoAxios = (id: number, filename: string) => {
+export const useNoVideoAxios = (id: number, filename: string, notifyRef?: React.RefObject<ProgressNotifyHandle|null>) => {
    return useMutation({
       mutationFn: async () => {
          await sendTemeletry(id.toString())
@@ -61,7 +62,8 @@ export const useNoVideoAxios = (id: number, filename: string) => {
       },
       onSuccess: (data: Blob) => {
          download(data, filename)
-         toast.success('Downloaded successfully')
+         if (notifyRef && notifyRef.current) notifyRef.current.blink()
+         else toast.success('Downloaded successfully')
       },
    })
 }

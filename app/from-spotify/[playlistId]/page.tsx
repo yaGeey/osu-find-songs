@@ -1,6 +1,6 @@
 'use client'
 // TODO rewrite to batch
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
 import OsuCard from './_components/OsuCard'
@@ -28,6 +28,7 @@ import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
 import axios from 'axios'
 import Loading from '@/components/state/Loading'
+import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 const CHUNK_SIZE = 100
 
 export default function PLaylistPage() {
@@ -35,13 +36,14 @@ export default function PLaylistPage() {
    const searchParams = useSearchParams()
    const { playlistId } = params
    const queryClient = useQueryClient()
+   const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
 
    const [hasQueryChanged, setHasQueryChanged] = useState(false)
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
    const [searchType, setSearchType] = useState<'local' | 'api'>('api')
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
-
+   const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
    const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
 
    // fetching playlist
@@ -55,7 +57,10 @@ export default function PLaylistPage() {
       queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
       queryFn: async ({ pageParam = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100` }) =>
          await fetchWithToken(pageParam),
-      getNextPageParam: (lastPage) => (lastPage.next ? lastPage.next : undefined),
+      getNextPageParam: (lastPage) => {
+         if (!spotifyTotal) setSpotifyTotal(lastPage.total)
+         return lastPage.next ? lastPage.next : undefined
+      },
       getPreviousPageParam: (firstPage) => (firstPage.previous ? firstPage.previous : undefined),
       initialPageParam: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100`,
       throwOnError: (error, query) => {
@@ -73,39 +78,52 @@ export default function PLaylistPage() {
    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
    const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || []
+   const isTracksLoadingFinal = isFetchingNextPage || hasNextPage || isTracksLoading || tracks.length < spotifyTotal
+   const mapsFetched = beatmapsets.flat().length
 
    // beatmapset search
    const chunked = chunkArray(tracks, CHUNK_SIZE)
    const beatmapsetQueries = useQueries({
       queries: chunked.map((chunk) => ({
-         queryKey: ['search-from-spotify', chunk[0].track.id ?? 'err'],
-         queryFn: async () => {
+         queryKey: ['search-from-spotify', chunk?.[0]?.track?.id ?? 'err'],
+         queryFn: async ({ signal }) => {
             const t0 = performance.now()
             // if (!item.track) return [] //? odd error rarely occurs
-            const { data } = await axios.post<BeatmapSet[][]>(`/api/batch/osu-search`, {
+            const body = {
                qs: chunk.map(
                   (item) => `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}`,
                ),
                m: searchParams.get('m'),
                s: searchParams.get('s'),
-            })
-            addTimeLeft(performance.now() - t0)
-            return data
+            }
+
+            try {
+               const { data } = await axios.post<BeatmapSet[][]>('/api/batch/osu-search', body, { signal })
+               addTimeLeft(performance.now() - t0)
+               return data
+            } catch (err: any) {
+               if (err?.code === 'ERR_CANCELED' || err?.name === 'CanceledError') throw new Error('canceled')
+               throw err
+            }
          },
          enabled: !!tracks,
-         onError: (error: any) => toast.error(`Error: ${error.message}`, { autoClose: false }),
+         onError: (error: any) => {
+            if (error.message === 'canceled') return // ігноруємо
+            toast.error(`Error: ${error.message}`, { autoClose: false })
+         },
       })),
    })
 
-   const isLoading = useMemo(
-      () => beatmapsetQueries.some((q) => q.isLoading) || isTracksLoading,
-      [beatmapsetQueries, isTracksLoading],
-   )
+   const isLoading = beatmapsetQueries.some((q) => q.isLoading) || isTracksLoadingFinal
+   // const isLoading = true
    const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // setting data for display
    useEffect(() => {
-      const data = beatmapsetQueries.filter(q => q.data !== undefined).map((q) => q.data).flat()
+      const data = beatmapsetQueries
+         .filter((q) => q.data !== undefined)
+         .map((q) => q.data)
+         .flat()
       setBeatmapsets(data)
       setFilteredBeatmapsets(data)
    }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length])
@@ -125,13 +143,11 @@ export default function PLaylistPage() {
             setTimeToSearch(Math.min(time, 2000))
          }, 100)
 
-         const timer = setTimeout(() => {
-            queryClient.removeQueries({
-               predicate: (query) => {
-                  return query.queryKey[0] !== 'spotify-playlist'
-               },
-            })
-            beatmapsetQueries.forEach((query) => query.refetch())
+         const timer = setTimeout(async () => {
+            const predicate = (query: any) => query.queryKey?.[0] === 'search-from-spotify'
+            await queryClient.cancelQueries({ predicate }) // calls AbortController
+            // removes only active queries, so completed ones stay in cache. Also triggres refetch as there is no result for subsribed queryKey
+            queryClient.removeQueries({ predicate, type: 'active' })
 
             setTimeToSearch(null)
             clearInterval(interval)
@@ -159,25 +175,25 @@ export default function PLaylistPage() {
          <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}
-         <Progress isVisible={!!timeToSearch} value={(timeToSearch! * 100) / 2000} color="text-main-lighter" />
-
-         {/* fetching spotify progress */}
+         <Progress isVisible={!!timeToSearch} value={(timeToSearch! * 100) / 2000} color="text-main-lightest" />
+         {/* loading progress */}
          <Progress
             isVisible={isLoading}
-            value={(beatmapsetQueries.filter((q) => !q.isLoading).length * 100) / tracks.length}
+            value={spotifyTotal > 0 ? Math.min((mapsFetched / spotifyTotal) * 100, 100) : 0}
             isError={beatmapsetQueries.some((q) => q.isError)}
          >
             {msLeft > 5000 && (
                <span>
-                  {beatmapsetQueries.filter((q) => !q.isLoading).length}/{tracks.length} | {timeLeft} left
+                  {mapsFetched}/{spotifyTotal} | {timeLeft} left
                </span>
             )}
          </Progress>
-
          {/* download all progress */}
          <Progress isVisible={progress !== null} value={progress || 0} isError={progress === -1} color="text-success">
             {text}
          </Progress>
+         {/* notification progress */}
+         <ProgressNotify ref={progressNotifyRef} color="text-success"></ProgressNotify>
 
          <header
             className={tw(
@@ -198,7 +214,7 @@ export default function PLaylistPage() {
          </header>
 
          <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
-            <div className=" min-h-[calc(100vh-3.5rem)] bg-main-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1900px]">
+            <div className=" min-h-[calc(100vh-3.5rem)] bg-main-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1800px]">
                <Filters
                   foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                   onChange={(val, searchTypeRes, mode) => setSearchType(searchTypeRes)}

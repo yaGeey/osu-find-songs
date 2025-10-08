@@ -10,6 +10,7 @@ import { groupBy } from '@/utils/arrayManaging'
 import { use, useEffect, useRef, useState } from 'react'
 import ImageFallback from '@/components/ImageFallback'
 import { useAudioStore } from '@/hooks/useAudioStore'
+import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 
 export default function OsuCard({
    beatmapset,
@@ -98,7 +99,8 @@ export default function OsuCard({
                         <h3 className="font-medium text-sm -mt-1">from {beatmapset.artist}</h3>
                      </div>
                      <h4 className="font-inter-tight text-xs">
-                        <span className='drop-shadow-xs/20'>created by</span> <span className="selected">{beatmapset.creator}</span>
+                        <span className="drop-shadow-xs/20">created by</span>{' '}
+                        <span className="selected">{beatmapset.creator}</span>
                      </h4>
                      <div className="flex gap-2.5 text-main-gray text-[11px] items-center ">
                         <FontAwesomeIcon icon={faHeart} />
@@ -173,7 +175,11 @@ export default function OsuCard({
                         data-tooltip-delay-show={400}
                      />
                   </div>
-                  <Tooltip id="tooltip" place="top" style={{ fontSize: '11px', padding: '0 0.25rem', zIndex: 100000 }} />
+                  <Tooltip
+                     id={'tooltip' + beatmapset.id}
+                     place="top"
+                     style={{ fontSize: '11px', padding: '0 0.25rem', zIndex: 100000 }}
+                  />
                </>
             }
          </div>
