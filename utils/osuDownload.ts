@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { createParallelAction } from './serverActionsParallel'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -47,9 +48,11 @@ const sendTemeletry = async (mapId: string) => {
    } catch (err) {}
 }
 
-export const useNoVideoAxios = (id: number, filename: string, notifyRef?: React.RefObject<ProgressNotifyHandle|null>) => {
+export const useNoVideoAxios = (id: number, filename: string) => {
+   const { remove, add } = useMapDownloadStore()
    return useMutation({
       mutationFn: async () => {
+         add(id)
          await sendTemeletry(id.toString())
          const res = await axios.get(`https://catboy.best/d/${id}`, {
             responseType: 'blob',
@@ -57,13 +60,18 @@ export const useNoVideoAxios = (id: number, filename: string, notifyRef?: React.
          return res.data
       },
       onError: (error: any) => {
+         remove(id)
          console.error('Error downloading file:', error)
          toast.error('Error downloading file: ' + error.message)
       },
       onSuccess: (data: Blob) => {
+         remove(id)
          download(data, filename)
-         if (notifyRef && notifyRef.current) notifyRef.current.blink()
-         else toast.success('Downloaded successfully')
+
+         const { pending, progressBlinkRef } = useMapDownloadStore.getState()
+         if (progressBlinkRef && progressBlinkRef.current && !pending.length) {
+            progressBlinkRef.current.blink(2000)
+         }
       },
    })
 }

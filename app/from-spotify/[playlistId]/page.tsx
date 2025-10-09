@@ -29,6 +29,7 @@ import VirtuosoCards from './_components/VirtuosoCards'
 import axios from 'axios'
 import Loading from '@/components/state/Loading'
 import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 const CHUNK_SIZE = 100
 
 export default function PLaylistPage() {
@@ -36,7 +37,12 @@ export default function PLaylistPage() {
    const searchParams = useSearchParams()
    const { playlistId } = params
    const queryClient = useQueryClient()
+
    const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
+   const { pending, setProgressBlinkRef } = useMapDownloadStore()
+   useEffect(() => {
+      setProgressBlinkRef(progressNotifyRef)
+   }, [setProgressBlinkRef, progressNotifyRef])
 
    const [hasQueryChanged, setHasQueryChanged] = useState(false)
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
@@ -115,7 +121,6 @@ export default function PLaylistPage() {
    })
 
    const isLoading = beatmapsetQueries.some((q) => q.isLoading) || isTracksLoadingFinal
-   // const isLoading = true
    const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // setting data for display
@@ -193,7 +198,10 @@ export default function PLaylistPage() {
             {text}
          </Progress>
          {/* notification progress */}
-         <ProgressNotify ref={progressNotifyRef} color="text-success"></ProgressNotify>
+         <ProgressNotify ref={progressNotifyRef} color="text-success" />
+         <Progress isVisible={!!pending.length} value={100} variant="indeterminate">
+            {pending.length} map{pending.length > 1 && 's'} downloading...
+         </Progress>
 
          <header
             className={tw(

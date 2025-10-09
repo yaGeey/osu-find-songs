@@ -7,10 +7,11 @@ import { twMerge as tw } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
 import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
-import { use, useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import ImageFallback from '@/components/ImageFallback'
-import { useAudioStore } from '@/hooks/useAudioStore'
-import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
+import { useAudioStore } from '@/contexts/useAudioStore'
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+import Loading from '@/components/state/Loading'
 
 export default function OsuCard({
    beatmapset,
@@ -21,6 +22,8 @@ export default function OsuCard({
    onHover?: boolean
    className?: string
 }) {
+   const { pending, add } = useMapDownloadStore()
+   const [isDownloading, setIsDownloading] = useState(pending.includes(beatmapset.id))
    const ref = useRef<HTMLDivElement>(null)
    const { currentUrl, play, stop } = useAudioStore()
 
@@ -36,6 +39,11 @@ export default function OsuCard({
       .join(' | ')
 
    const mutation = useNoVideoAxios(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
+   function handleDownload() {
+      setIsDownloading(true)
+      add(beatmapset.id)
+      mutation.mutate()
+   }
    return (
       <>
          <div
@@ -166,18 +174,23 @@ export default function OsuCard({
                   {/* download buttons */}
                   <div
                      className={tw(
-                        'absolute top-0 right-0 h-full w-7 bg-main-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
+                        'absolute top-0 right-0 h-full w-7  transition-all bg-main-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
                         onHover && 'group-hover/card:flex',
+                        isDownloading && 'flex',
                      )}
                   >
-                     <FontAwesomeIcon
-                        icon={beatmapset.video ? faFileVideo : faDownload}
-                        onClick={() => mutation.mutate()}
-                        className="cursor-pointer"
-                        data-tooltip-id={'tooltip' + beatmapset.id}
-                        data-tooltip-content={beatmapset.video ? 'Download with video' : 'Download without video'}
-                        data-tooltip-delay-show={400}
-                     />
+                     {!isDownloading ? (
+                        <FontAwesomeIcon
+                           icon={beatmapset.video ? faFileVideo : faDownload}
+                           onClick={handleDownload}
+                           className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
+                           data-tooltip-id={'tooltip' + beatmapset.id}
+                           data-tooltip-content={beatmapset.video ? 'Download with video' : 'Download without video'}
+                           data-tooltip-delay-show={400}
+                        />
+                     ) : (
+                        <Loading color="4b2e2e" radius={15} />
+                     )}
                   </div>
                   <Tooltip
                      id={'tooltip' + beatmapset.id}

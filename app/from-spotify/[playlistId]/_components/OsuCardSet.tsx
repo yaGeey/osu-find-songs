@@ -7,7 +7,7 @@ import { useMemo, useRef, useState } from 'react'
 import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import { useAudioStore } from '@/hooks/useAudioStore'
+import { useAudioStore } from '@/contexts/useAudioStore'
 import sortFn from '../_utils/sortBeatmaps'
 
 export default function OsuCardSet({
