@@ -30,6 +30,7 @@ import axios from 'axios'
 import Loading from '@/components/state/Loading'
 import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+import { formatBytes } from '@/utils/numbers'
 const CHUNK_SIZE = 100
 
 export default function PLaylistPage() {
@@ -40,6 +41,8 @@ export default function PLaylistPage() {
 
    const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
    const { pending, setProgressBlinkRef } = useMapDownloadStore()
+   const bytesDownloaded = Object.values(pending).reduce((acc, cur) => acc + (cur.downloadedBytes || 0), 0)
+   const bytesTotal = Object.values(pending).reduce((acc, cur) => acc + (cur.totalBytes || 0), 0)
    useEffect(() => {
       setProgressBlinkRef(progressNotifyRef)
    }, [setProgressBlinkRef, progressNotifyRef])
@@ -199,8 +202,16 @@ export default function PLaylistPage() {
          </Progress>
          {/* notification progress */}
          <ProgressNotify ref={progressNotifyRef} color="text-success" />
-         <Progress isVisible={!!pending.length} value={100} variant="indeterminate">
-            {pending.length} map{pending.length > 1 && 's'} downloading...
+         <Progress isVisible={!!Object.values(pending).length} value={(bytesDownloaded / bytesTotal) * 100 || 0}>
+            {Object.values(pending).map(
+               (p) =>
+                  p.downloadedBytes &&
+                  p.totalBytes && (
+                     <p>
+                        {p.filename} ({formatBytes(p.downloadedBytes)}/{formatBytes(p.totalBytes)} MB)
+                     </p>
+                  ),
+            )}
          </Progress>
 
          <header

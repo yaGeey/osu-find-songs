@@ -49,13 +49,17 @@ const sendTemeletry = async (mapId: string) => {
 }
 
 export const useNoVideoAxios = (id: number, filename: string) => {
-   const { remove, add } = useMapDownloadStore()
+   const { remove, update } = useMapDownloadStore()
    return useMutation({
       mutationFn: async () => {
-         add(id)
          await sendTemeletry(id.toString())
          const res = await axios.get(`https://catboy.best/d/${id}`, {
             responseType: 'blob',
+            onDownloadProgress: (progressEvent) => {
+               if (progressEvent.total) {
+                  update(id, progressEvent.loaded, progressEvent.total)
+               }
+            },
          })
          return res.data
       },
@@ -69,7 +73,7 @@ export const useNoVideoAxios = (id: number, filename: string) => {
          download(data, filename)
 
          const { pending, progressBlinkRef } = useMapDownloadStore.getState()
-         if (progressBlinkRef && progressBlinkRef.current && !pending.length) {
+         if (progressBlinkRef && progressBlinkRef.current && !Object.values(pending).length) {
             progressBlinkRef.current.blink(2000)
          }
       },

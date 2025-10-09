@@ -22,8 +22,8 @@ export default function OsuCard({
    onHover?: boolean
    className?: string
 }) {
-   const { pending, add } = useMapDownloadStore()
-   const [isDownloading, setIsDownloading] = useState(pending.includes(beatmapset.id))
+   const mutation = useNoVideoAxios(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
+   const { add } = useMapDownloadStore()
    const ref = useRef<HTMLDivElement>(null)
    const { currentUrl, play, stop } = useAudioStore()
 
@@ -38,10 +38,8 @@ export default function OsuCard({
       .map(([k, v]) => `${k} ${new Date(v!).toLocaleDateString()}`)
       .join(' | ')
 
-   const mutation = useNoVideoAxios(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
    function handleDownload() {
-      setIsDownloading(true)
-      add(beatmapset.id)
+      add(beatmapset.id, `${beatmapset.artist} - ${beatmapset.title}`)
       mutation.mutate()
    }
    return (
@@ -176,10 +174,10 @@ export default function OsuCard({
                      className={tw(
                         'absolute top-0 right-0 h-full w-7  transition-all bg-main-darker hidden flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 rounded-r-[14px] overflow-hidden',
                         onHover && 'group-hover/card:flex',
-                        isDownloading && 'flex',
+                        mutation.isPending && 'flex',
                      )}
                   >
-                     {!isDownloading ? (
+                     {!mutation.isPending ? (
                         <FontAwesomeIcon
                            icon={beatmapset.video ? faFileVideo : faDownload}
                            onClick={handleDownload}
