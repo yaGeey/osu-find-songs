@@ -29,7 +29,7 @@ function checkFilterCondition(field: any, filter: Filter, value: string | number
    // At this point field is expected to be string or number
    let fieldValue: number | string = field as number | string
 
-   if (typeof fieldValue === 'string' && isDate) {
+   if (typeof fieldValue === 'string' && !isDate) {
       fieldValue = parseFloat(fieldValue)
       if (isNaN(fieldValue)) return false
    }
