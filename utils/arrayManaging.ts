@@ -171,3 +171,8 @@ export function mergeGroupedArrays<T>(grouped: Record<string, any[]>[]) {
       {} as Record<string, T[]>,
    )
 }
+
+// filter matrix
+export function filterMatrix<T>(matrix: T[][], filterFn: (item: T) => boolean) {
+   return matrix.map((arr) => arr.filter(filterFn)).filter((arr) => arr.length > 0)
+}

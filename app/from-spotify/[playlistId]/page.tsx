@@ -1,5 +1,4 @@
 'use client'
-// TODO rewrite to batch
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
@@ -31,6 +30,7 @@ import Loading from '@/components/state/Loading'
 import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import { formatBytes } from '@/utils/numbers'
+import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
 const CHUNK_SIZE = 100
 
 export default function PLaylistPage() {
@@ -171,7 +171,7 @@ export default function PLaylistPage() {
    // preparing data for display
    const maps = useMemo(
       () =>
-         uniqueBeatmapsetMatrix(filteredBeatmapsets.filter((data) => data && data.length)).sort((a, b) =>
+         uniqueBeatmapsetMatrix(filteredBeatmapsets).sort((a, b) =>
             sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'),
          ),
       [filteredBeatmapsets, searchParams],
@@ -236,8 +236,8 @@ export default function PLaylistPage() {
             <div className=" min-h-[calc(100vh-3.5rem)] bg-main-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1800px]">
                <Filters
                   foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
-                  onChange={(val, searchTypeRes, mode) => setSearchType(searchTypeRes)}
                   disabled={isLoading}
+                  onFilterChange={(filters) => setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))}
                />
 
                {!isLoading && maps.length < 45 ? (

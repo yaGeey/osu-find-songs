@@ -28,7 +28,7 @@ export default function OsuCardSet({
       setIsDialogOpen(false)
    }
 
-   const maps = useMemo(() => beatmapsets.sort(sortFn(sortFnString)), [beatmapsets, sortFnString])
+   const maps = useMemo(() => beatmapsets.sort(sortFn(sortFnString || sortQuery)), [beatmapsets, sortFnString, sortQuery])
    return (
       <>
          <div
@@ -36,9 +36,9 @@ export default function OsuCardSet({
             className={tw('relative h-[105px] group min-w-[386px] w-[464px] cursor-pointer', className)}
             onClick={() => setIsDialogOpen(true)}
          >
-            {beatmapsets.slice(0, 3).map((beatmapset, i) => (
+            {maps.slice(0, 3).map((beatmapset, i) => (
                <OsuCard
-                  key={i}
+                  key={beatmapset.id}
                   beatmapset={beatmapset}
                   onHover={false}
                   className={tw(
@@ -52,7 +52,7 @@ export default function OsuCardSet({
                <div className={`fixed top-0 left-0 w-screen h-screen bg-black/40 z-1000`} onClick={onClose}>
                   <div
                      className={
-                        'overflow-hidden absolute w-2/3 min-w-[750px] min-h-[500px] h-4/5 bg-main-darker rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'
+                        'overflow-hidden absolute w-2/3 min-w-[685px] min-h-[500px] h-4/5 bg-main-darker rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'
                      }
                      onClick={(e) => e.stopPropagation()}
                   >
