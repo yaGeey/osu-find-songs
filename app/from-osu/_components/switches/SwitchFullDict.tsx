@@ -30,7 +30,7 @@ export default function SwitchFull({
          className={tw(
             'font-inter-tight border-2 border-main-border rounded-full flex items-center gap-1 h-[26px] cursor-pointer',
             isDisabled && 'brightness-60',
-            !required && 'pl-1.5 bg-white-50 ',
+            !required && 'pl-1.5 bg-gray-200',
             className,
          )}
          onClick={() => isDisabled && setIsDisabled(false)}

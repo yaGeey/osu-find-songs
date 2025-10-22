@@ -1,6 +1,6 @@
 import { CSSObject } from '@emotion/react'
 
-export const sortOptions = [
+export const _sortOptions = [
    { value: 'sort-date', label: 'Default' },
    { value: 'sort-artist', label: 'By Artist' },
    { value: 'sort-bpm', label: 'By BPM' },
@@ -11,18 +11,32 @@ export const sortOptions = [
    { value: 'sort-length', label: 'By Length' },
    { value: 'sort-title', label: 'By Title' },
 ]
+export const sortOptions = [
+   { value: 'sort-date', label: ['date'] },
+   { value: 'sort-artist', label: ['artist'] },
+   { value: 'sort-bpm', label: ['bpm'] },
+   { value: 'sort-creator', label: ['creator'] },
+   { value: 'sort-date-updated', label: ['date updated'] },
+   { value: 'sort-length', label: ['length'] },
+   { value: 'sort-title', label: ['title'] },
+]
 
-export const groupOptions = [
-   { value: 'no', label: 'No Grouping' },
+export const _groupOptions = [
    // { value: 'artist', label: 'By Artist' },
-   { value: 'bpm', label: 'By BPM' },
+   { value: 'bpm', label: 'bpm' },
    // { value: 'creator', label: 'By Creator' },
    // { value: 'date', label: 'By Date Downloaded' },
    // { value: 'dif', label: 'By Difficulty' },
-   { value: 'genre', label: 'By Genre' },
-   { value: 'length', label: 'By Length' },
+   { value: 'genre', label: 'genre' },
+   { value: 'length', label: 'length' },
    // { value: 'title', label: 'By Title' },
-   { value: 'year', label: 'By Year' },
+   { value: 'year', label: 'year' },
+]
+export const groupOptions = [
+   { value: 'bpm', label: ['bpm'] },
+   { value: 'genre', label: ['genre'] },
+   { value: 'length', label: ['length'] },
+   { value: 'year', label: ['year'] },
 ]
 
 export const filterOptions = [{ value: 'exact-spotify', label: 'Exact Spotify match' }]

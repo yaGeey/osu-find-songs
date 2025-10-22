@@ -2,16 +2,11 @@ import { BeatmapSet } from '@/types/Osu'
 import { Combined, CombinedQueried, CombinedSingle, CombinedSingleSimple, Song, SongDataQueried } from '@/types/types'
 
 // filters
-export const filterFn = (filters: string[]) => (a: CombinedSingleSimple) => {
-   if (!filters.length) return true
+export const filterFn = (exactSpotify: boolean) => (a: CombinedSingleSimple) => {
+   if (!exactSpotify) return true
 
-   return filters.every((filter) => {
-      switch (filter) {
-         case 'exact-spotify':
-            if (!a.spotify) return false
-            return a.spotify.length !== 20
-      }
-   })
+   if (!a.spotify) return false
+   return a.spotify.length !== 20
 }
 
 export const searchFilterFn = (search: string) => (a: CombinedSingleSimple) => {
@@ -70,7 +65,8 @@ export function uniqueArray<T>(arr: T[], key: keyof T) {
    })
 }
 
-export function flatCombinedArray(arr: CombinedQueried): any[] { // TODO fix types
+export function flatCombinedArray(arr: CombinedQueried): any[] {
+   // TODO fix types
    return arr.local.map((item, i) => ({
       local: item,
       spotify: arr.spotifyQuery.data?.[i],

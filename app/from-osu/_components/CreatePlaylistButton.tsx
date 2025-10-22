@@ -23,19 +23,10 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
    const [modalContent, setModalContent] = useState<React.ReactNode | null>(null)
    const [onOkayFn, setOnOkayFn] = useState<() => void>(() => {})
    const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay')
-   const router = useRouter()
 
    const mutation = useMutation({
       mutationFn: ({ playlistId, uris }: { playlistId: string; uris: string[] }) => AddItemsToPlaylist(playlistId, uris),
    })
-
-   function navigateToAuth() {
-      const encodeRedirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!)
-      const clientId = process.env.NEXT_PUBLIC_AUTH_SPOTIFY_ID
-      const scope = 'playlist-modify-public playlist-modify-private'
-      const url = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeRedirectUri}&scope=${scope}`
-      router.push(url)
-   }
 
    function handleModal(
       content: React.ReactNode,
@@ -104,9 +95,10 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
                   <>
                      <h1 className="text-lg font-semibold">Success!</h1>
                      <p>
-                        ❤️ Like the playlist to save it to your library, <br /> 🔁 or copy tracks with Ctrl+A, C, then V in your playlist.
+                        ❤️ Like the playlist to save it to your library, <br /> 🔁 or copy tracks with Ctrl+A, C, then V in your
+                        playlist.
                      </p>
-                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black animate-pulse">
+                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black animate-pulse font-outline">
                         {playlist!.external_urls.spotify}
                      </ExternalLink>
                   </>,
@@ -130,19 +122,27 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             onClick={() => handleCreatePlaylist()}
             data-tooltip-id="tooltip-1"
             data-tooltip-content="Create playlist on your Spotify account and populate it with tracks with filter 'Exact Spotify match'"
-            className={tw('bg-main-dark-vivid md:whitespace-nowrap min-w-[135px]', className)}
+            className={tw('bg-main-dark-vivid md:whitespace-nowrap w-fit', className)}
          >
-            Create Spotify playlist
+            Create playlist
             <FontAwesomeIcon icon={faSpotify} className="ml-1.5 text-lg mt-0.5" />
          </Button>
 
          <Modal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onOkay={onOkayFn}
-            state={state}
-            okBtn={onOkayText}
-            closeBtn="Close"
+            buttons={[
+               {
+                  onClick: () => setIsModalOpen(false),
+                  text: 'Close',
+                  className: 'bg-main-dark',
+               },
+               {
+                  onClick: onOkayFn,
+                  text: onOkayText,
+                  className: 'bg-success',
+               },
+            ]}
+            status={state}
          >
             {modalContent}
          </Modal>

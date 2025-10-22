@@ -2,24 +2,22 @@ import ReactDom from 'react-dom'
 import { twMerge as tw } from 'tailwind-merge'
 import { Button } from './buttons/Buttons'
 
+type ModalButtonProps = {
+   onClick: () => void
+   text?: string
+   className?: string
+}
+
 export default function Modal({
+   buttons,
    children,
    isOpen,
-   onClose,
-   onOkay,
-   state,
-   okBtn,
-   closeBtn,
-   dialog,
+   status,
 }: {
+   buttons: ModalButtonProps[]
    children: React.ReactNode
    isOpen: boolean
-   onClose?: () => void
-   onOkay?: () => void
-   state: 'error' | 'success' | 'warning' | 'info' | 'loading'
-   okBtn?: string
-   closeBtn?: string
-   dialog?: boolean
+   status: 'error' | 'success' | 'warning' | 'info' | 'loading'
 }) {
    if (!isOpen) return null
 
@@ -27,33 +25,28 @@ export default function Modal({
       <div className={`fixed top-0 left-0 w-screen h-screen bg-black/30 z-10000 text-center`}>
          <div
             className={tw(
-               'bg-main-light bg-triangles-faded text-black text-balance max-w-[540px] border-4 rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3.5 transition-all shadow-2xl flex flex-col',
-               state === 'error' && 'border-invalid',
-               state === 'success' && 'border-success',
-               state === 'warning' && 'border-yellow-400',
-               state === 'info' && 'border-main-border',
-               state === 'loading' && 'border-main-border',
+               'overflow-hidden animate-border [--color-animated-body:var(--color-main-light)] text-black text-balance max-w-[540px] border-4 rounded-xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3.5 transition-all shadow-2xl flex flex-col',
+               status === 'error' && '[--color-animated-border:var(--color-error)]',
+               status === 'success' && '[--color-animated-border:var(--color-success)]',
+               status === 'warning' && '[--color-animated-border:var(--color-warning)]',
+               status === 'info' && '[--color-animated-border:var(--color-main-subtle)]',
+               status === 'loading' && '[--color-animated-border:var(--color-main-subtle)]',
             )}
          >
-            <div className="flex-1 p-3 flex flex-col gap-2 justify-center items-center font-semibold">{children}</div>
+            <div className="flex-1 p-3 flex flex-col gap-2 justify-center items-center">{children}</div>
             <div className="flex gap-2 justify-center mt-3 shadow-none">
-               {state !== 'loading' && okBtn && (
-                  <Button
-                     onClick={onOkay}
-                     className={tw('h-[35px]', dialog ? 'bg-main-dark' : 'bg-success font-medium shadow-none')}
-                     textClassName="font-outline"
-                  >
-                     {okBtn}
-                  </Button>
-               )}
-               {state !== 'loading' && closeBtn && (
-                  <Button
-                     onClick={onClose}
-                     className={tw('h-[35px]', dialog ? 'bg-main-dark' : 'bg-error font-medium shadow-none')}
-                     textClassName="font-outline"
-                  >
-                     {closeBtn}
-                  </Button>
+               {buttons.map(
+                  (btn, index) =>
+                     btn.text && (
+                        <Button
+                           key={index}
+                           onClick={btn.onClick}
+                           className={tw('h-[35px]', btn.className)}
+                           textClassName="font-outline-sm"
+                        >
+                           {btn.text}
+                        </Button>
+                     ),
                )}
             </div>
          </div>

@@ -14,13 +14,22 @@ export default function HomeBtn() {
          </div>
          <Modal
             isOpen={isHomeRedirectModalVisible}
-            onClose={() => setIsHomeRedirectModalVisible(false)}
-            onOkay={() => router.push('/')}
-            closeBtn="Stay"
-            okBtn="Redirect"
-            state="warning"
+            status="warning"
+            buttons={[
+               {
+                  onClick: () => router.push('/'),
+                  text: 'Redirect',
+                  className: 'bg-success',
+               },
+               {
+                  onClick: () => setIsHomeRedirectModalVisible(false),
+                  text: 'Stay',
+                  className: 'bg-main-dark',
+               },
+            ]}
          >
-            <h1 className='font-semibold'>You are about to redirect to the landing page</h1>
+            <h4>You are about to be redirected to the landing page</h4>
+            <p>Your progress will not be saved</p>
          </Modal>
       </>
    )

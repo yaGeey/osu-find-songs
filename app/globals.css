@@ -14,13 +14,16 @@
    --color-main-gray: oklch(0.3 0 0); /* 1 */
 
    /* Semantic */
-   --color-success: oklch(0.7 0.2 150);
+   --color-success: oklch(0.7 0.16 150);
    --color-error: oklch(0.7 0.2 25);
-   --color-warning: oklch(0.9 0.2 95);
+   --color-warning: oklch(0.9 0.18 95);
 
    /* Accent / secondary */
-   /* --color-accent: oklch(0.6 0.15 290); */                                 
+   /* --color-accent: oklch(0.6 0.15 290); */
    --color-accent: oklch(0.8 0.16 250);
+
+   --color-animated-body: var(--color-main-light);
+   --color-animated-border: oklch(0.6 0.2 320);
 
    /* Brand */
    --color-brand-spotify: #1ed760;
@@ -42,14 +45,14 @@
    .animate-border {
       border: 4px solid #0000;
       background:
-         linear-gradient(var(--color-main-light), var(--color-main-light)) padding-box,
-         linear-gradient(var(--angle), var(--color-main-border), #ae44ab) border-box;
+         linear-gradient(var(--color-animated-body), var(--color-animated-body)) padding-box,
+         linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
       animation: 7s rotate linear infinite;
       transition: all 0.3s ease;
    }
    .animate-border:hover {
       animation: none;
-      border-color: #ae44ab;
+      border-color: var(--color-animated-border);
    }
 
    @keyframes rotate {
@@ -98,6 +101,12 @@
    }
    .font-outline-sm {
       @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)];
+   }
+   .input-parent {
+      @apply border-2 border-main-border bg-gray-200 rounded-full flex items-center gap-1 px-1.5 w-fit h-[26px] transition-all text-sm;
+   }
+   .input-parent-no-padding {
+      @apply border-2 border-main-border bg-gray-200 rounded-full flex items-center gap-1 w-fit h-[26px] transition-all text-sm;
    }
    .bg-triangles {
       background:

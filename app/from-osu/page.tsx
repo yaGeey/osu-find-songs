@@ -27,10 +27,11 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Virtuoso } from 'react-virtuoso'
 import useTimeLeft from '@/hooks/useTimeLeft'
-const Select = dynamic(() => import('react-select'), { ssr: false })
-
-const CHUNK_SIZE = 10 // TODO make it dynamic depending on the songs length
-// TODO! yyaaay it's working, but loading spinner breaks. fix this
+import Dropdown from '@/components/selectors/Dropdown'
+import DropdownSort from '@/components/selectors/DropdownSort'
+import Search from '@/components/Search'
+import Toggle from '@/components/Toggle'
+import { FO_CHUNK_SIZE } from '@/variables'
 
 export default function FromOsu() {
    const router = useRouter()
@@ -40,10 +41,10 @@ export default function FromOsu() {
          router.push('/from-osu/select')
       }
    }, [songs, setSongs, router])
-   const chunkedLocal = chunkArray(songs, CHUNK_SIZE)
+   const chunkedLocal = chunkArray(songs, FO_CHUNK_SIZE)
 
    const [info, setInfo] = useState<CombinedSingleSimple | null>(null)
-   const [filters, setFilters] = useState<string[]>([])
+   const [exactSpotify, setExactSpotify] = useState(false)
    const [groupFn, setGroupFn] = useState<string>('no')
    const [sortFn, setSortFn] = useState('sort-date')
    const [isSettingsVisible, setIsSettingsVisible] = useState(false)
@@ -58,7 +59,7 @@ export default function FromOsu() {
 
    useEffect(() => {
       setInfo(null)
-   }, [filters, groupFn, sortFn])
+   }, [exactSpotify, groupFn, sortFn])
 
    // queries
    const spotifyQueries = useQueries({
@@ -163,7 +164,7 @@ export default function FromOsu() {
          if (group !== '') items.push({ type: 'group', key: group })
 
          if (group === '' || group === selectedGroup) {
-            const filtered = groupedDict[group].filter(filterFn(filters)).filter(searchFilterFn(search))
+            const filtered = groupedDict[group].filter(filterFn(exactSpotify)).filter(searchFilterFn(search))
             filtered.forEach((data) => {
                items.push({ type: 'card', data })
             })
@@ -171,7 +172,7 @@ export default function FromOsu() {
       }
 
       return items
-   }, [groupedDict, selectedGroup, filters, search])
+   }, [groupedDict, selectedGroup, exactSpotify, search])
 
    return (
       <div className="overflow-hidden">
@@ -202,98 +203,53 @@ export default function FromOsu() {
                   //TODO Зробити щоб можна змінювалась коли isSettingsVisible. Тре svg не імпорт а в окремий компонент можна
                   className={tw('hover:animate-spin hover:duration-2000 cursor-pointer', isSettingsVisible && 'brightness-130')}
                />
+               <CreatePlaylistButton
+                  data={combined.flatMap((item) => flatCombinedArray(item)).map((item) => item.spotify)}
+                  isDisabled={!isLoggedWithSpotify || isLoading}
+                  data-tooltip-id={!isLoggedWithSpotify || isLoading ? 'tooltip' : undefined}
+                  data-tooltip-content={
+                     isLoggedWithSpotify
+                        ? 'Wait for the Spotify data to load'
+                        : 'Log in to your Spotify account on a previous page to create a playlist'
+                  }
+               />
             </section>
-            <hr className="border-2 border-main-border h-3/4"></hr>
+            {/* <hr className="border-2 border-main-border h-3/4"></hr> */}
             <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />
 
-            <div
-               className="flex 2xl:gap-3 gap-1.5 items-center justify-center "
-               data-tooltip-id={isLoading ? 'tooltip' : undefined}
-               data-tooltip-content="Wait for the beatmaps data to load"
-            >
-               <label className="font-semibold hidden lgx:block" htmlFor="filter-select">
-                  Exact Spotify match
-               </label>
-               <input
-                  type="checkbox"
-                  id="filter-select"
-                  onChange={(e) => setFilters(e.target.checked ? ['exact-spotify'] : [])}
-                  className="mt-1 w-4 h-4 accent-main-border"
+            {/* <hr className="border-2 border-main-border h-3/4"></hr> */}
+
+            <section className="flex gap-2">
+               <Toggle
+                  value={exactSpotify}
+                  setValue={setExactSpotify}
                   disabled={isLoading}
+                  text={{ on: 'Exact Spotify', off: 'Any Spotify' }}
+                  width={130}
                />
-            </div>
-            <div
-               className="flex gap-3 justify-center items-center "
-               data-tooltip-id={isLoading ? 'tooltip' : undefined}
-               data-tooltip-content="Wait for the beatmaps data to load"
-            >
-               <label className="text-md font-semibold tracking-wider hidden xl:block" htmlFor="group-select">
-                  Group
-               </label>
-               <Select
-                  className="lg:w-[200px] min-w-[75px] w-fit z-1"
-                  onChange={(e: any) => setGroupFn(e.value)}
-                  id="group-select"
-                  defaultValue={groupOptions[0]}
+               <Dropdown
+                  onSelected={(option) => {
+                     console.log(option.value)
+                     setGroupFn(option.value ?? 'no')
+                  }}
+                  placeholder="Group by"
                   options={groupOptions}
-                  isDisabled={isLoading}
-                  styles={selectStyles}
-                  data-tooltip-id={isLoading ? 'tooltip' : undefined}
-                  data-tooltip-content="Wait for the beatmaps data to load"
+                  disabled={isLoading}
+                  width={100}
                />
-            </div>
-            <hr className="border-2 border-main-border h-3/4"></hr>
-            <div
-               className="flex gap-3 items-center justify-end"
-               data-tooltip-id={isLoading ? 'tooltip' : undefined}
-               data-tooltip-content="Wait for the beatmaps data to load"
-            >
-               <label className="text-md font-semibold hidden lgx:block" htmlFor="sort-select">
-                  Sort
-               </label>
-               <Select
-                  className="lg:w-[200px] min-w-[75px] w-fit z-1"
-                  onChange={(e: any) => setSortFn(e.value)}
-                  id="sort-select"
-                  defaultValue={sortOptions[0]}
-                  options={sortOptions}
-                  isDisabled={isLoading}
-                  styles={selectStyles}
+               <DropdownSort
+                  onSelected={({ query, order }) => {
+                     setSortFn(query ?? 'no')
+                     setSortOrder(order)
+                  }}
                />
-               <TextSwitch
-                  options={[
-                     {
-                        value: 'asc',
-                        label: <FontAwesomeIcon icon={faArrowUpShortWide} />,
-                     },
-                     {
-                        value: 'desc',
-                        label: <FontAwesomeIcon icon={faArrowDownWideShort} />,
-                     },
-                  ]}
-                  selected={sortOrder}
-                  setSelected={(value: string) => setSortOrder(value as 'asc' | 'desc')}
-                  className="h-[34px] ml-1"
-               />
-            </div>
-            <hr className="border-2 border-main-border h-3/4"></hr>
-            <div className="relative">
-               <input
-                  type="text"
-                  className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]"
-                  placeholder="Search"
-                  onChange={(e) => setSearch(e.target.value)}
-               />
-               <FontAwesomeIcon
-                  icon={faSearch}
-                  className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-400 text-lg"
-               />
-            </div>
+               <Search value={search} setValue={setSearch} placeholder="Search songs" width={200} disabled={isLoading} />
+            </section>
          </header>
 
          {/* content */}
-         <main className="max-h-[calc(100dvh-108px)] flex justify-center sm:justify-end">
-            <div className="h-[calc(100dvh-108px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-[56px]">
+         <main className="max-h-[calc(100dvh-56px)] flex justify-center sm:justify-end">
+            <div className="h-[calc(100dvh-56px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-[56px]">
                {info && <Info data={info} onClose={() => setInfo(null)} />}
             </div>
 
@@ -325,25 +281,12 @@ export default function FromOsu() {
                   </div>
                )}
                className="scrollbar w-full"
-               style={{ height: 'calc(100dvh - 108px)' }} // 108px = header + footer height. doesn't changing
+               style={{ height: 'calc(100dvh - 56px)' }} // 56px = header height
                overscan={300}
                defaultItemHeight={85}
             />
          </main>
 
-         <footer className="absolute bottom-0 left-0 bg-main border-t-4 border-main-border w-screen h-13 flex justify-center items-center px-8 gap-8 z-100">
-            <CreatePlaylistButton
-               data={combined.flatMap((item) => flatCombinedArray(item)).map((item) => item.spotify)}
-               className="w-[215px] py-1"
-               isDisabled={!isLoggedWithSpotify || isLoading}
-               data-tooltip-id={!isLoggedWithSpotify || isLoading ? 'tooltip' : undefined}
-               data-tooltip-content={
-                  isLoggedWithSpotify
-                     ? 'Wait for the Spotify data to load'
-                     : 'Log in to your Spotify account on a previous page to create a playlist'
-               }
-            />
-         </footer>
          <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
       </div>
    )

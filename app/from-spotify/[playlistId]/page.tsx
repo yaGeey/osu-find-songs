@@ -31,7 +31,7 @@ import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/Progres
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import { formatBytes } from '@/utils/numbers'
 import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
-const CHUNK_SIZE = 100
+import { FS_CHUNK_SIZE, MAPS_AMOUNT_TO_SHOW_VIRTUALIZED } from '@/variables'
 
 export default function PLaylistPage() {
    const params = useParams()
@@ -91,7 +91,7 @@ export default function PLaylistPage() {
    const mapsFetched = beatmapsets.flat().length
 
    // beatmapset search
-   const chunked = chunkArray(tracks, CHUNK_SIZE)
+   const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
    const beatmapsetQueries = useQueries({
       queries: chunked.map((chunk) => ({
          queryKey: ['search-from-spotify', chunk?.[0]?.track?.id ?? 'err'],
@@ -240,7 +240,7 @@ export default function PLaylistPage() {
                   onFilterChange={(filters) => setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))}
                />
 
-               {!isLoading && maps.length < 45 ? (
+               {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
                   <div className="flex p-4 gap-4 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100vh-3.5rem-127px)] scrollbar">
                      {maps.map((data, i) => {
                         if (data.length > 1 && data.length < 18)
@@ -278,35 +278,52 @@ export default function PLaylistPage() {
          {/* modals */}
          <Modal
             isOpen={modal?.type === 'confirm-download'}
-            onOkay={() => {
-               setModal({ type: 'downloading' })
-               handleDownloadAll()
-            }}
-            okBtn="Download"
-            onClose={() => setModal(null)}
-            closeBtn="Close"
-            state="info"
+            buttons={[
+               {
+                  onClick: () => setModal(null),
+                  text: 'Cancel',
+                  className: 'bg-error',
+               },
+               {
+                  onClick: () => {
+                     setModal({ type: 'downloading' })
+                     handleDownloadAll()
+                  },
+                  text: 'Download',
+                  className: 'bg-success',
+               },
+            ]}
+            status="info"
          >
             <p className="text-balance text-center">
                If there is more than one beatmap set for a song, the first one based on your search{' '}
-               <span className="text-accent font-outline">filters</span> will be downloaded
+               <span className="text-accent font-outline-sm">filters</span> will be downloaded
             </p>
             {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
          </Modal>
          <Modal
             isOpen={modal?.type === 'downloading' && progress !== null}
-            onOkay={() => setModal(null)}
-            okBtn="Got it"
-            state="info"
+            buttons={[
+               {
+                  onClick: () => setModal(null),
+                  text: 'Okay',
+                  className: 'bg-main-dark',
+               },
+            ]}
+            status="info"
          >
             Please wait, this may take some time. Don't close this page
          </Modal>
          <Modal
             isOpen={modal?.type === 'downloading' && progress === null}
-            onOkay={() => setModal(null)}
-            okBtn="Close"
-            state="success"
-            dialog
+            buttons={[
+               {
+                  onClick: () => setModal(null),
+                  text: 'Close',
+                  className: 'bg-main-dark',
+               },
+            ]}
+            status="success"
          >
             Downloaded successfully
          </Modal>
