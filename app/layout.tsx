@@ -10,6 +10,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import MobileDeviceCheck from '@/components/MobileDeviceCheck'
 import Telemetry from '@/components/Telemetry'
+import { Suspense } from 'react'
 // Prevent fontawesome from dynamically adding its css since we did it manually above
 config.autoAddCss = false
 
@@ -66,11 +67,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <body
                className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
             >
-               <Providers>
-                  <MobileDeviceCheck />
-                  <Telemetry />
-                  {children}
-               </Providers>
+               <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+                  <Providers>
+                     <MobileDeviceCheck />
+                     <Telemetry />
+                     {children}
+                  </Providers>
+               </Suspense>
                {process.env.NODE_ENV !== 'development' && <Analytics />}
             </body>
          </html>
