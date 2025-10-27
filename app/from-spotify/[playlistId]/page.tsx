@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
 import OsuCard from './_components/OsuCard'
-import { QueryFunctionContext, useInfiniteQuery, useQueries, useQueryClient } from '@tanstack/react-query'
-import { fetchWithToken } from '@/lib/Spotify'
+import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetchWithToken, getPlaylist } from '@/lib/Spotify'
 import { PlaylistPage } from '@/types/Spotify'
 import { Button } from '@/components/buttons/Buttons'
 import { beatmapsSearch } from '@/lib/osu'
@@ -54,6 +54,11 @@ export default function PLaylistPage() {
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
    const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
    const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
+
+   const { data: playlistInfo } = useQuery({
+      queryKey: ['spotify-playlist-info', playlistId],
+      queryFn: async () => getPlaylist(playlistId as string),
+   })
 
    // fetching playlist
    const {
@@ -179,7 +184,7 @@ export default function PLaylistPage() {
    const { text, progress, handleDownloadAll } = useDownloadAll(maps)
 
    return (
-      <div className="min-w-[685px] font-inter overflow-hidden">
+      <div className="min-w-[690px] font-inter overflow-hidden">
          <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}
@@ -216,32 +221,41 @@ export default function PLaylistPage() {
 
          <header
             className={tw(
-               'min-w-[685px] bg-triangles [--color-dialog:var(--color-main])]  fixed z-100 w-screen h-14 flex justify-center items-center px-4 gap-10 border-b-3 border-main-darker',
+               'min-w-[690px] bg-triangles [--color-dialog:var(--color-main])] fixed z-100 w-screen h-12 flex justify-between items-center px-4 gap-10 border-b-3 border-main-darker',
             )}
          >
-            <section className="absolute left-4 flex items-center gap-4">
+            <section className="flex items-center gap-4">
                <HomeBtn />
                <a href="https://github.com/yaGeey/osu-find-songs" target="_blank" rel="noopener noreferrer">
                   <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
                </a>
             </section>
-            <Button onClick={() => setModal({ type: 'confirm-download' })} className="text-white py-1 w-45" disabled={isLoading}>
+            <p className="absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray">{playlistInfo?.name}</p>
+            <Button
+               onClick={() => setModal({ type: 'confirm-download' })}
+               className="text-white py-0.5 px-5 bg-main-dark"
+               textClassName="font-outline-sm"
+               disabled={isLoading}
+            >
                Download all
                <FontAwesomeIcon icon={faDownload} className="ml-2" />
             </Button>
-            <Search beatmapsets={beatmapsets} onChange={setFilteredBeatmapsets} />
          </header>
 
-         <main className="flex justify-center items-center min-h-[calc(100vh-4rem)] mt-[56px]">
-            <div className=" min-h-[calc(100vh-3.5rem)] bg-main-darker [@media(min-width:980px)]:w-4/5 w-full  max-w-[1800px]">
-               <Filters
-                  foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
-                  disabled={isLoading}
-                  onFilterChange={(filters) => setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))}
-               />
+         <main className="flex justify-center min-h-[calc(100vh-3rem)] mt-12">
+            <div className="min-h-[calc(100vh-3rem)] bg-main-darker [@media(max-width:1000px)]:w-full [@media(max-width:1000px)]:min-w-[690px] w-4/5 min-w-[1000px] max-w-[1800px]">
+               <div className="bg-main-dark z-110 w-full top-12 px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
+                  <Filters
+                     foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
+                     disabled={isLoading}
+                     onFilterChange={(filters) => setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))}
+                     beatmapsets={beatmapsets}
+                     onSearch={setFilteredBeatmapsets}
+                  />
+               </div>
 
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
-                  <div className="flex p-4 gap-4 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100vh-3.5rem-127px)] scrollbar">
+                  <div className="flex p-4 gap-4 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100vh-3rem-127px)] scrollbar pb-12">
                      {maps.map((data, i) => {
                         if (data.length > 1 && data.length < 18)
                            return (

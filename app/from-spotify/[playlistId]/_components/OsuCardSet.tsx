@@ -3,7 +3,7 @@ import { BeatmapSet } from '@/types/Osu'
 import OsuCard from './OsuCard'
 import { twMerge as tw } from 'tailwind-merge'
 import ReactDom from 'react-dom'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -56,7 +56,7 @@ export default function OsuCardSet({
                      }
                      onClick={(e) => e.stopPropagation()}
                   >
-                     <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-dark w-full border-b-2 border-main-border">
+                     <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-dark w-full border-b-3 border-main-border">
                         <h4>Sort by</h4>
                         <SwitchSort
                            options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites']}
@@ -71,7 +71,7 @@ export default function OsuCardSet({
                         />
                      </div>
                      <div className="h-full bg-main-darker overflow-y-auto scrollbar">
-                        <div className="items flex p-4 gap-4 flex-wrap pb-20">
+                        <div className="flex p-4 gap-4 flex-wrap pb-20">
                            {maps.map((beatmapset, i) => (
                               <OsuCard
                                  key={beatmapset.id}

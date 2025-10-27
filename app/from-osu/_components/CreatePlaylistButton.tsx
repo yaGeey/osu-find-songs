@@ -122,7 +122,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             onClick={() => handleCreatePlaylist()}
             data-tooltip-id="tooltip-1"
             data-tooltip-content="Create playlist on your Spotify account and populate it with tracks with filter 'Exact Spotify match'"
-            className={tw('bg-main-dark-vivid md:whitespace-nowrap w-fit', className)}
+            className={tw('bg-main-dark-vivid md:whitespace-nowrap w-fit py-0.5 px-5', className)}
          >
             Create playlist
             <FontAwesomeIcon icon={faSpotify} className="ml-1.5 text-lg mt-0.5" />

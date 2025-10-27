@@ -191,7 +191,7 @@ export default function FromOsu() {
                : `${spotifyQueries.filter((q) => !q.isLoading).length}/${songs.length} | ${timeLeftSpotify} left`}
          </Progress>
 
-         <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-14 flex justify-between items-center px-4 gap-3">
+         <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-12 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
                <HomeBtn />
                <Image
@@ -214,11 +214,7 @@ export default function FromOsu() {
                   }
                />
             </section>
-            {/* <hr className="border-2 border-main-border h-3/4"></hr> */}
             <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />
-
-            {/* <hr className="border-2 border-main-border h-3/4"></hr> */}
-
             <section className="flex gap-2">
                <Toggle
                   value={exactSpotify}
@@ -248,8 +244,8 @@ export default function FromOsu() {
          </header>
 
          {/* content */}
-         <main className="max-h-[calc(100dvh-56px)] flex justify-center sm:justify-end">
-            <div className="h-[calc(100dvh-56px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-[56px]">
+         <main className="max-h-[calc(100dvh-48px)] flex justify-center sm:justify-end">
+            <div className="h-[calc(100dvh-48px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-12">
                {info && <Info data={info} onClose={() => setInfo(null)} />}
             </div>
 
@@ -281,7 +277,7 @@ export default function FromOsu() {
                   </div>
                )}
                className="scrollbar w-full"
-               style={{ height: 'calc(100dvh - 56px)' }} // 56px = header height
+               style={{ height: 'calc(100dvh - 48px)' }}
                overscan={300}
                defaultItemHeight={85}
             />

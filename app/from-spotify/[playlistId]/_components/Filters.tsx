@@ -5,16 +5,22 @@ import { twMerge as tw } from 'tailwind-merge'
 import { useQueryState } from 'nuqs'
 import DropdownFilterMulti from '@/components/selectors/DropdownFilterMulti'
 import { SelectedOption } from '@/components/selectors/FilterOptions'
+import { BeatmapSet } from '@/types/Osu'
+import Search from './Search'
 // TODO If =1 then res: 1 - 1.99
 
 export default function Filters({
    foundString,
    disabled = false,
    onFilterChange,
+   beatmapsets,
+   onSearch,
 }: {
    foundString?: string
    disabled?: boolean
    onFilterChange: (filters: SelectedOption[]) => void
+   beatmapsets: BeatmapSet[][]
+   onSearch: React.Dispatch<React.SetStateAction<BeatmapSet[][]>>
 }) {
    const [m, setM] = useQueryState('m', { defaultValue: '' })
    const [s, setS] = useQueryState('s', { defaultValue: '' })
@@ -22,11 +28,7 @@ export default function Filters({
    // useEffect(() => { if (sort) setSort('') }, []) //? don't work, don't know why it's not clearing
 
    return (
-      <div
-         className={tw(
-            'bg-main-dark z-110 sticky top-[56px] px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border ',
-         )}
-      >
+      <div>
          {/* Main filters */}
          <div className="flex justify-between text-[15px]">
             <div className="flex items-center gap-6.5 text-[15px]">
@@ -42,6 +44,7 @@ export default function Filters({
                   onChange={(val) => setM(val)}
                />
             </div>
+            <Search beatmapsets={beatmapsets} onChange={onSearch} disabled={disabled} />
          </div>
          <section className="flex items-center gap-7.5 mt-3 text-[15px]">
             <h4>State</h4>

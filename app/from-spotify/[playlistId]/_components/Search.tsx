@@ -1,21 +1,25 @@
 import { BeatmapSet } from '@/types/Osu'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import SearchComponents from '@/components/Search'
+import { useEffect, useState } from 'react'
 
 export default function Search({
    beatmapsets,
    onChange,
+   disabled = false,
 }: {
    beatmapsets: BeatmapSet[][]
    onChange: (beatmapsets: BeatmapSet[][]) => void
+   disabled?: boolean
 }) {
-   function handleSearch(search: string) {
+   const [value, setValue] = useState('')
+
+   useEffect(() => {
       const timer = setTimeout(() => {
          onChange(
             beatmapsets.map((beatmapset) =>
                beatmapset.filter((beatmap) => {
-                  if (!search.length) return true
-                  const val = search.toLowerCase()
+                  if (!value.length) return true
+                  const val = value.toLowerCase()
                   return (
                      beatmap.artist.toLowerCase().includes(val) ||
                      beatmap.title.toLowerCase().includes(val) ||
@@ -26,17 +30,7 @@ export default function Search({
          )
       }, 400)
       return () => clearTimeout(timer)
-   }
+   }, [value, beatmapsets])
 
-   return (
-      <div className="relative">
-         <input
-            type="text"
-            className="bg-white rounded-lg h-[34px] px-3 outline-none text-[14px] w-[250px]"
-            placeholder="Search"
-            onChange={(e) => handleSearch(e.target.value)}
-         />
-         <FontAwesomeIcon icon={faSearch} className="absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-400 text-lg" />
-      </div>
-   )
+   return <SearchComponents value={value} setValue={setValue} width={250} disabled={disabled} />
 }

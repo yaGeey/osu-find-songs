@@ -33,7 +33,7 @@ export default function Modal({
                status === 'loading' && '[--color-animated-border:var(--color-main-subtle)]',
             )}
          >
-            <div className="flex-1 p-3 flex flex-col gap-2 justify-center items-center">{children}</div>
+            <div className="flex-1 p-3 flex flex-col gap-2 justify-center items-center font-medium">{children}</div>
             <div className="flex gap-2 justify-center mt-3 shadow-none">
                {buttons.map(
                   (btn, index) =>

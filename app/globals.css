@@ -23,7 +23,8 @@
    --color-accent: oklch(0.8 0.16 250);
 
    --color-animated-body: var(--color-main-light);
-   --color-animated-border: oklch(0.6 0.2 320);
+   /* --color-animated-border: oklch(0.6 0.2 320); */
+   --color-animated-border: oklch(0.6 0.15 290);
 
    /* Brand */
    --color-brand-spotify: #1ed760;
@@ -50,7 +51,9 @@
       animation: 7s rotate linear infinite;
       transition: all 0.3s ease;
    }
-   .animate-border:hover {
+   .animate-border:hover,
+   .animate-border-from-osu:hover,
+   .animate-border-from-spotify:hover {
       animation: none;
       border-color: var(--color-animated-border);
    }
@@ -60,7 +63,6 @@
          --angle: 360deg;
       }
    }
-
    @property --angle {
       syntax: '<angle>';
       initial-value: 0deg;
@@ -114,6 +116,12 @@
          url(/osu/tris2.png) no-repeat top right,
          var(--color-dialog);
    }
+   .bg-test {
+      background-color: var(--color-main);
+      background-image: url('https://osu.ppy.sh/assets/images/nav2-background-hue0.1aba1596.png');
+      background-blend-mode: luminosity;
+      filter: none;
+   }
    .bg-triangles-faded {
       background:
          linear-gradient(transparent, var(--color-dialog) 60px, var(--color-dialog) 100%),
@@ -126,6 +134,37 @@
          linear-gradient(transparent, var(--color-dialog) 60px, var(--color-dialog) 100%),
          url(/osu/tris2.png) no-repeat top right,
          var(--color-dialog);
+   }
+
+   .animate-border-from-spotify {
+      border: 3px solid #0000;
+      background:
+         linear-gradient(to right, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+         linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
+      animation: 5s rotate linear infinite;
+      transition: all 0.3s ease;
+   }
+   .border-from-spotify {
+      border: 3px solid #0000;
+      background:
+         linear-gradient(to right, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+         linear-gradient(var(--angle), var(--color-main-border), var(--color-main-border)) border-box;
+      transition: all 0.3s ease;
+   }
+   .animate-border-from-osu {
+      border: 3px solid #0000;
+      background:
+         linear-gradient(to left, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+         linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
+      animation: 5s rotate linear infinite;
+      transition: all 0.3s ease;
+   }
+   .border-from-osu {
+      border: 3px solid #0000;
+      background:
+         linear-gradient(to left, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+         linear-gradient(var(--angle), var(--color-main-border), var(--color-main-border)) border-box;
+      transition: all 0.3s ease;
    }
 }
 

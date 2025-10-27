@@ -7,6 +7,9 @@ import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { ToastContainer, toast } from 'react-toastify'
 import { getServerToken } from '@/lib/Spotify'
+import Footer from '@/components/Footer'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCopy, faUpload } from '@fortawesome/free-solid-svg-icons'
 
 // prettier-ignore
 export default function SelectPage() {
@@ -92,15 +95,28 @@ export default function SelectPage() {
    }
 
    return (
-      <>
+      <div className="flex flex-col justify-center items-center min-h-screen text-white">
          <BgImage />
-         <div className="absolute mx-auto top-1/2 -translate-y-1/2 left-0 right-0 w-fit font-inter">
-            <div className="overflow-hidden animate-border rounded-2xl px-10 py-7 shadow-lg select-none cursor-pointer hover:shadow-lg hover:brightness-110 transition-all duration-300 flex flex-col justify-center items-center">
-               <h1 className="font-medium text-xl">
-                  Click to browse your osu! beatmaps folder
-               </h1>
-               <span className="text-main-border">C:/Users/.../AppData/Local/osu!/Songs</span>
-               <h3 className="text-sm mt-2">⚠️ This may take some time depending on the number of beatmaps ⚠️</h3>
+         <div className="flex flex-col justify-center items-center flex-1 text-nowrap">
+            <h1 className="text-4xl tracking-tight font-semibold mb-3">Select your osu! beatmaps folder</h1>
+            <h3 className="text-lg text-white/60">This may take some time</h3>
+            <div className="text-xl flex items-center gap-2">
+               <h2
+                  className="cursor-pointer hover:underline active:text-main-white"
+                  onClick={(e) => {
+                     navigator.clipboard.writeText(e.currentTarget.innerText)
+                     toast.success('Copied to clipboard!')
+                  }}
+               >
+                  %LocalAppData%\osu!\Songs
+               </h2>
+               <FontAwesomeIcon icon={faCopy} />
+            </div>
+            <div className="relative border-2 border-dashed w-full border-main rounded-lg mt-7 p-8 text-center relative hover:brightness-125 transition-all">
+               <div className="text-main pointer-none">
+                  <FontAwesomeIcon icon={faUpload} className="text-5xl mb-3" />
+                  <div className="text-lg font-medium">Click to select folder</div>
+               </div>
                {/* @ts-expect-error */}
                <input directory=""
                   webkitdirectory=""
@@ -118,11 +134,12 @@ export default function SelectPage() {
                         },
                      })
                   }}
-                  className="opacity-0 absolute top-0 left-0 w-full h-full"
+                  className="absolute opacity-0 top-0 left-0 w-full h-full"
                />
             </div>
          </div>
          <ToastContainer />
-      </>
+         <Footer />
+      </div>
    )
 }

@@ -14,7 +14,7 @@ export default function BgImage({ image, className }: { image?: string; brightne
    const [isLoaded, setIsLoaded] = useState(false)
    const [number] = useState(() => Math.floor(Math.random() * links.length))
    return (
-      <div className={tw('fixed -z-10 top-0 left-0 w-full h-full brightness-[.4]', className)}>
+      <div className={tw('fixed -z-10 top-0 left-0 w-full h-full brightness-[.5]', className)}>
          <Image
             // src={image || links[number]}
             src={image || '/bg.svg'}

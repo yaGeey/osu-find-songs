@@ -48,7 +48,7 @@ export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; 
    return (
       <VirtuosoGrid
          className="scrollbar"
-         style={{ height: 'calc(100vh - 3.5rem - 127px)' }} // Virtuoso потребує контейнера з визначеною висотою
+         style={{ height: 'calc(100vh - 3rem - 127px)' }} // Virtuoso потребує контейнера з визначеною висотою (header 3rem + filters 127px)
          data={maps}
          components={{
             List: ListContainer,
