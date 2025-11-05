@@ -244,7 +244,7 @@ export default function PLaylistPage() {
 
          <main className="flex justify-center min-h-[calc(100vh-3rem)] mt-12">
             <div className="min-h-[calc(100vh-3rem)] bg-main-darker [@media(max-width:1000px)]:w-full [@media(max-width:1000px)]:min-w-[690px] w-4/5 min-w-[1000px] max-w-[1800px]">
-               <div className="bg-main-dark z-110 w-full top-12 px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
+               <div className="[background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full top-12 px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
                   <Filters
                      foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                      disabled={isLoading}

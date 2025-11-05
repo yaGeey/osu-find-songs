@@ -28,9 +28,9 @@ export default function Filters({
    // useEffect(() => { if (sort) setSort('') }, []) //? don't work, don't know why it's not clearing
 
    return (
-      <div>
+      <div className="relative">
          {/* Main filters */}
-         <div className="flex justify-between text-[15px]">
+         <div className="flex justify-between text-[15px] ">
             <div className="flex items-center gap-6.5 text-[15px]">
                <h4>Mode</h4>
                <SwitchFullDict

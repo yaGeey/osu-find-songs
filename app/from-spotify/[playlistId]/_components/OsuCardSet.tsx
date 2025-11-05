@@ -56,7 +56,7 @@ export default function OsuCardSet({
                      }
                      onClick={(e) => e.stopPropagation()}
                   >
-                     <div className="flex items-center justify-center gap-4 text-[15px] text-white p-4 bg-main-dark w-full border-b-3 border-main-border">
+                     <div className="[background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r-t.svg)_no-repeat_top_right,var(--color-main-dark)] flex items-center justify-center gap-4 text-[15px] text-white p-4 w-full border-b-3 border-main-border">
                         <h4>Sort by</h4>
                         <SwitchSort
                            options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites']}

@@ -112,8 +112,8 @@
    }
    .bg-triangles {
       background:
-         url(/osu/tris.png) no-repeat,
-         url(/osu/tris2.png) no-repeat top right,
+         url(/osu/tris-l-t.svg) no-repeat,
+         url(/osu/tris-r-t.svg) no-repeat top right,
          var(--color-dialog);
    }
    .bg-test {
