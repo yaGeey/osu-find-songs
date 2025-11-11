@@ -44,7 +44,7 @@ export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; 
          )
       },
    )
-   
+
    return (
       <VirtuosoGrid
          className="scrollbar"
@@ -58,29 +58,20 @@ export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; 
          }}
          overscan={250}
          totalCount={maps.length}
-         itemContent={(index, data) => {
-            // Логіка рендерингу OsuCardSet або OsuCard
-            if (data.length > 1 && data.length < 18) {
-               return (
-                  <OsuCardSet
-                     key={data[0].id + index}
-                     beatmapsets={data}
-                     sortQuery={sortQuery}
-                     className="w-full animate-in fade-in duration-500" // ItemContainer - flex-grow -> w-full
-                  />
-               )
-            } else {
-               return (
-                  <div className="h-[105px]">
-                     <OsuCard
-                        key={data[0].id}
-                        beatmapset={data[0]}
-                        className="w-full animate-in fade-in duration-500 shadow-sm"
-                     />
-                  </div>
-               )
-            }
-         }}
+         itemContent={(index, data) =>
+            data.length > 1 && data.length < 18 ? (
+               <OsuCardSet
+                  key={data[0].id + index}
+                  beatmapsets={data}
+                  sortQuery={sortQuery}
+                  className="w-full animate-in fade-in duration-500" // ItemContainer - flex-grow -> w-full
+               />
+            ) : (
+               <div className="h-[105px]">
+                  <OsuCard key={data[0].id} beatmapset={data[0]} className="w-full animate-in fade-in duration-500 shadow-sm" />
+               </div>
+            )
+         }
       />
    )
 }
