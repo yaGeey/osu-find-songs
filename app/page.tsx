@@ -14,7 +14,7 @@ export default function LandingPage() {
       <div className="flex flex-col justify-center items-center min-h-screen text-white -z-1">
          <BgImage />
          <div className="mb-11 flex flex-col gap-20 items-center mt-24 [@media(max-width:1300px)]:mt-1">
-            <div className="h-[400px] flex gap-16 justify-center items-center [@media(max-width:1300px)]:flex-col [@media(max-width:1300px)]:h-[840px]">
+            <div className="h-[400px] flex gap-16 justify-center items-center [@media(max-width:1300px)]:flex-col [@media(max-width:1300px)]:h-[800px]">
                <div className="w-[600px] h-full px-5 py-10">
                   <div className="flex gap-6 items-center ">
                      <Image src="/icon.png" width={80} height={80} alt="logo" className="drop-shadow-sm" />
@@ -66,7 +66,7 @@ export default function LandingPage() {
                   </span>
                </div>
             </div>
-            <div className="flex gap-44 text-xl font-medium _mb-11 _mt-20">
+            <div className="flex gap-44 text-xl font-medium _mb-11 _mt-20 [@media(max-width:1300px)]:gap-8">
                <Link href="/from-osu/select">
                   <Button
                      className={tw(
