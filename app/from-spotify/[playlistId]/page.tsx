@@ -282,7 +282,7 @@ export default function PLaylistPage() {
                            />
                         ),
                      )}
-                     {maps.length % 2 && <div className="flex-grow h-26 min-w-[386px] w-[464px]" />}
+                     {!!(maps.length % 2) && <div className="flex-grow h-26 min-w-[386px] w-[464px]" />}
                   </div>
                ) : (
                   <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
