@@ -18,6 +18,8 @@ export default function ImageFallback({
          onError={() => {
             setImgSrc(fallbackSrc)
          }}
+         unoptimized
+         decoding="async"
       />
    )
 }

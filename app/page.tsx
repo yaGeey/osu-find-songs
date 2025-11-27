@@ -6,10 +6,12 @@ import Image from 'next/image'
 import Footer from '@/components/Footer'
 import { useQueryState } from 'nuqs'
 import { twMerge as tw } from 'tailwind-merge'
+import { useState } from 'react'
 import './page.css'
 
 export default function LandingPage() {
    const [details, setDetails] = useQueryState('details', { defaultValue: '' })
+   const [imagesLoaded, setImagesLoaded] = useState({ osu: false, spotify: false })
    return (
       <div className="flex flex-col justify-center items-center min-h-screen text-white -z-1">
          <BgImage />
@@ -38,24 +40,44 @@ export default function LandingPage() {
                >
                   <div
                      className={tw(
-                        'w-[560px] h-[350px] bg-[url(/from-osu.png)] bg-cover bg-center absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer transition-all duration-700',
+                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer transition-all duration-700 overflow-hidden',
+                        !imagesLoaded.osu && 'opacity-0',
                         details === 'from-osu'
                            ? 'card-front go-front'
                            : details === 'from-spotify'
                              ? 'card-back go-back'
                              : 'card-back',
                      )}
-                  />
+                  >
+                     <Image
+                        src="/from-osu.png"
+                        alt="From osu! to Spotify"
+                        fill
+                        priority
+                        className="object-cover"
+                        onLoad={() => setImagesLoaded((p) => ({ ...p, osu: true }))}
+                     />
+                  </div>
                   <div
                      className={tw(
-                        'w-[560px] h-[350px] bg-[url(/from-spotify.png)] bg-cover bg-center absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer transition-all duration-700',
+                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer transition-all duration-700 overflow-hidden',
+                        !imagesLoaded.spotify && 'opacity-0',
                         details === 'from-spotify'
                            ? 'card-front go-front'
                            : details === 'from-osu'
                              ? 'card-back go-back'
                              : 'card-front',
                      )}
-                  />
+                  >
+                     <Image
+                        src="/from-spotify.png"
+                        alt="From Spotify to osu!"
+                        fill
+                        priority
+                        className="object-cover"
+                        onLoad={() => setImagesLoaded((p) => ({ ...p, spotify: true }))}
+                     />
+                  </div>
 
                   <span className="absolute -bottom-7 right-0 text-base text-white/60 flex gap-2">
                      {/* prettier-ignore */}

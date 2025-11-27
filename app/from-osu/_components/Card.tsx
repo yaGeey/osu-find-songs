@@ -75,6 +75,7 @@ function Card({
                      alt={local.title || 'alt'}
                      fill
                      style={{ objectFit: 'cover' }}
+                     unoptimized
                   />
                </div>
             )}
