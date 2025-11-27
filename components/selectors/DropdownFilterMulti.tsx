@@ -7,7 +7,13 @@ import DropdownInput from './bricks/DropdownInput'
 import DropdownFilterSelect from './bricks/DropdownFilterSelect'
 import DropdownValueInput from './bricks/DropdownValueInput'
 
-export default function DropdownFilterMultiDropdownFilter({ onSelected }: { onSelected: (options: SelectedOption[]) => void }) {
+export default function DropdownFilterMultiDropdownFilter({
+   onSelected,
+   disabled = false,
+}: {
+   onSelected: (options: SelectedOption[]) => void
+   disabled?: boolean
+}) {
    const [query, setQuery] = useState('')
    const [value, setValue] = useState<number | string>('')
    const [selected, setSelected] = useState<SelectedOption[]>([])
@@ -34,7 +40,7 @@ export default function DropdownFilterMultiDropdownFilter({ onSelected }: { onSe
 
    return (
       <div
-         className={tw('input-parent')}
+         className={tw('input-parent', disabled && 'brightness-75 pointer-events-none')}
          onKeyDown={(e) => {
             if (e.key !== 'Enter') return
             if (query && value) addItem()

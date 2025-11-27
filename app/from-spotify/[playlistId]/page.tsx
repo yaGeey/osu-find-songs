@@ -32,6 +32,7 @@ import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import { formatBytes } from '@/utils/numbers'
 import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
 import { FS_CHUNK_SIZE, MAPS_AMOUNT_TO_SHOW_VIRTUALIZED } from '@/variables'
+import DevLoadingTime from '@/components/DevLoadingTime'
 
 export default function PLaylistPage() {
    const params = useParams()
@@ -64,7 +65,7 @@ export default function PLaylistPage() {
    const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
    const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
 
-   const { data: playlistInfo } = useQuery({
+   const { data: playlistInfo, isLoading: playlistLoading } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
       queryFn: async () => getPlaylist(playlistId as string),
    })
@@ -121,7 +122,7 @@ export default function PLaylistPage() {
             }
 
             try {
-               const { data } = await axios.post<BeatmapSet[][]>('/api/batch/osu-search', body, { signal })
+               const { data } = await axios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, { signal })
                addTimeLeft(performance.now() - t0)
                return data
             } catch (err: any) {
@@ -137,7 +138,7 @@ export default function PLaylistPage() {
       })),
    })
 
-   const isLoading = beatmapsetQueries.some((q) => q.isLoading) || isTracksLoadingFinal
+   const isLoading = beatmapsetQueries.some((q) => q.isLoading) || isTracksLoadingFinal || playlistLoading
    const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // setting data for display
@@ -146,6 +147,7 @@ export default function PLaylistPage() {
          .filter((q) => q.data !== undefined)
          .map((q) => q.data)
          .flat()
+         .filter((item): item is BeatmapSet[] => item !== null)
       setBeatmapsets(data)
       setFilteredBeatmapsets(data)
    }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length])
@@ -194,6 +196,7 @@ export default function PLaylistPage() {
 
    return (
       <div className="min-w-[690px] font-inter overflow-hidden">
+         <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
          <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}
@@ -239,7 +242,14 @@ export default function PLaylistPage() {
                   <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
                </a>
             </section>
-            <p className="absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray">{playlistInfo?.name}</p>
+            <p
+               className={tw(
+                  'absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray',
+                  isLoading && 'animate-pulse',
+               )}
+            >
+               {playlistInfo?.name}
+            </p>
             <Button
                onClick={() => setModal({ type: 'confirm-download' })}
                className="text-white py-0.5 px-5 bg-main-dark"
@@ -252,7 +262,7 @@ export default function PLaylistPage() {
          </header>
 
          <main className="flex justify-center min-h-[calc(100vh-3rem)] mt-12">
-            <div className="min-h-[calc(100vh-3rem)] bg-main-darker [@media(max-width:1000px)]:w-full [@media(max-width:1000px)]:min-w-[690px] w-4/5 min-w-[1000px] max-w-[1800px]">
+            <div className="relative min-h-[calc(100vh-3rem)] bg-main-darker [@media(max-width:1000px)]:w-full [@media(max-width:1000px)]:min-w-[690px] w-4/5 min-w-[1000px] max-w-[1800px]">
                {/* TODO background image from playlist */}
                <div className="[background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full top-12 px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
                   <Filters
@@ -293,7 +303,7 @@ export default function PLaylistPage() {
                      <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
                   </div>
                )}
-               {isLoading && maps.length && <Loading />}
+               {isLoading && <Loading className="top-39 h-[calc(100%-9.75rem)]" radius={50} />}
             </div>
          </main>
 

@@ -32,7 +32,7 @@ export default function SwitchSort({
          data-tooltip-delay-show={500}
          className={tw(
             'bg-main-subtle font-inter border-2 border-main-border pl-7 rounded-full flex items-center gap-2.5 px-2.5 select-none',
-            disabled && 'brightness-60 pointer-events-none',
+            disabled && 'brightness-75 pointer-events-none',
          )}
       >
          {options.map((option, i) => (

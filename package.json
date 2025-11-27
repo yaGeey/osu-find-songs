@@ -41,6 +41,7 @@
       "next-auth": "^4.24.11",
       "next-intl": "^3.26.3",
       "nuqs": "^2.4.1",
+      "p-limit": "^7.2.0",
       "react": "19.2.0",
       "react-dom": "19.2.0",
       "react-error-boundary": "^5.0.0",

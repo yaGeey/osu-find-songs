@@ -3,9 +3,8 @@ import { cookies } from 'next/headers'
 import { Song } from '@/types/types'
 import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spotifySearchConditions'
 import { Playlist, SpotifyAuthResponse, SpotifyError, TrackFull } from '@/types/Spotify'
-import axios from 'axios'
-import { axiosErrorHandler, unexpectedErrorHandler } from './errorHandlers'
-// import { H } from '@highlight-run/next/server'
+import { isAxiosError } from 'axios'
+import { customAxios as axios } from './axios'
 
 export async function getServerToken(): Promise<string> {
    let token = (await cookies()).get('spotifyToken')?.value
@@ -24,7 +23,7 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUse
       token = isUserToken ? await getUserToken() : await getServerToken()
       return await func(token)
    } catch (err) {
-      if (axios.isAxiosError<SpotifyError>(err)) {
+      if (isAxiosError<SpotifyError>(err)) {
          if (err.response?.data.error.status === 429 && token) {
             const wait = parseInt(err.response?.headers?.['Retry-After'])
             if (wait > 60 || isNaN(wait)) throw new Error(`Spotify rate limit: wait too long (${wait}s)`)
@@ -32,8 +31,7 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUse
             await new Promise((resolve) => setTimeout(resolve, wait * 1000 + 1))
             return await func(token)
          }
-         axiosErrorHandler(err, 'Spotify')
-      } else unexpectedErrorHandler(err, 'Spotify')
+      }
       throw err
    }
 }
@@ -114,7 +112,6 @@ export async function getPlaylist(playlistId: string): Promise<Playlist | undefi
       const { data } = await axios.get<Playlist>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
          headers: { Authorization: `Bearer ${token}` },
       })
-      // H.log('get_playlist', 'log')
       return data
    })
 }

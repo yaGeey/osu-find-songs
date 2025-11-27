@@ -1,14 +1,10 @@
 'use server'
 import { BeatmapSet } from '@/types/Osu'
 import axios from 'axios'
-import { axiosErrorHandler, unexpectedErrorHandler } from './errorHandlers'
+import { customAxios } from './axios'
 
 let osuToken: string | null = null
 let tokenRefreshing: Promise<string> | null = null
-const customAxios = axios.create({
-   httpAgent: new (require('http')).Agent({ keepAlive: true }),
-   httpsAgent: new (require('https')).Agent({ keepAlive: true }),
-})
 
 async function getToken(): Promise<string> {
    if (osuToken) return osuToken
@@ -21,19 +17,20 @@ async function getToken(): Promise<string> {
    return tokenRefreshing
 }
 
-async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
+async function fetchOsu<T>(func: (token: string) => Promise<T>, retries = 1): Promise<T> {
    const token = await getToken()
    try {
       return await func(token)
    } catch (err) {
       if (axios.isAxiosError<{ error: string }>(err)) {
-         if (err.response?.data.error === 'Too Many Attempts.' && token) {
-            console.warn(`OSU: Too many attempts, retrying in 1s...`)
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            return await func(token)
+         if ((err.response?.status === 429 || err.response?.data.error === 'Too Many Attempts') && retries > 0) {
+            const jitter = Math.random() * 400
+            const delay = 300 + jitter
+            console.warn(`OSU 429. Retry in ${Math.floor(delay)}ms`)
+            await new Promise((resolve) => setTimeout(resolve, delay))
+            return fetchOsu(func, retries - 1)
          }
-         axiosErrorHandler(err, 'OSU')
-      } else unexpectedErrorHandler(err, 'OSU')
+      }
       throw err
    }
 }
@@ -61,7 +58,7 @@ export async function beatmapsSearch(queries: { [key: string]: string | null }):
          })
          .join('&')
 
-      const res = await axios.get(`https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`, {
+      const res = await customAxios.get(`https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`, {
          headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -81,7 +78,7 @@ export async function revalidateOsuToken(): Promise<string> {
       scope: 'public',
    })
 
-   const { data } = await axios.post<{
+   const { data } = await customAxios.post<{
       access_token: string
       expires_in: number
       token_type: string
