@@ -8,12 +8,11 @@ export default function ExternalLink({
    href,
    disabled,
    ...props
-}: HTMLAttributes<HTMLAnchorElement> & { href: string, disabled?: boolean }) {
+}: HTMLAttributes<HTMLAnchorElement> & { href: string; disabled?: boolean }) {
    return (
       <a
          href={href}
          target="_blank"
-         rel="noopener noreferrer"
          className={tw('selected hover:underline flex items-center', className, disabled ? 'pointer-events-none opacity-50' : '')}
          {...props}
       >

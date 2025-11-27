@@ -5,7 +5,6 @@ import { faHeart, faCirclePlay, faCircleCheck, faStar } from '@fortawesome/free-
 import { faDownload, faFileVideo, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
-import { Tooltip } from 'react-tooltip'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef, useState } from 'react'
 import ImageFallback from '@/components/ImageFallback'
@@ -83,7 +82,7 @@ export default function OsuCard({
                   </button>
                   <div className="relative flex-grow flex justify-end overflow-hidden">
                      <ImageFallback
-                        src={beatmapset.covers.card}
+                        src={beatmapset.covers.cover}
                         alt="cover"
                         width={286}
                         height={100}
@@ -116,11 +115,7 @@ export default function OsuCard({
                         <FontAwesomeIcon icon={faStar} />
                         <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
                         <FontAwesomeIcon icon={faCircleCheck} />
-                        <span
-                           className="-ml-1.75 -mb-0.25"
-                           data-tooltip-id={'tooltip' + beatmapset.id}
-                           data-tooltip-content={dateString}
-                        >
+                        <span className="-ml-1.75 -mb-0.25" data-tooltip-id={'tooltip'} data-tooltip-content={dateString}>
                            {new Date(
                               beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date,
                            ).toLocaleDateString()}
@@ -153,7 +148,7 @@ export default function OsuCard({
                                           .map((beatmap, j) => (
                                              <div
                                                 style={getColor(beatmap.difficulty_rating)}
-                                                data-tooltip-id={'tooltip' + beatmapset.id}
+                                                data-tooltip-id={'tooltip'}
                                                 data-tooltip-content={`${beatmap.mode} | ${beatmap.difficulty_rating} - ${beatmap.version}`}
                                                 key={j}
                                                 className="h-[15px] w-[8px] rounded-full drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.15)]"
@@ -182,7 +177,7 @@ export default function OsuCard({
                            icon={beatmapset.video ? faFileVideo : faDownload}
                            onClick={handleDownload}
                            className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
-                           data-tooltip-id={'tooltip' + beatmapset.id}
+                           data-tooltip-id={'tooltip'}
                            data-tooltip-content={beatmapset.video ? 'Download with video' : 'Download without video'}
                            data-tooltip-delay-show={400}
                         />
@@ -190,11 +185,6 @@ export default function OsuCard({
                         <Loading color="4b2e2e" radius={15} />
                      )}
                   </div>
-                  <Tooltip
-                     id={'tooltip' + beatmapset.id}
-                     place="top"
-                     style={{ fontSize: '11px', padding: '0 0.25rem', zIndex: 100000 }}
-                  />
                </>
             }
          </div>

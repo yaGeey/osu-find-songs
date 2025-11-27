@@ -22,7 +22,6 @@ import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from '@fortawesome
 import { filterFn, searchFilterFn, groupArray, chunkArray, mergeGroupedArrays, flatCombinedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
 import DynamicBg from './_components/DynamicBg'
-import { Tooltip } from 'react-tooltip'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { Virtuoso } from 'react-virtuoso'
@@ -282,8 +281,6 @@ export default function FromOsu() {
                defaultItemHeight={85}
             />
          </main>
-
-         <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
       </div>
    )
 }

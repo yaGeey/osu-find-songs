@@ -24,7 +24,7 @@ export default function SelectPage() {
    return (
       <div className="flex flex-col justify-center items-center min-h-screen text-white">
          <BgImage />
-         <div className="flex flex-col justify-center items-center flex-1 text-nowrap">
+         <div className="flex flex-col justify-center items-center flex-1 text-nowrap mt-1">
             <h1 className="text-4xl tracking-tight font-semibold mb-3">Select a public playlist</h1>
             <h3 className="text-lg text-white/60">*NOT Album, Daily, Private playlist</h3>
             <h2 className="text-xl mt-7 mb-3">Right-click the playlist → Share → Copy link to playlist</h2>
@@ -49,8 +49,8 @@ export default function SelectPage() {
                   className="absolute top-1/2 transform -translate-y-1/2 right-2 text-lg text-black/80"
                />
             </div>
-            <span className={tw('text-left w-full ml-2 text-success -mt-0.5', !isLoading && 'hidden')}>Redirecting..</span>
-            <span className={tw('text-left w-full ml-2 text-error -mt-0.5', !isError && 'invisible')}>Invalid link</span>
+            <span className={tw('text-center w-full ml-2 text-success -mt-0.5', !isLoading && 'invisible')}>Redirecting..</span>
+            <span className={tw('text-center w-full ml-2 text-error -mt-0.5', !isError && 'invisible')}>Invalid link</span>
          </div>
          <Footer />
       </div>
