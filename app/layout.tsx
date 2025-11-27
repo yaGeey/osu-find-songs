@@ -4,6 +4,7 @@ import './globals.css'
 import Providers from './Providers'
 import { Analytics } from '@vercel/analytics/next'
 import { HighlightInit } from '@highlight-run/next/client'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 // This ensures that the icon CSS is loaded immediately before attempting to render icons
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
       title: 'osu! find songs – Search & Convert 🎵',
       description:
          'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.',
-      images: [{ url: '/icon.png' }],
+      images: [{ url: '/preview.png' }],
       locale: 'en_US',
    },
    twitter: {
@@ -42,41 +43,53 @@ export const metadata: Metadata = {
          'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.',
       images: ['https://osu-find-songs.vercel.app/icon.png'],
    },
+   robots: {
+      follow: true,
+      index: true,
+      googleBot: {
+         index: true,
+         follow: true,
+         'max-image-preview': 'large',
+         'max-snippet': -1,
+      },
+   },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+   const isDev = process.env.NODE_ENV === 'development'
    return (
-      <>
-         <HighlightInit
-            excludedHostnames={['localhost']}
-            projectId={process.env.HIGHLIGHT_PROJECT_ID!}
-            serviceName={process.env.HIGHLIGHT_APP_NAME!}
-            tracingOrigins
-            networkRecording={{
-               enabled: true,
-               recordHeadersAndBody: true,
-               urlBlocklist: [],
-            }}
-         />
-         <html lang="en">
-            {process.env.NODE_ENV === 'development' && (
-               <head>
-                  <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-               </head>
+      <html lang="en">
+         {isDev && (
+            <head>
+               <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+            </head>
+         )}
+         <body
+            className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
+         >
+            {!isDev && (
+               <HighlightInit
+                  excludedHostnames={['localhost']}
+                  projectId={process.env.HIGHLIGHT_PROJECT_ID!}
+                  serviceName={process.env.HIGHLIGHT_APP_NAME!}
+                  tracingOrigins
+                  networkRecording={{
+                     enabled: true,
+                     recordHeadersAndBody: true,
+                     urlBlocklist: [],
+                  }}
+               />
             )}
-            <body
-               className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
-            >
-               <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
-                  <Providers>
-                     <MobileDeviceCheck />
-                     <Telemetry />
-                     {children}
-                  </Providers>
-               </Suspense>
-               {process.env.NODE_ENV !== 'development' && <Analytics />}
-            </body>
-         </html>
-      </>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+               <Providers>
+                  <MobileDeviceCheck />
+                  <Telemetry />
+                  {children}
+               </Providers>
+            </Suspense>
+            {!isDev && <Analytics />}
+            {!isDev && <GoogleAnalytics gaId={process.env.GA_ID!} />}
+         </body>
+      </html>
    )
 }
