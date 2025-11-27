@@ -1,10 +1,24 @@
+import { useEffect } from 'react'
 import BgImage from './BgImage'
 import { Button } from './buttons/Buttons'
 import Image from 'next/image'
-import ExternalLink from './ExternalLink'
+import Link from 'next/link'
+import { sendTelegramError } from '@/lib/notify'
 
-export default function ErrorCallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
-   console.log(error)
+export default function ErrorCallback({
+   error,
+   resetErrorBoundary,
+}: {
+   error: Error & { digest?: string }
+   resetErrorBoundary: () => void
+}) {
+   useEffect(() => {
+      console.error(error)
+      if (process.env.NODE_ENV !== 'development') {
+         sendTelegramError(error.message, error.digest)
+      }
+   }, [error])
+
    return (
       <div className="flex items-center h-screen">
          <BgImage />
@@ -13,14 +27,13 @@ export default function ErrorCallback({ error, resetErrorBoundary }: { error: Er
             <div className="flex flex-col justify-center items-center flex-grow">
                <h2 className="text-xl font-semibold">What the....</h2>
                <p className="text-lg font-semibold">Something went wrong</p>
-               <p>
-                  Please open{' '}
-                  <ExternalLink href="https://github.com/yaGeey/osu-find-songs/issues">an issue on GitHub</ExternalLink> and
-                  include the console error log (F12) if you want to help solve this.
-               </p>
+               <pre>I am really sorry, as well as this cat</pre>
                <Button onClick={resetErrorBoundary} className="mt-5">
-                  Try reloading the page
+                  Reload the page
                </Button>
+               <Link href="/">
+                  <a className="mt-3 selected hover:underline">Go back to Home</a>
+               </Link>
             </div>
          </div>
       </div>
