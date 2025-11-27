@@ -1,8 +1,10 @@
 import BgImage from './BgImage'
 import { Button } from './buttons/Buttons'
 import Image from 'next/image'
+import ExternalLink from './ExternalLink'
 
 export default function ErrorCallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+   console.log(error)
    return (
       <div className="flex items-center h-screen">
          <BgImage />
@@ -11,9 +13,13 @@ export default function ErrorCallback({ error, resetErrorBoundary }: { error: Er
             <div className="flex flex-col justify-center items-center flex-grow">
                <h2 className="text-xl font-semibold">What the....</h2>
                <p className="text-lg font-semibold">Something went wrong</p>
-               <pre>This cat is saying "sorry"</pre>
-               <Button onClick={resetErrorBoundary} className="bg-main-dark mt-5">
-                  Try again
+               <p>
+                  Please open{' '}
+                  <ExternalLink href="https://github.com/yaGeey/osu-find-songs/issues">an issue on GitHub</ExternalLink> and
+                  include the console error log (F12) if you want to help solve this.
+               </p>
+               <Button onClick={resetErrorBoundary} className="mt-5">
+                  Try reloading the page
                </Button>
             </div>
          </div>
