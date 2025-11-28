@@ -9,6 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import sortFn from '../_utils/sortBeatmaps'
+import DummyCard from './DummyCard'
+
+// TODO https://gemini.google.com/share/aa975ed497a9
 
 export default function OsuCardSet({
    beatmapsets,
@@ -28,22 +31,27 @@ export default function OsuCardSet({
       setIsDialogOpen(false)
    }
 
-   const maps = useMemo(() => beatmapsets.sort(sortFn(sortFnString || sortQuery)), [beatmapsets, sortFnString, sortQuery])
+   const maps = useMemo(() => [...beatmapsets].sort(sortFn(sortFnString || sortQuery)), [beatmapsets, sortFnString, sortQuery])
    return (
       <>
          <div
             ref={ref}
-            className={tw('relative h-[105px] group min-w-[386px] w-[464px] cursor-pointer', className)}
+            className={tw('relative h-[105px] group/set min-w-[386px] w-[464px] cursor-pointer transition-all', className)}
             onClick={() => setIsDialogOpen(true)}
          >
-            {maps.slice(0, 3).map((beatmapset, i) => (
+            {maps[0] && (
                <OsuCard
+                  key={maps[0].id}
+                  beatmapset={maps[0]}
+                  onHover={false}
+                  className="z-2 w-full even:top-[5px] even:opacity-35 pointer-events-none group-hover/set:even:top-[7px] group-hover/set:last:top-[14px]"
+               />
+            )}
+            {maps.slice(1, 3).map((beatmapset, i) => (
+               <DummyCard
                   key={beatmapset.id}
                   beatmapset={beatmapset}
-                  onHover={false}
-                  className={tw(
-                     'first:z-2 w-full not-first:absolute even:top-[5px] last:top-[10px] even:opacity-35 last:opacity-10 pointer-events-none group-hover:even:top-[7px] group-hover:last:top-[14px]',
-                  )}
+                  className="w-full absolute even:top-[5px] last:top-[10px] even:opacity-35 last:opacity-10 pointer-events-none group-hover/set:even:top-[7px] group-hover/set:last:top-[14px] transition-all"
                />
             ))}
          </div>
@@ -85,19 +93,6 @@ export default function OsuCardSet({
                </div>,
                document.body,
             )}
-
-         <style jsx>{`
-            .items::after {
-               content: '';
-               position: absolute;
-               bottom: 0;
-               left: 0;
-               right: 0;
-               height: 30px;
-               background: linear-gradient(transparent, #c07272);
-               z-index: 1000;
-            }
-         `}</style>
       </>
    )
 }
