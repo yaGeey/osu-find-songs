@@ -65,7 +65,7 @@ export default function PLaylistPage() {
    const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
    const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
 
-   const { data: playlistInfo, isLoading: playlistLoading } = useQuery({
+   const { data: playlistInfo, isFetching: playlistLoading } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
       queryFn: async () => getPlaylist(playlistId as string),
    })
@@ -76,7 +76,7 @@ export default function PLaylistPage() {
       fetchNextPage,
       hasNextPage,
       isFetchingNextPage,
-      isLoading: isTracksLoading,
+      isFetching: isTracksLoading,
    } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
       queryFn: async ({ pageParam = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100` }) =>
@@ -118,7 +118,8 @@ export default function PLaylistPage() {
                   (item) => `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}`,
                ),
                m: searchParams.get('m'),
-               s: searchParams.get('s'),
+               // s: searchParams.get('s'),
+               s: 'any',
             }
 
             try {
@@ -138,7 +139,7 @@ export default function PLaylistPage() {
       })),
    })
 
-   const isLoading = beatmapsetQueries.some((q) => q.isLoading) || isTracksLoadingFinal || playlistLoading
+   const isLoading = beatmapsetQueries.some((q) => q.isFetching) || isTracksLoadingFinal || playlistLoading
    const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // setting data for display
@@ -150,38 +151,26 @@ export default function PLaylistPage() {
          .filter((item): item is BeatmapSet[] => item !== null)
       setBeatmapsets(data)
       setFilteredBeatmapsets(data)
-   }, [beatmapsetQueries.filter((q) => !q.isLoading).length, beatmapsetQueries.filter((q) => !q.isFetching).length])
+   }, [beatmapsetQueries.filter((q) => !q.isFetching).length])
 
-   // search
+   // filtering on query change
    useEffect(() => {
-      if (!hasQueryChanged && !searchParams.get('q') && !searchParams.get('m') && !searchParams.get('s')) return
-      else setHasQueryChanged(true)
-      resetTimeLeft()
-
-      let time = 0
-      setTimeToSearch(time)
-
-      if (searchType == 'api') {
-         const interval = setInterval(() => {
-            time += 100
-            setTimeToSearch(Math.min(time, 2000))
-         }, 100)
-
-         const timer = setTimeout(async () => {
-            const predicate = (query: any) => query.queryKey?.[0] === 'search-from-spotify'
-            await queryClient.cancelQueries({ predicate }) // calls AbortController
-            // removes only active queries, so completed ones stay in cache. Also triggres refetch as there is no result for subsribed queryKey
-            queryClient.removeQueries({ predicate, type: 'active' })
-
-            setTimeToSearch(null)
-            clearInterval(interval)
-         }, 2000)
-         return () => {
-            clearTimeout(timer)
-            clearInterval(interval)
-         }
-      }
-      if (searchType == 'local') console.log('local search')
+      const status = searchParams.get('s')
+      const mode = searchParams.get('m')
+      const modeMapped = { '0': 'osu', '1': 'taiko', '2': 'fruits', '3': 'mania' }[mode || '']
+      setFilteredBeatmapsets(
+         beatmapsets.map((set) =>
+            set.filter(
+               (map) =>
+                  (status
+                     ? status === 'any'
+                        ? true
+                        : map.status === status
+                     : ['ranked', 'approved', 'loved', 'qualified'].includes(map.status)) &&
+                  map.beatmaps.some((b) => (modeMapped ? b.mode === modeMapped : true)),
+            ),
+         ),
+      )
    }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
 
    // preparing data for display
@@ -242,17 +231,13 @@ export default function PLaylistPage() {
                   <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
                </a>
             </section>
-            <p
-               className={tw(
-                  'absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray',
-                  isLoading && 'animate-pulse',
-               )}
-            >
+            <p className={tw('absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray', isLoading && 'animate-pulse')}>
                {playlistInfo?.name}
             </p>
+            {/* TODO I REMOVED TEMPORARLT */}
             <Button
                onClick={() => setModal({ type: 'confirm-download' })}
-               className="text-white py-0.5 px-5 bg-main-dark"
+               className="text-white py-0.5 px-5 bg-main-dark invisible"
                textClassName="font-outline-sm"
                disabled={isLoading}
             >
@@ -277,7 +262,7 @@ export default function PLaylistPage() {
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
                   <div className="flex p-4 gap-4 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100vh-3rem-127px)] scrollbar pb-12">
                      {maps.map((data, i) =>
-                        data.length > 1 && data.length < 18 ? (
+                        data.length > 1 && (data.length < 18 || data[0].artist === data[1].artist) ? (
                            <OsuCardSet
                               key={data[0].id + i}
                               beatmapsets={data}

@@ -35,7 +35,9 @@ export default function Filters({
                <h4>Mode</h4>
                <SwitchFullDict
                   className="font-inter"
+                  required
                   options={{
+                     any: '',
                      'osu!': '0',
                      'osu!taiko': '1',
                      'osu!catch': '2',

@@ -1,0 +1,16 @@
+.card-download::after {
+   content: '';
+   position: absolute;
+   top: 0;
+   right: 0;
+   height: 100%;
+   width: 28px;
+   background-color: var(--color-main-darker);
+   color: rgba(0, 0, 0, 0.5);
+   font-size: 14px;
+   transition: opacity 0.3s ease;
+}
+.card-download {
+   background: red;
+   overflow: hidden;
+}

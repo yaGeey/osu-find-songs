@@ -17,7 +17,7 @@ export type Beatmap = {
    is_scoreable: boolean
    last_updated: string
    max_combo: number
-   mode: string
+   mode: 'osu' | 'taiko' | 'fruits' | 'mania'
    owners: {
       id: number
       username: string
@@ -25,7 +25,7 @@ export type Beatmap = {
    passcount: number
    playcount: number
    ranked: number
-   status: string
+   status: Status
    total_length: number
    url: string
    user_id: number
@@ -71,7 +71,7 @@ export type BeatmapSet = {
    preview_url: string
    source: string | null
    spotlight: boolean
-   status: string
+   status: Status
    storyboard: boolean
    tags: string
    title: string
@@ -84,3 +84,4 @@ export type BeatmapSet = {
    submitted_date: string
    rating: number
 }
+type Status = 'ranked' | 'approved' | 'qualified' | 'loved' | 'pending' | 'graveyard'
