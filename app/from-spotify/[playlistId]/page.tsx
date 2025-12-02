@@ -221,7 +221,7 @@ export default function PLaylistPage() {
                {playlistInfo?.name}
             </p>
             {/* TODO DISABELD + downloading not the first map*/}
-            <div className="_invisible">
+            <div className="invisible">
                <DownloadAllBtn disabled={isLoading} maps={maps} progress={progress} handleDownloadAll={handleDownloadAll} />
             </div>
          </header>
