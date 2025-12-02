@@ -1,10 +1,13 @@
+import { RateLimitManager } from '@/lib/RateLimitManager'
 import { BeatmapSet } from '@/types/Osu'
 import { getWindowsFriendlyLocalTime } from '@/utils/dates'
-import { download, getNoVideoAxios, getNoVideoParallel } from '@/utils/osuDownload'
+import { download } from '@/utils/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { customAxios } from '@/lib/axios'
 
+const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 3 })
 export default function useDownloadAll(maps: BeatmapSet[][]) {
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
@@ -16,19 +19,24 @@ export default function useDownloadAll(maps: BeatmapSet[][]) {
       let count = 0
 
       const valid = maps.filter((set) => set.length)
-      const downloadedFiles = await Promise.all(
-         valid.map(async (set) => {
-            const b: BeatmapSet = set[0]
-            const filename = `${b.id} ${b.artist} - ${b.title}.osz`
-            // TODO add paralleling
-            const blob = await getNoVideoAxios(b.id)
-            count++
-            setText(`Downloading... (${count}/${valid.length})`)
-            setProgress((count / valid.length) * 99)
-            console.log(`Downloaded ${filename}`)
-            return { filename, blob }
-         }),
-      )
+      const tasks = valid.map((set) => async () => {
+         const b: BeatmapSet = set[0]
+         const filename = `${b.id} ${b.artist} - ${b.title}.osz`
+         const res = await customAxios.get(`https://catboy.best/d/${b.id}`, {
+            responseType: 'blob',
+            timeout: 15000,
+         })
+
+         // UI
+         count++
+         setText(`Downloading... (${count}/${valid.length})`)
+         setProgress((count / valid.length) * 99)
+         console.log(`Downloaded ${filename}`)
+
+         return { ...res, filename, blob: res.data }
+      })
+      const result = await manager.executeBatch(tasks)
+      const downloadedFiles = result.filter((r) => r) as Array<{ filename: string; blob: Blob }>
 
       setText('Creating zip...')
       downloadedFiles.forEach(({ filename, blob }) => zip.file(filename, blob))

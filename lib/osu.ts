@@ -48,6 +48,24 @@ export async function getBeatmap(id: string): Promise<BeatmapSet> {
    })
 }
 
+export async function beatmapsSearchV2(queries: { [key: string]: string | null }): Promise<any> {
+   const token = await getToken()
+   const queryString = Object.entries(queries)
+      .flatMap(([key, value]) => {
+         if (!value) return []
+         return `${key}=${encodeURIComponent(value)}`
+      })
+      .join('&')
+
+   return await customAxios.get(`https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`, {
+      headers: {
+         Authorization: `Bearer ${token}`,
+         'Content-Type': 'application/json',
+         Accept: 'application/json',
+      },
+   })
+}
+
 export async function beatmapsSearch(queries: { [key: string]: string | null }): Promise<any> {
    // TODO fix any
    return fetchOsu(async (token) => {

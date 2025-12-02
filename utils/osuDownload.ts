@@ -1,13 +1,15 @@
 // https://github.com/eligrey/FileSaver.js/issues/796 - xhr download progress
 // TODO: xhr requests download progress add
 // TODO with videos error fetching download
-import axios from 'axios'
+import axios, { AxiosResponse, isAxiosError } from 'axios'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { createParallelAction } from './serverActionsParallel'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+import { parse } from 'path'
+import { RateLimitManager } from '@/lib/RateLimitManager'
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -19,12 +21,6 @@ export function download(blob: Blob, filename: string) {
    a.click()
    document.body.removeChild(a)
    window.URL.revokeObjectURL(url)
-}
-
-export const getNoVideo = async (id: number) => {
-   const res = await fetch(`https://catboy.best/d/${id}`)
-   if (!res.ok) throw new Error(await res.text())
-   return res.blob()
 }
 
 export const getNoVideoAxios = async (id: number) => {
@@ -53,14 +49,19 @@ export const useNoVideoAxios = (id: number, filename: string) => {
    return useMutation({
       mutationFn: async () => {
          await sendTemeletry(id.toString())
-         const res = await axios.get(`https://catboy.best/d/${id}`, {
-            responseType: 'blob',
-            onDownloadProgress: (progressEvent) => {
-               if (progressEvent.total) {
-                  update(id, progressEvent.loaded, progressEvent.total)
-               }
-            },
-         })
+         const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 3 })
+         const res = await manager.getRateLimited<AxiosResponse<Blob>>(() =>
+            axios.get(`https://catboy.best/d/${id}`, {
+               responseType: 'blob',
+               onDownloadProgress: (progressEvent) => {
+                  if (progressEvent.total) {
+                     update(id, progressEvent.loaded, progressEvent.total)
+                  }
+               },
+               timeout: 15000,
+               timeoutErrorMessage: `Can't download map, please download it directly from osu! website. \nhttps://osu.ppy.sh/beatmapsets/${id}`,
+            }),
+         )
          return res.data
       },
       onError: (error: any) => {
@@ -84,14 +85,6 @@ export const getVideo = async (id: number) => {
    const res = await fetch(`https://osu.ppy.sh/beatmapsets/${id}/download`)
    if (!res.ok) throw new Error(await res.text())
    return res.blob()
-}
-
-export const downloadNoVideo = async (id: number, filename: string) => {
-   getNoVideo(id).then((blob) => download(blob, filename))
-}
-
-export const downloadVideo = async (id: number, filename: string) => {
-   getVideo(id).then((blob) => download(blob, filename))
 }
 
 function downloadXhr(url: string, filename: string): void {

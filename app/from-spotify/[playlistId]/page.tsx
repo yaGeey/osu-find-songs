@@ -7,7 +7,6 @@ import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery, useQueryC
 import { fetchWithToken, getPlaylist } from '@/lib/Spotify'
 import { PlaylistPage } from '@/types/Spotify'
 import { Button } from '@/components/buttons/Buttons'
-import { beatmapsSearch } from '@/lib/osu'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
@@ -16,7 +15,6 @@ import { BeatmapSet } from '@/types/Osu'
 import OsuCardSet from './_components/OsuCardSet'
 import { toast, ToastContainer } from 'react-toastify'
 import Filters from './_components/Filters'
-import Search from './_components/Search'
 import Progress from '@/components/state/Progress'
 import BgImage from '@/components/BgImage'
 import { sortBeatmapsMatrix } from './_utils/sortBeatmapsMatrix'
@@ -38,7 +36,6 @@ export default function PLaylistPage() {
    const params = useParams()
    const searchParams = useSearchParams()
    const { playlistId } = params
-   const queryClient = useQueryClient()
 
    // download progress
    const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
@@ -57,9 +54,7 @@ export default function PLaylistPage() {
       }
    }, [])
 
-   const [hasQueryChanged, setHasQueryChanged] = useState(false)
    const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
-   const [searchType, setSearchType] = useState<'local' | 'api'>('api')
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
    const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
    const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
@@ -154,12 +149,12 @@ export default function PLaylistPage() {
    }, [beatmapsetQueries.filter((q) => !q.isFetching).length])
 
    // filtering on query change
-   useEffect(() => {
+   function filterBeatmaps() {
       const status = searchParams.get('s')
       const mode = searchParams.get('m')
       const modeMapped = { '0': 'osu', '1': 'taiko', '2': 'fruits', '3': 'mania' }[mode || '']
-      setFilteredBeatmapsets(
-         beatmapsets.map((set) =>
+      setFilteredBeatmapsets(p =>
+         p.map((set) =>
             set.filter(
                (map) =>
                   (status
@@ -171,7 +166,8 @@ export default function PLaylistPage() {
             ),
          ),
       )
-   }, [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
+   }
+   useEffect(() => filterBeatmaps(), [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
 
    // preparing data for display
    const maps = useMemo(
@@ -210,10 +206,10 @@ export default function PLaylistPage() {
          <ProgressNotify ref={progressNotifyRef} color="text-success" />
          <Progress isVisible={!!Object.values(pending).length} value={(bytesDownloaded / bytesTotal) * 100 || 0}>
             {Object.values(pending).map(
-               (p) =>
+               (p, id) =>
                   p.downloadedBytes &&
                   p.totalBytes && (
-                     <p>
+                     <p key={id}>
                         {p.filename} ({formatBytes(p.downloadedBytes)}/{formatBytes(p.totalBytes)} MB)
                      </p>
                   ),
@@ -237,9 +233,10 @@ export default function PLaylistPage() {
             {/* TODO I REMOVED TEMPORARLT */}
             <Button
                onClick={() => setModal({ type: 'confirm-download' })}
-               className="text-white py-0.5 px-5 bg-main-dark invisible"
+               className="text-white py-0.5 px-5 bg-main-dark _invisible"
                textClassName="font-outline-sm"
                disabled={isLoading}
+               // disabled
             >
                Download all
                <FontAwesomeIcon icon={faDownload} className="ml-2" />
@@ -253,7 +250,10 @@ export default function PLaylistPage() {
                   <Filters
                      foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                      disabled={isLoading}
-                     onFilterChange={(filters) => setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))}
+                     onFilterChange={(filters) => {
+                        setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))
+                        filterBeatmaps()
+                     }}
                      beatmapsets={beatmapsets}
                      onSearch={setFilteredBeatmapsets}
                   />
