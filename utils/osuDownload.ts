@@ -6,9 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { createParallelAction } from './serverActionsParallel'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
-import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import { parse } from 'path'
 import { RateLimitManager } from '@/lib/RateLimitManager'
 
 export function download(blob: Blob, filename: string) {
@@ -46,10 +44,10 @@ const sendTemeletry = async (mapId: string) => {
 
 export const useNoVideoAxios = (id: number, filename: string) => {
    const { remove, update } = useMapDownloadStore()
+   const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
    return useMutation({
       mutationFn: async () => {
          await sendTemeletry(id.toString())
-         const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 3 })
          const res = await manager.getRateLimited<AxiosResponse<Blob>>(() =>
             axios.get(`https://catboy.best/d/${id}`, {
                responseType: 'blob',

@@ -177,7 +177,7 @@ export default function PLaylistPage() {
       )
    }, [searchParams, beatmapsets, filters, searchQuery])
 
-   const { text, progress, handleDownloadAll } = useDownloadAll(maps)
+   const { text, progress, handleDownloadAll } = useDownloadAll(maps, searchParams.get('sort') || 'relevance_asc')
 
    return (
       <div className="min-w-[690px] font-inter overflow-hidden">
@@ -221,7 +221,7 @@ export default function PLaylistPage() {
                {playlistInfo?.name}
             </p>
             {/* TODO DISABELD + downloading not the first map*/}
-            <div className="invisible">
+            <div className="_invisible">
                <DownloadAllBtn disabled={isLoading} maps={maps} progress={progress} handleDownloadAll={handleDownloadAll} />
             </div>
          </header>

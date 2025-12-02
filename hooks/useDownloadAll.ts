@@ -6,9 +6,11 @@ import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { customAxios } from '@/lib/axios'
+import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 
-const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 3 })
-export default function useDownloadAll(maps: BeatmapSet[][]) {
+const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
+
+export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
 
@@ -20,7 +22,7 @@ export default function useDownloadAll(maps: BeatmapSet[][]) {
 
       const valid = maps.filter((set) => set.length)
       const tasks = valid.map((set) => async () => {
-         const b: BeatmapSet = set[0]
+         const b: BeatmapSet = [...set].sort(sortFn(sortQuery))[0]
          const filename = `${b.id} ${b.artist} - ${b.title}.osz`
          const res = await customAxios.get(`https://catboy.best/d/${b.id}`, {
             responseType: 'blob',
