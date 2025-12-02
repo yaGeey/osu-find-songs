@@ -1,36 +1,21 @@
-import { BeatmapSet } from '@/types/Osu'
 import SearchComponents from '@/components/Search'
 import { useEffect, useState } from 'react'
 
 export default function Search({
-   beatmapsets,
-   onChange,
+   onSearch,
    disabled = false,
 }: {
-   beatmapsets: BeatmapSet[][]
-   onChange: (beatmapsets: BeatmapSet[][]) => void
+   onSearch: React.Dispatch<React.SetStateAction<string>>
    disabled?: boolean
 }) {
    const [value, setValue] = useState('')
 
    useEffect(() => {
       const timer = setTimeout(() => {
-         onChange(
-            beatmapsets.map((beatmapset) =>
-               beatmapset.filter((beatmap) => {
-                  if (!value.length) return true
-                  const val = value.toLowerCase()
-                  return (
-                     beatmap.artist.toLowerCase().includes(val) ||
-                     beatmap.title.toLowerCase().includes(val) ||
-                     beatmap.creator.toLowerCase().includes(val)
-                  )
-               }),
-            ),
-         )
+         onSearch(value)
       }, 400)
       return () => clearTimeout(timer)
-   }, [value, beatmapsets])
+   }, [value, onSearch])
 
    return <SearchComponents value={value} setValue={setValue} width={250} disabled={disabled} />
 }

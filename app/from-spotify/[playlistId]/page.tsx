@@ -6,11 +6,8 @@ import OsuCard from './_components/OsuCard'
 import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchWithToken, getPlaylist } from '@/lib/Spotify'
 import { PlaylistPage } from '@/types/Spotify'
-import { Button } from '@/components/buttons/Buttons'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload } from '@fortawesome/free-solid-svg-icons'
-import Modal from '@/components/Modal'
 import { BeatmapSet } from '@/types/Osu'
 import OsuCardSet from './_components/OsuCardSet'
 import { toast, ToastContainer } from 'react-toastify'
@@ -27,10 +24,12 @@ import axios from 'axios'
 import Loading from '@/components/state/Loading'
 import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import { formatBytes } from '@/utils/numbers'
 import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
 import { FS_CHUNK_SIZE, MAPS_AMOUNT_TO_SHOW_VIRTUALIZED } from '@/variables'
 import DevLoadingTime from '@/components/DevLoadingTime'
+import DownloadAllBtn from './_components/DownloadAllBtn'
+import ProgressMapDownload from './_components/ProgressMapDownload'
+import { SelectedOption } from '@/components/selectors/FilterOptions'
 
 export default function PLaylistPage() {
    const params = useParams()
@@ -39,9 +38,7 @@ export default function PLaylistPage() {
 
    // download progress
    const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
-   const { pending, setProgressBlinkRef } = useMapDownloadStore()
-   const bytesDownloaded = Object.values(pending).reduce((acc, cur) => acc + (cur.downloadedBytes || 0), 0)
-   const bytesTotal = Object.values(pending).reduce((acc, cur) => acc + (cur.totalBytes || 0), 0)
+   const { setProgressBlinkRef } = useMapDownloadStore()
    useEffect(() => {
       setProgressBlinkRef(progressNotifyRef)
    }, [setProgressBlinkRef, progressNotifyRef])
@@ -54,11 +51,10 @@ export default function PLaylistPage() {
       }
    }, [])
 
-   const [timeToSearch, setTimeToSearch] = useState<number | null>(null)
    const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
-   const [filteredBeatmapsets, setFilteredBeatmapsets] = useState<BeatmapSet[][]>([])
+   const [filters, setFilters] = useState<SelectedOption[]>([])
+   const [searchQuery, setSearchQuery] = useState('')
    const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
-   const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
 
    const { data: playlistInfo, isFetching: playlistLoading } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
@@ -98,7 +94,7 @@ export default function PLaylistPage() {
 
    const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || []
    const isTracksLoadingFinal = isFetchingNextPage || hasNextPage || isTracksLoading || tracks.length < spotifyTotal
-   const mapsFetched = beatmapsets.flat().length
+   const mapsFetched = beatmapsets.length
 
    // beatmapset search
    const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
@@ -137,7 +133,7 @@ export default function PLaylistPage() {
    const isLoading = beatmapsetQueries.some((q) => q.isFetching) || isTracksLoadingFinal || playlistLoading
    const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
-   // setting data for display
+   // full data
    useEffect(() => {
       const data = beatmapsetQueries
          .filter((q) => q.data !== undefined)
@@ -145,38 +141,42 @@ export default function PLaylistPage() {
          .flat()
          .filter((item): item is BeatmapSet[] => item !== null)
       setBeatmapsets(data)
-      setFilteredBeatmapsets(data)
    }, [beatmapsetQueries.filter((q) => !q.isFetching).length])
 
-   // filtering on query change
-   function filterBeatmaps() {
+   // prepara data for display
+   const maps = useMemo(() => {
       const status = searchParams.get('s')
       const mode = searchParams.get('m')
       const modeMapped = { '0': 'osu', '1': 'taiko', '2': 'fruits', '3': 'mania' }[mode || '']
-      setFilteredBeatmapsets(p =>
-         p.map((set) =>
-            set.filter(
-               (map) =>
-                  (status
-                     ? status === 'any'
-                        ? true
-                        : map.status === status
-                     : ['ranked', 'approved', 'loved', 'qualified'].includes(map.status)) &&
-                  map.beatmaps.some((b) => (modeMapped ? b.mode === modeMapped : true)),
-            ),
-         ),
-      )
-   }
-   useEffect(() => filterBeatmaps(), [searchParams.get('q'), searchParams.get('m'), searchParams.get('s')])
+      const queryLower = searchQuery.toLowerCase().trim()
 
-   // preparing data for display
-   const maps = useMemo(
-      () =>
-         uniqueBeatmapsetMatrix(filteredBeatmapsets).sort((a, b) =>
-            sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'),
-         ),
-      [filteredBeatmapsets, searchParams],
-   )
+      const filtered = filterBeatmapsMatrix(beatmapsets, filters)
+         .map((set) =>
+            set.filter((map) => {
+               const isStatusMatch = status
+                  ? status === 'any'
+                     ? true
+                     : map.status === status
+                  : ['ranked', 'approved', 'loved', 'qualified'].includes(map.status)
+
+               const isModeMatch = modeMapped ? map.beatmaps.some((b) => b.mode === modeMapped) : true
+
+               const isSearchMatch = !queryLower
+                  ? true
+                  : map.artist.toLowerCase().includes(queryLower) ||
+                    map.title.toLowerCase().includes(queryLower) ||
+                    map.creator.toLowerCase().includes(queryLower)
+
+               return isStatusMatch && isModeMatch && isSearchMatch
+            }),
+         )
+         .filter((set) => set.length > 0)
+
+      return uniqueBeatmapsetMatrix(filtered).sort((a, b) =>
+         sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'),
+      )
+   }, [searchParams, beatmapsets, filters, searchQuery])
+
    const { text, progress, handleDownloadAll } = useDownloadAll(maps)
 
    return (
@@ -185,7 +185,7 @@ export default function PLaylistPage() {
          <BgImage className="brightness-[.75]" />
 
          {/* search timeout progress */}
-         <Progress isVisible={!!timeToSearch} value={(timeToSearch! * 100) / 2000} color="text-main-lightest" />
+         {/* <Progress isVisible={!!timeToSearch} value={(timeToSearch! * 100) / 2000} color="text-main-lightest" /> */}
          {/* loading progress */}
          <Progress
             isVisible={isLoading}
@@ -204,17 +204,7 @@ export default function PLaylistPage() {
          </Progress>
          {/* notification progress */}
          <ProgressNotify ref={progressNotifyRef} color="text-success" />
-         <Progress isVisible={!!Object.values(pending).length} value={(bytesDownloaded / bytesTotal) * 100 || 0}>
-            {Object.values(pending).map(
-               (p, id) =>
-                  p.downloadedBytes &&
-                  p.totalBytes && (
-                     <p key={id}>
-                        {p.filename} ({formatBytes(p.downloadedBytes)}/{formatBytes(p.totalBytes)} MB)
-                     </p>
-                  ),
-            )}
-         </Progress>
+         <ProgressMapDownload />
 
          <header
             className={tw(
@@ -230,17 +220,10 @@ export default function PLaylistPage() {
             <p className={tw('absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray', isLoading && 'animate-pulse')}>
                {playlistInfo?.name}
             </p>
-            {/* TODO I REMOVED TEMPORARLT */}
-            <Button
-               onClick={() => setModal({ type: 'confirm-download' })}
-               className="text-white py-0.5 px-5 bg-main-dark _invisible"
-               textClassName="font-outline-sm"
-               disabled={isLoading}
-               // disabled
-            >
-               Download all
-               <FontAwesomeIcon icon={faDownload} className="ml-2" />
-            </Button>
+            {/* TODO DISABELD + downloading not the first map*/}
+            <div className="_invisible">
+               <DownloadAllBtn disabled={isLoading} maps={maps} progress={progress} handleDownloadAll={handleDownloadAll} />
+            </div>
          </header>
 
          <main className="flex justify-center min-h-[calc(100vh-3rem)] mt-12">
@@ -250,12 +233,9 @@ export default function PLaylistPage() {
                   <Filters
                      foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                      disabled={isLoading}
-                     onFilterChange={(filters) => {
-                        setFilteredBeatmapsets(filterBeatmapsMatrix(beatmapsets, filters))
-                        filterBeatmaps()
-                     }}
+                     onFilterChange={setFilters}
                      beatmapsets={beatmapsets}
-                     onSearch={setFilteredBeatmapsets}
+                     onSearch={setSearchQuery}
                   />
                </div>
 
@@ -291,59 +271,6 @@ export default function PLaylistPage() {
                {isLoading && <Loading className="top-39 h-[calc(100%-9.75rem)]" radius={50} />}
             </div>
          </main>
-
-         {/* modals */}
-         <Modal
-            isOpen={modal?.type === 'confirm-download'}
-            buttons={[
-               {
-                  onClick: () => setModal(null),
-                  text: 'Cancel',
-                  className: 'bg-error',
-               },
-               {
-                  onClick: () => {
-                     setModal({ type: 'downloading' })
-                     handleDownloadAll()
-                  },
-                  text: 'Download',
-                  className: 'bg-success',
-               },
-            ]}
-            status="info"
-         >
-            <p className="text-balance text-center">
-               If there is more than one beatmap set for a song, the first one based on your search{' '}
-               <span className="text-accent font-outline-sm">filters</span> will be downloaded
-            </p>
-            {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
-         </Modal>
-         <Modal
-            isOpen={modal?.type === 'downloading' && progress !== null}
-            buttons={[
-               {
-                  onClick: () => setModal(null),
-                  text: 'Okay',
-                  className: 'bg-main-dark',
-               },
-            ]}
-            status="info"
-         >
-            Please wait, this may take some time. Don't close this page
-         </Modal>
-         <Modal
-            isOpen={modal?.type === 'downloading' && progress === null}
-            buttons={[
-               {
-                  onClick: () => setModal(null),
-                  text: 'Close',
-                  className: 'bg-main-dark',
-               },
-            ]}
-            status="success"
-         >
-            Downloaded successfully
-         </Modal>
          <ToastContainer />
       </div>
    )

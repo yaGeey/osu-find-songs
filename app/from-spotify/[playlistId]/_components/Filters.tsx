@@ -20,7 +20,7 @@ export default function Filters({
    disabled?: boolean
    onFilterChange: (filters: SelectedOption[]) => void
    beatmapsets: BeatmapSet[][]
-   onSearch: React.Dispatch<React.SetStateAction<BeatmapSet[][]>>
+   onSearch: React.Dispatch<React.SetStateAction<string>>
 }) {
    const [m, setM] = useQueryState('m', { defaultValue: '' })
    const [s, setS] = useQueryState('s', { defaultValue: '' })
@@ -36,6 +36,7 @@ export default function Filters({
                <SwitchFullDict
                   className="font-inter"
                   required
+                  defaultValue="any"
                   options={{
                      any: '',
                      'osu!': '0',
@@ -46,7 +47,7 @@ export default function Filters({
                   onChange={(val) => setM(val)}
                />
             </div>
-            <Search beatmapsets={beatmapsets} onChange={onSearch} disabled={disabled} />
+            <Search onSearch={onSearch} disabled={disabled} />
          </div>
          <section className="flex items-center gap-7.5 mt-3 text-[15px]">
             <h4>State</h4>
