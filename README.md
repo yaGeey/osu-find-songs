@@ -1,47 +1,51 @@
-### 🔗 https://osufindsongs.vercel.app
+<div align="center">
 
-This is my pet project I built to connect **osu** with **Spotify**. It features two main tools:
+# [osufindsongs](https://osufindsongs.vercel.app)
 
----
-<p align="center">
-   <strong style="font-size: 20px;">From Spotify to osu!</strong>
-</p>
-<p align="center">
-  <img src="./public/preview.png" width="500"/>
-</p>
+_A tool that links osu! with Spotify: scan your osu! songs to get playlists, or find beatmaps from a playlist_ 🎮🎶
 
-Pick any **public Spotify playlist** and the app will try to match each track **to osu! beatmaps**. You can filter, sort and search results with all the options provided by osu search queries and even custom one. Once you're happy with the results, you can download each beatmap individually — or grab them all in a single zip archive.
+[![Website](https://img.shields.io/badge/🌐_Website-osufindsongs.vercel.app-blue)](https://osufindsongs.vercel.app) [![osuck](https://img.shields.io/badge/-📁_osuck-4d3249)](https://tools.osuck.net/tool/67df097dafb780368707339a) [![os](https://img.shields.io/github/stars/yaGeey/osu-find-songs?logo=github)](https://github.com/yaGeey/osu-find-songs)
 
+</div>
 
 ---
 
 <p align="center">
-  <strong style="font-size: 20px;">From osu! to Spotify</strong>
+   <strong style="font-size: 20px;">🎧 From Spotify to osu!</strong>
 </p>
+<div align="center">
+  <img src="./public/preview.png" width="600" alt="Spotify to osu! feature"/>
+</div>
+
+<br>
+
+- 🎵 Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps.
+- 📊 You can filter, sort and search results with all the options provided by osu search queries and even custom one.
+- 💾 Once you're happy with the results, you can download each beatmap individually — or grab them all in a single zip archive.
+
+---
+
 <p align="center">
-  <img src="./public/from-osu.png" width="500"/>
+   <strong style="font-size: 20px;">🎮 From osu! to Spotify</strong>
 </p>
+<div align="center">
+  <img src="./public/from-osu.png" width="600" alt="osu! to Spotify feature"/>
+</div>
 
-The app will scan all your ```.osu``` files to extract track metadata. It then automatically searches for those songs on Spotify and YouTube. You can view, listen or watch videos in the app, and instantly **generate a Spotify playlist**. Similarly to the native osu! client, you can organize your songs exactly the way you're used to.
+<br>
 
+**Transform your osu! library into Spotify playlists!**
+
+- 💻 Select a folder with your map. App will automatically searches for those songs on Spotify and YouTube.
+- 🔎 You can view, listen or watch videos in the app, and instantly generate a Spotify playlist.
+- 🗂️ Similarly to the native osu! client, you can organize your songs exactly the way you're used to.
 
 ---
 
 ### Try it out!
-
-For **minimal usage** I suggest throw your osu songs folder at app, wait for a couple of minutes and get freshly new Spotify playlist to listen.
 
 I hope you find this tool useful and fun to use. I really put soul in it.
 Thanks for checking it out — and even bigger thanks if you decide to give it a try!💗
 And even bigger thanks if you consider to star the repo!
 
 ThunderBirdo featured my app in [his video](https://www.youtube.com/watch?v=0uZ4RehxDO4&t=300s&ab_channel=ThunderBirdo)! Just note: the map background issue on cards is already fixed, and the video only covers the `from-osu` page.
-
----
-
-### Tech stack
-
-- Full Next JS with Tailwind with type safety (I guess), axios + tanstack query
-- **APIs used**: osu api, spotify api with users oAuth, wiki api, youtube (scraping lib)
-- **Optimization**: list virtualization, batching queries on apps api
-  etc. Sadly ChatGPT can't read all my files, and I don't have CLI AI tools to write all my tech stack 😼
