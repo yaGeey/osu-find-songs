@@ -1,11 +1,13 @@
 'use client'
 import BgImage from '@/components/BgImage'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import Footer from '@/components/Footer'
-import { twMerge as tw } from 'tailwind-merge'
+import { twMerge as tw, twMerge } from 'tailwind-merge'
+import { getPlaylist } from '@/lib/Spotify'
+import { useMutation } from '@tanstack/react-query'
 
 export default function SelectPage() {
    const [isLoading, setIsLoading] = useState(false)
@@ -13,18 +15,22 @@ export default function SelectPage() {
    const inputRef = useRef<HTMLInputElement>(null)
    const router = useRouter()
 
-   // functio parse
-
-   function handleClick(url: string) {
-      setIsLoading(true)
+   function parseIdFromUrl(url: string) {
       const parts = url.split('/')
-      const id = parts[parts.length - 1].split('?')[0]
-      router.push('/from-spotify/' + id)
+      return parts[parts.length - 1].split('?')[0]
    }
 
-   // const mutation = useMutation({
-   //    mutationFn: async () => await getPlaylist()
-   // })
+   const mutation = useMutation({
+      mutationFn: async (id: string) => await getPlaylist(id),
+      onSuccess: (data, playlistId) => {
+         setError(null)
+         setIsLoading(true)
+         router.push('/from-spotify/' + playlistId)
+      },
+      onError: () => {
+         setError('Playlist not found or is private')
+      },
+   })
 
    return (
       <div className="flex flex-col justify-center items-center min-h-screen text-white">
@@ -41,21 +47,30 @@ export default function SelectPage() {
                   onChange={(e) => {
                      if (e.target.value) {
                         if (e.target.checkValidity()) {
-                           handleClick(e.target.value)
-                        } else setError(e.target.value.search('album') ? 'Albums are not supported' : 'Invalid link')
+                           mutation.mutate(parseIdFromUrl(e.target.value))
+                        } else {
+                           setError(e.target.value.search('album') !== -1 ? 'Albums are not supported' : 'Invalid link')
+                        }
                      } else setError(null)
                   }}
-                  disabled={isLoading}
+                  disabled={isLoading || mutation.isPending}
                   ref={inputRef}
-                  className="bg-gray-100 disabled:border-success hover:brightness-115 text-black border-3 w-full border-main rounded-lg pl-2 py-2 pr-8 [&:not(:placeholder-shown)]:bg-gray-200 valid:[&:not(:placeholder-shown)]:border-success invalid:[&:not(:placeholder-shown)]:border-error transition-all outline-0"
+                  className={twMerge(
+                     'bg-gray-100 disabled:border-success hover:brightness-115 text-black border-3 w-full border-main-darker rounded-lg pl-2 py-2 pr-8 invalid:[&:not(:placeholder-shown)]:border-error transition-all outline-0',
+                     !error ? ' valid:[&:not(:placeholder-shown)]:border-success' : 'border-error',
+                  )}
                ></input>
                <FontAwesomeIcon
                   icon={faSpotify}
                   className="absolute top-1/2 transform -translate-y-1/2 right-2 text-lg text-black/80"
                />
             </div>
-            <span className={tw('text-center w-full ml-2 text-success -mt-0.5', !isLoading && 'invisible')}>Redirecting..</span>
-            <span className={tw('text-center w-full ml-2 text-error -mt-0.5', !error && 'invisible')}>{error}</span>
+            <div className="h-6">
+               {(isLoading || mutation.isPending) && <span className={tw('text-center w-full text-success')}>Loading..</span>}
+               {error && !isLoading && !mutation.isPending && (
+                  <span className={tw('text-center w-full text-error')}>{error ?? 'e'}</span>
+               )}
+            </div>
          </div>
          <Footer />
       </div>

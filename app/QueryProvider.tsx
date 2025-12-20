@@ -1,10 +1,11 @@
 'use client'
 
 // Since QueryClientProvider relies on useContext under the hood, we have to put 'use client' on top
-import { isServer, QueryClient } from '@tanstack/react-query'
+import { isServer, QueryCache, QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { toast } from 'react-toastify'
 
 function makeQueryClient() {
    return new QueryClient({
@@ -16,6 +17,12 @@ function makeQueryClient() {
             staleTime: Infinity,
          },
       },
+      queryCache: new QueryCache({
+         onError: (error, query) => {
+            toast.error(`Something went wrong ${error instanceof Error ? `: ${error.message}` : ''}`)
+            console.error(`Error in query ${query.queryKey}:`, error)
+         },
+      })
    })
 }
 
