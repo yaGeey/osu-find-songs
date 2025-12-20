@@ -12,6 +12,7 @@ import { config } from '@fortawesome/fontawesome-svg-core'
 import MobileDeviceCheck from '@/components/MobileDeviceCheck'
 import Telemetry from '@/components/Telemetry'
 import { Suspense } from 'react'
+import { metadataObj, JsonLd } from './metadata'
 // Prevent fontawesome from dynamically adding its css since we did it manually above
 config.autoAddCss = false
 
@@ -24,46 +25,16 @@ const interTight = Inter_Tight({
    subsets: ['latin'],
 })
 
-export const metadata: Metadata = {
-   title: 'osu! find songs – Search & Convert 🎵',
-   description:
-      'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.',
-   icons: { icon: '/icon.png' },
-   openGraph: {
-      title: 'osu! find songs – Search & Convert 🎵',
-      description:
-         'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.',
-      images: [{ url: '/preview.png' }],
-      locale: 'en_US',
-   },
-   twitter: {
-      card: 'summary_large_image',
-      title: 'osu! find songs – Search & Convert 🎵',
-      description:
-         'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.',
-      images: ['https://osu-find-songs.vercel.app/icon.png'],
-   },
-   robots: {
-      follow: true,
-      index: true,
-      googleBot: {
-         index: true,
-         follow: true,
-         'max-image-preview': 'large',
-         'max-snippet': -1,
-      },
-   },
-}
+export const metadata: Metadata = metadataObj
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
    const isDev = process.env.NODE_ENV === 'development'
    return (
       <html lang="en">
-         {isDev && (
-            <head>
-               <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
-            </head>
-         )}
+         <head>
+            {isDev && <script src="https://unpkg.com/react-scan/dist/auto.global.js" />}
+            <JsonLd />
+         </head>
          <body
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
          >

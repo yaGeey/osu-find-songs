@@ -1,5 +1,4 @@
 import { searchSongWithConditions } from '@/lib/Spotify'
-import { SpotifyError, Track, TrackFull } from '@/types/Spotify'
 import { Song } from '@/types/types'
 import axios from 'axios'
 const BATCH_SIZE = 50
@@ -20,8 +19,8 @@ export async function POST(req: Request) {
          : null,
    )
 
-   const simplified: (Track[] | undefined)[] = results.map((batch) =>
-      batch?.map((item: Track) => ({
+   const simplified = results.map((batch) =>
+      batch?.map((item) => ({
          album: {
             album_type: item.album.album_type,
             external_urls: item.album.external_urls,

@@ -1,6 +1,6 @@
 'use client'
 import { Track } from '@/types/Spotify'
-import { AddItemsToPlaylist, createPlaylist, fetchMyProfile, fetchSpotify, getServerToken } from '@/lib/Spotify'
+import { addItemsToPlaylist, createPlaylist, fetchMyProfile, fetchSpotify, getServerToken } from '@/lib/Spotify'
 import { useMutation } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import Modal from '@/components/Modal'
@@ -25,7 +25,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
    const [onOkayText, setOnOkayText] = useState<string | undefined>('Okay')
 
    const mutation = useMutation({
-      mutationFn: ({ playlistId, uris }: { playlistId: string; uris: string[] }) => AddItemsToPlaylist(playlistId, uris),
+      mutationFn: ({ playlistId, uris }: { playlistId: string; uris: string[] }) => addItemsToPlaylist(playlistId, uris),
    })
 
    function handleModal(
@@ -49,7 +49,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
 
       try {
          handleModal(<h1 className="animate-pulse font-semibold">Getting profile...</h1>, 'loading')
-         let profile
+         let profile: SpotifyApi.CurrentUsersProfileResponse
          try {
             profile = await fetchMyProfile()
          } catch (err) {
@@ -58,7 +58,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
          }
 
          handleModal(<h1 className="animate-pulse font-semibold">Creating playlist...</h1>, 'loading')
-         let playlist
+         let playlist: SpotifyApi.CreatePlaylistResponse
          try {
             playlist = await createPlaylist({
                userId: profile.id,
@@ -83,7 +83,7 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             const chunk = tracks.slice(i, i + chunkSize)
             promises.push(
                mutation.mutateAsync({
-                  playlistId: playlist!.id,
+                  playlistId: playlist.id,
                   uris: chunk.map((track) => track.uri),
                }),
             )

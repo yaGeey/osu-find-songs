@@ -36,16 +36,16 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUse
    }
 }
 
-export const findSong = async (query: string): Promise<{ tracks: { items: [TrackFull] | [] } }> => {
+export const findSong = async (query: string) => {
    return fetchSpotify(async (token) => {
-      const res = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
+      const res = await axios.get<SpotifyApi.TrackSearchResponse>(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
          headers: { Authorization: `Bearer ${token}` },
       })
       return res.data
    })
 }
 
-export const searchSongWithConditions = async (song: Song): Promise<[TrackFull] | null> => {
+export const searchSongWithConditions = async (song: Song) => {
    let modifiedSong = applyAlwaysConditions(song)
 
    for (const condition of conditions) {
@@ -107,18 +107,18 @@ export async function revalidateSpotifyToken(): Promise<string> {
    return data.access_token
 }
 
-export async function getPlaylist(playlistId: string): Promise<Playlist | undefined> {
+export async function getPlaylist(playlistId: string) {
    return fetchSpotify(async (token) => {
-      const { data } = await axios.get<Playlist>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      const { data } = await axios.get<SpotifyApi.SinglePlaylistResponse>(`https://api.spotify.com/v1/playlists/${playlistId}`, {
          headers: { Authorization: `Bearer ${token}` },
       })
       return data
    })
 }
 
-export async function fetchMyProfile(): Promise<any | undefined> {
+export async function fetchMyProfile() {
    return fetchSpotify(async (token) => {
-      const res = await axios.get('https://api.spotify.com/v1/me', {
+      const res = await axios.get<SpotifyApi.CurrentUsersProfileResponse>('https://api.spotify.com/v1/me', {
          headers: { Authorization: `Bearer ${token}` },
       })
       return res.data
@@ -137,9 +137,9 @@ export async function createPlaylist({
    isPublic?: boolean
    collaborative?: boolean
    description: string
-}): Promise<Playlist | undefined> {
+}) {
    return fetchSpotify(async (token) => {
-      const { data } = await axios.post<Playlist>(
+      const { data } = await axios.post<SpotifyApi.CreatePlaylistResponse>(
          `https://api.spotify.com/v1/users/${userId}/playlists`,
          {
             name,
@@ -149,16 +149,15 @@ export async function createPlaylist({
          },
          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
       )
-      // H.log('create_playlist', 'log')
       return data
    }, true)
 }
 
-export async function AddItemsToPlaylist(playlistId: string, uris: string[]) {
+export async function addItemsToPlaylist(playlistId: string, uris: string[]) {
    return fetchSpotify(async (token) => {
       if (uris.length > 100) throw new Error('Max 100 tracks per request, got ' + uris.length)
       if (uris.length === 0) throw new Error('No tracks provided')
-      const res = await axios.post(
+      const res = await axios.post<SpotifyApi.AddTracksToPlaylistResponse>(
          `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
          { uris, position: 0 }, //? add to the beginning of the playlist
          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },

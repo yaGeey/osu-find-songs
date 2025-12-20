@@ -219,7 +219,7 @@ export default function FromOsu() {
                   value={exactSpotify}
                   setValue={setExactSpotify}
                   disabled={isLoading}
-                  text={{ on: 'Exact Spotify', off: 'Any Spotify' }}
+                  text={{ on: 'Exact Spotify match', off: 'Any Spotify match' }}
                   width={130}
                />
                <Dropdown

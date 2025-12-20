@@ -234,7 +234,6 @@ export default function PLaylistPage() {
                      foundString={Array.isArray(maps) && maps.length ? maps.length + '/' + tracks.length : ''}
                      disabled={isLoading}
                      onFilterChange={setFilters}
-                     beatmapsets={beatmapsets}
                      onSearch={setSearchQuery}
                   />
                </div>

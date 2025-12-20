@@ -33,6 +33,24 @@ export default function LandingPage() {
                      {details === 'from-osu' &&
                         "The app will scan all your .osu files to extract track metadata. It then automatically searches for those songs on Spotify and YouTube. You can view, listen or watch videos in the app, and instantly generate a Spotify playlist. Similarly to the native osu! client, you can organize your songs exactly the way you're used to."}
                   </p>
+                  <div className="sr-only">
+                     <h2>
+                        A tool that links osu! with Spotify: scan your beatmaps to build playlists, or find beatmaps from
+                        playlist.
+                     </h2>
+                     <section>
+                        Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You
+                        can filter, sort and search results with all the options provided by osu search queries and even custom
+                        one. Once you're happy with the results, you can download each beatmap individually — or grab them all in
+                        a single zip archive.
+                     </section>
+                     <section>
+                        The app will scan all your .osu files to extract track metadata. It then automatically searches for those
+                        songs on Spotify and YouTube. You can view, listen or watch videos in the app, and instantly generate a
+                        Spotify playlist. Similarly to the native osu! client, you can organize your songs exactly the way you're
+                        used to.
+                     </section>
+                  </div>
                </div>
                <div
                   className="w-[600px] h-full relative"
@@ -88,7 +106,7 @@ export default function LandingPage() {
                   </span>
                </div>
             </div>
-            <div className="flex gap-44 text-xl font-medium _mb-11 _mt-20 [@media(max-width:1300px)]:gap-8">
+            <nav className="flex gap-44 text-xl font-medium _mb-11 _mt-20 [@media(max-width:1300px)]:gap-8">
                <Link href="/from-osu/select">
                   <Button
                      className={tw(
@@ -113,7 +131,7 @@ export default function LandingPage() {
                      Spotify to beatmaps
                   </Button>
                </Link>
-            </div>
+            </nav>
          </div>
          <Footer />
       </div>

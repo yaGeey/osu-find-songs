@@ -43,7 +43,7 @@ export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; 
             Footer: () => <div className="h-4" />,
          }}
          overscan={300}
-         totalCount={maps.length}
+         totalCount={Math.round(maps.length / 2)}
          itemContent={(index, data) => {
             if (data.length > 1 && data.length < 18) {
                return <OsuCardSet key={data[0].id} beatmapsets={data} sortQuery={sortQuery} className="w-full" />

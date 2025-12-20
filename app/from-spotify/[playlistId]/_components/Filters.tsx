@@ -1,11 +1,9 @@
 'use client'
 import SwitchFullDict from '@/app/from-osu/_components/switches/SwitchFullDict'
 import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
-import { twMerge as tw } from 'tailwind-merge'
 import { useQueryState } from 'nuqs'
 import DropdownFilterMulti from '@/components/selectors/DropdownFilterMulti'
 import { SelectedOption } from '@/components/selectors/FilterOptions'
-import { BeatmapSet } from '@/types/Osu'
 import Search from './Search'
 // TODO If =1 then res: 1 - 1.99
 
@@ -13,19 +11,16 @@ export default function Filters({
    foundString,
    disabled = false,
    onFilterChange,
-   beatmapsets,
    onSearch,
 }: {
    foundString?: string
    disabled?: boolean
    onFilterChange: (filters: SelectedOption[]) => void
-   beatmapsets: BeatmapSet[][]
    onSearch: React.Dispatch<React.SetStateAction<string>>
 }) {
    const [m, setM] = useQueryState('m', { defaultValue: '' })
    const [s, setS] = useQueryState('s', { defaultValue: '' })
    const [sort, setSort] = useQueryState('sort', { defaultValue: '' })
-   // useEffect(() => { if (sort) setSort('') }, []) //? don't work, don't know why it's not clearing
 
    return (
       <div className="relative">

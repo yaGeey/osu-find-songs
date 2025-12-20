@@ -27,7 +27,7 @@ export default function Footer() {
       },
    })
    return (
-      <div className="mt-auto mb-8">
+      <footer className="mt-auto mb-8">
          <p className="text-lg">Consider staring ⭐ a GitHub repo if you like this app!</p>
          {lastUpdated && stargazeCount && (
             <a
@@ -41,6 +41,6 @@ export default function Footer() {
                <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px] ml-1" />
             </a>
          )}
-      </div>
+      </footer>
    )
 }
