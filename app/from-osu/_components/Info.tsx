@@ -46,7 +46,7 @@ export default function Info({ data, onClose, className }: Props) {
    const yt = useQuery({
       queryKey: ['youtube', local.id],
       queryFn: async (): Promise<Media[]> => {
-         let song = applyAlwaysConditions(local)
+         const song = applyAlwaysConditions(local)
          const { data } = await axios.get(`/api?query=${encodeURIComponent(song.author + ' ' + song.title)}`)
          return data
       },
@@ -169,7 +169,7 @@ export default function Info({ data, onClose, className }: Props) {
                   <div className="flex gap-2">
                      <span className="text-5xl text-red-500 font-bold">!</span>
                      <span className="text-lg font-semibold">
-                        The song wasn't found through a normal search query, so there could be a ton of useless results
+                        The song wasn&apos;t found through a normal search query, so there could be a ton of useless results
                      </span>
                   </div>
                )}

@@ -4,7 +4,7 @@ import { neon } from '@neondatabase/serverless'
 
 export async function POST(req: Request) {
    const body = await req.json()
-   const {session_id, user_agent, referrer, page } = body
+   const { session_id, user_agent, referrer, page } = body
 
    let country = req.headers.get('x-vercel-ip-country')
    let city = req.headers.get('x-vercel-ip-city')
@@ -21,7 +21,6 @@ export async function POST(req: Request) {
    }
 
    try {
-      'use server'
       const sql = neon(`${process.env.DATABASE_URL}`)
       await sql`
          INSERT INTO telemetry (session_id, user_agent, referrer, country, city, page)

@@ -112,12 +112,12 @@ export default function SelectPage() {
                </h2>
                <FontAwesomeIcon icon={faCopy} />
             </div>
-            <div className="relative border-2 border-dashed w-full border-main rounded-lg mt-7 p-8 text-center relative hover:brightness-125 transition-all">
+            <div className="border-2 border-dashed w-full border-main rounded-lg mt-7 p-8 text-center relative hover:brightness-125 transition-all">
                <div className="text-main pointer-none">
                   <FontAwesomeIcon icon={faUpload} className="text-5xl mb-3" />
                   <div className="text-lg font-medium">Click to select folder</div>
                </div>
-               {/* @ts-expect-error */}
+               {/* @ts-expect-error directory exists*/}
                <input directory=""
                   webkitdirectory=""
                   type="file"

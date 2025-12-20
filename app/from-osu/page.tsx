@@ -34,7 +34,7 @@ import { FO_CHUNK_SIZE } from '@/variables'
 
 export default function FromOsu() {
    const router = useRouter()
-   let { songs, setSongs } = useSongContext()
+   const { songs, setSongs } = useSongContext()
    useEffect(() => {
       if (!songs.length) {
          router.push('/from-osu/select')

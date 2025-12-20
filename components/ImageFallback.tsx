@@ -14,6 +14,7 @@ export default function ImageFallback({
    return (
       <Image
          {...props}
+         alt={props.alt ?? 'image'}
          src={imgSrc}
          onError={() => {
             setImgSrc(fallbackSrc)

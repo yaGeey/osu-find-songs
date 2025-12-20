@@ -69,7 +69,7 @@ export default function DownloadAllBtn({
             ]}
             status="info"
          >
-            Please wait, this may take some time. Don't close this page
+            Please wait, this may take some time. Don&apos;t close this page
          </Modal>
          <Modal
             isOpen={modal?.type === 'downloading' && progress === null}

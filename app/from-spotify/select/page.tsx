@@ -6,8 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import Footer from '@/components/Footer'
 import { twMerge as tw } from 'tailwind-merge'
-import { useMutation } from '@tanstack/react-query'
-import { getPlaylist } from '@/lib/Spotify'
 
 export default function SelectPage() {
    const [isLoading, setIsLoading] = useState(false)
@@ -16,12 +14,11 @@ export default function SelectPage() {
    const router = useRouter()
 
    // functio parse
-   
+
    function handleClick(url: string) {
       setIsLoading(true)
       const parts = url.split('/')
       const id = parts[parts.length - 1].split('?')[0]
-      // @ts-ignore
       router.push('/from-spotify/' + id)
    }
 

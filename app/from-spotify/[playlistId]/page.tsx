@@ -131,7 +131,7 @@ export default function PLaylistPage() {
    })
 
    const isLoading = beatmapsetQueries.some((q) => q.isFetching) || isTracksLoadingFinal || playlistLoading
-   const { addTimeLeft, resetTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
+   const { addTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // full data
    useEffect(() => {
@@ -264,7 +264,7 @@ export default function PLaylistPage() {
                {!isLoading && !maps.length && (
                   <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
                      No results found
-                     <p className="text-base">Try setting the state to 'any' to see unranked maps</p>
+                     <p className="text-base">Try setting the state to &apos;any&apos; to see unranked maps</p>
                   </div>
                )}
                {isLoading && <Loading className="top-39 h-[calc(100%-9.75rem)]" radius={50} />}

@@ -5,6 +5,7 @@ import Providers from './Providers'
 import { Analytics } from '@vercel/analytics/next'
 import { HighlightInit } from '@highlight-run/next/client'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import Script from 'next/script'
 
 // This ensures that the icon CSS is loaded immediately before attempting to render icons
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -32,12 +33,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
    return (
       <html lang="en">
          <head>
-            {isDev && <script src="https://unpkg.com/react-scan/dist/auto.global.js" />}
             <JsonLd />
          </head>
          <body
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
          >
+            {isDev && <Script src="https://unpkg.com/react-scan/dist/auto.global.js" strategy="beforeInteractive" />}
             {!isDev && (
                <HighlightInit
                   excludedHostnames={['localhost']}
