@@ -3,6 +3,17 @@
 This is my pet project I built to connect **osu** with **Spotify**. It features two main tools:
 
 ---
+<p align="center">
+   <strong style="font-size: 20px;">From Spotify to osu!</strong>
+</p>
+<p align="center">
+  <img src="./public/preview.png" width="500"/>
+</p>
+
+Pick any **public Spotify playlist** and the app will try to match each track **to osu! beatmaps**. You can filter, sort and search results with all the options provided by osu search queries and even custom one. Once you're happy with the results, you can download each beatmap individually — or grab them all in a single zip archive.
+
+
+---
 
 <p align="center">
   <strong style="font-size: 20px;">From osu! to Spotify</strong>
@@ -11,24 +22,14 @@ This is my pet project I built to connect **osu** with **Spotify**. It features 
   <img src="./public/from-osu.png" width="500"/>
 </p>
 
-Just point to your `Songs/` folder, and the app will scan all your `.osu` files to extract track metadata. It then automatically searches for those songs on **Spotify, YouTube, and Wikipedia** (to get artist info). You can view listen or watch videos in app, and instantly **generate a Spotify playlist**. There's also advanced **sorting, filtering, search, and grouping**, similar to the native osu! client, so you can organize your songs exactly the way you're used to.
+The app will scan all your ```.osu``` files to extract track metadata. It then automatically searches for those songs on Spotify and YouTube. You can view, listen or watch videos in the app, and instantly **generate a Spotify playlist**. Similarly to the native osu! client, you can organize your songs exactly the way you're used to.
 
----
-
-<p align="center">
-   <strong style="font-size: 20px;">From Spotify to osu!</strong>
-</p>
-<p align="center">
-  <img src="./public/from-spotify.png" width="500"/>
-</p>
-
-Pick any **public Spotify playlist** and the app will try to match each track to **osu! beatmaps**. You can **filter, sort and search** results with all the options provided by osu search queries and even custom one. Once you're happy with the results, you can **download** each beatmap individually — or grab them all in a single zip archive. The app picks the "best match" per track using your sorting preferences.
 
 ---
 
 ### Try it out!
 
-> For **minimal usage** I suggest throw your osu songs folder at app, wait for a couple of minutes and get freshly new Spotify playlist to listen.
+For **minimal usage** I suggest throw your osu songs folder at app, wait for a couple of minutes and get freshly new Spotify playlist to listen.
 
 I hope you find this tool useful and fun to use. I really put soul in it.
 Thanks for checking it out — and even bigger thanks if you decide to give it a try!💗
