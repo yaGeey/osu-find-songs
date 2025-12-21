@@ -1,4 +1,3 @@
-import { RateLimitManager } from '@/lib/RateLimitManager'
 import { BeatmapSet } from '@/types/Osu'
 import { getWindowsFriendlyLocalTime } from '@/utils/dates'
 import { download } from '@/utils/osuDownload'
@@ -7,6 +6,7 @@ import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { customAxios } from '@/lib/axios'
 import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
+import RateLimitManager from '@/lib/api/RateLimitManager'
 
 const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
 
@@ -58,7 +58,6 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
          })
 
       toast.promise(promise, {
-         success: 'Downloaded successfully',
          error: 'Download failed',
       })
    }

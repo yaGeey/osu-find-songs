@@ -43,7 +43,9 @@
     "next-auth": "^4.24.11",
     "next-intl": "^3.26.3",
     "nuqs": "^2.4.1",
+    "osu-api-extended": "^3.1.7",
     "p-limit": "^7.2.0",
+    "p-queue": "^9.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-error-boundary": "^5.0.0",
@@ -76,6 +78,7 @@
     "prettier": "^3.5.3",
     "tailwind-scrollbar": "^4.0.0",
     "tailwindcss": "^4.1.14",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   },
   "overrides": {

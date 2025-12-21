@@ -1,13 +1,13 @@
 // https://github.com/eligrey/FileSaver.js/issues/796 - xhr download progress
-// TODO: xhr requests download progress add
 // TODO with videos error fetching download
 import axios, { AxiosResponse, isAxiosError } from 'axios'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { createParallelAction } from './serverActionsParallel'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import { RateLimitManager } from '@/lib/RateLimitManager'
+import RateLimitManager from '@/lib/api/RateLimitManager'
+import RateLimitWithWindowManager from '@/lib/api/RateLimitWithWindowManager'
+import { BaseLimiter } from '@/lib/api/Base'
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -21,19 +21,6 @@ export function download(blob: Blob, filename: string) {
    window.URL.revokeObjectURL(url)
 }
 
-export const getNoVideoAxios = async (id: number) => {
-   const res = await axios.get(`https://catboy.best/d/${id}`, {
-      responseType: 'blob',
-   })
-   return res.data
-}
-export const getNoVideoParallel = createParallelAction(async (id: number) => {
-   const res = await axios.get(`https://catboy.best/d/${id}`, {
-      responseType: 'blob',
-   })
-   return res.data
-})
-
 const sendTemeletry = async (mapId: string) => {
    try {
       const sessionId = localStorage.getItem('sessionId')
@@ -42,30 +29,53 @@ const sendTemeletry = async (mapId: string) => {
    } catch (err) {}
 }
 
+const getBeatmap = async <T extends BaseLimiter>(
+   manager: T,
+   url: string,
+   id: number,
+   update: (id: number, downloadedBytes: number, totalBytes: number) => void,
+) => {
+   const controller = new AbortController()
+   let progressTimer: NodeJS.Timeout
+
+   const res = await manager.execute<AxiosResponse<Blob>>(() =>
+      axios.get(url, {
+         responseType: 'blob',
+         onDownloadProgress: (progressEvent) => {
+            clearTimeout(progressTimer)
+            progressTimer = setTimeout(() => {
+               controller.abort()
+            }, 5000)
+            if (progressEvent.total) {
+               update(id, progressEvent.loaded, progressEvent.total)
+            }
+         },
+         signal: controller.signal,
+      }),
+   )
+   return res.data
+}
+
 export const useNoVideoAxios = (id: number, filename: string) => {
    const { remove, update } = useMapDownloadStore()
-   const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
+   const managerCatboy = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
+   //? https://nerinyan.stoplight.io/docs/nerinyan-api/df11b327494c9-download-beatmapset
+   const managerNerinyan = RateLimitWithWindowManager.getInstance('nerinyan', { avg: 25, burst: 100, durationMs: 60000 })
+
    return useMutation({
       mutationFn: async () => {
          await sendTemeletry(id.toString())
-         const res = await manager.getRateLimited<AxiosResponse<Blob>>(() =>
-            axios.get(`https://catboy.best/d/${id}`, {
-               responseType: 'blob',
-               onDownloadProgress: (progressEvent) => {
-                  if (progressEvent.total) {
-                     update(id, progressEvent.loaded, progressEvent.total)
-                  }
-               },
-               timeout: 15000,
-               timeoutErrorMessage: `Can't download map, please download it directly from osu! website. \nhttps://osu.ppy.sh/beatmapsets/${id}`,
-            }),
-         )
-         return res.data
+         try {
+            return await getBeatmap(managerCatboy, `https://catboy.best/d/${id}`, id, update)
+         } catch (err) {
+            console.warn('Catboy failed, falling back to Nerinyan', err)
+            return await getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}`, id, update)
+         }
       },
       onError: (error: any) => {
          remove(id)
          console.error('Error downloading file:', error)
-         toast.error('Error downloading file: ' + error.message)
+         toast.error(`Can't download map, please download it directly from osu! website. \nhttps://osu.ppy.sh/beatmapsets/${id}`)
       },
       onSuccess: (data: Blob) => {
          remove(id)
@@ -77,39 +87,4 @@ export const useNoVideoAxios = (id: number, filename: string) => {
          }
       },
    })
-}
-
-export const getVideo = async (id: number) => {
-   const res = await fetch(`https://osu.ppy.sh/beatmapsets/${id}/download`)
-   if (!res.ok) throw new Error(await res.text())
-   return res.blob()
-}
-
-function downloadXhr(url: string, filename: string): void {
-   let blob: Blob
-   const xhr = new XMLHttpRequest()
-   xhr.open('GET', url, true)
-   xhr.responseType = 'blob'
-   xhr.onload = function (e): void {
-      blob = new Blob([this.response])
-   }
-   xhr.onprogress = function (pr): void {
-      console.log(pr.loaded / pr.total)
-   }
-   xhr.onloadend = function (e): void {
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.style.display = 'none'
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
-   }
-   xhr.send()
-}
-export const downloadNoVideoXhr = async (id: number, filename: string) => {
-   const res = downloadXhr(`https://catboy.best/d/${id}`, filename)
-   console.log(res)
 }
