@@ -15,7 +15,12 @@ export default function ErrorCallback({
    useEffect(() => {
       console.error(error)
       if (process.env.NODE_ENV !== 'development') {
-         sendTelegramError(error.message, error.digest)
+         sendTelegramError(`
+            🚨 <b>App Error</b>
+            <b>URL:</b> ${window.location.href}
+            <b>Message:</b> ${error.message}
+            <pre><code class="language-json">${JSON.stringify(error, null, 2)}</code></pre>
+         `)
       }
    }, [error])
 
