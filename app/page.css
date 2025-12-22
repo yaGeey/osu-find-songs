@@ -1,3 +1,36 @@
+/* ---------- BUTTONS ---------- */
+.animate-border-from-spotify {
+   border: 3px solid #0000;
+   background:
+      linear-gradient(to right, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+      linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
+   animation: 4s rotate linear infinite;
+   transition: all 0.3s ease;
+}
+.border-from-spotify {
+   border: 3px solid #0000;
+   background:
+      linear-gradient(to right, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+      linear-gradient(var(--angle), var(--color-main-border), var(--color-main-border)) border-box;
+   transition: all 0.3s ease;
+}
+.animate-border-from-osu {
+   border: 3px solid #0000;
+   background:
+      linear-gradient(to left, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+      linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
+   animation: 4s rotate linear infinite;
+   transition: all 0.3s ease;
+}
+.border-from-osu {
+   border: 3px solid #0000;
+   background:
+      linear-gradient(to left, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
+      linear-gradient(var(--angle), var(--color-main-border), var(--color-main-border)) border-box;
+   transition: all 0.3s ease;
+}
+/* ---------- CARDS ---------- */
+
 .card-front {
    transform: scale(1) translate(0, 0);
    z-index: 2;

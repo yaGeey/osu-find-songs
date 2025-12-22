@@ -10,20 +10,22 @@ import { useState } from 'react'
 import './page.css'
 
 export default function LandingPage() {
-   const [details, setDetails] = useQueryState('details', { defaultValue: '' })
+   const [details, setDetails] = useState('')
    const [imagesLoaded, setImagesLoaded] = useState({ osu: false, spotify: false })
    return (
-      <div className="flex flex-col justify-center items-center min-h-screen text-white -z-1">
+      <div className="flex flex-col justify-center items-center [min-height:100dvh] text-white -z-1 gap-16 p-5">
          <BgImage />
-         <div className="mb-11 flex flex-col gap-20 items-center mt-24 [@media(max-width:1300px)]:mt-1">
-            <div className="h-[400px] flex gap-16 justify-center items-center [@media(max-width:1300px)]:flex-col [@media(max-width:1300px)]:h-[800px]">
-               <div className="w-[600px] h-full px-5 py-10">
-                  <div className="flex gap-6 items-center ">
-                     <Image src="/icon.png" width={80} height={80} alt="logo" className="drop-shadow-sm" />
-                     <h1 className="text-4xl/[48px] w-[260px] tracking-tight font-semibold">Welcome to osu! find songs</h1>
+         <div className="flex flex-col gap-20 max-sm:gap-0 items-center mt-19 max-landing:mt-12 max-landing:w-fit max-landing:max-w-4/5 max-sm:w-full">
+            <div className="h-[400px] max-sm:h-fit max-landing:h-auto flex gap-1 justify-center items-center max-landing:flex-col max-landing:gap-11">
+               <div className="max-w-[600px] max-landing:max-w-full h-full max-landing:h-auto px-5 py-10 max-landing:py-0">
+                  <div className="flex gap-6 items-center max-sm:flex-col max-landing:justify-center">
+                     <Image src="/icon.png" width={80} height={80} alt="logo" className="drop-shadow-sm max-sm:scale-80" />
+                     <h1 className="text-4xl/[48px] w-[260px] max-sm:text-2xl max-sm:w-full max-landing:text-center max-sm:-mt-5 tracking-tight font-semibold">
+                        Welcome to osu! find songs
+                     </h1>
                   </div>
                   <p
-                     className="text-xl/[35px] mt-[1.95rem] animate-in fade-in slide-in-from-bottom-2.5 duration-1000"
+                     className="text-lg/[30px] max-landing:text-center text-balance max-sm:text-base mt-[1.95rem] animate-in fade-in slide-in-from-bottom-2.5 duration-1000"
                      key={details ?? 'none'}
                   >
                      {!details &&
@@ -52,13 +54,16 @@ export default function LandingPage() {
                      </section>
                   </div>
                </div>
+               <div className="visible landing:hidden w-full flex justify-between items-center max-w-[740px] max-landing:max-w-[590px]">
+                  <NavigationButtons details={details} />
+               </div>
                <div
-                  className="w-[600px] h-full relative"
+                  className="w-[590px] h-[380px] relative max-sm:hidden"
                   onClick={() => setDetails((p) => (p === 'from-spotify' || !p ? 'from-osu' : 'from-spotify'))}
                >
                   <div
                      className={tw(
-                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer transition-all duration-700 overflow-hidden',
+                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer overflow-hidden',
                         !imagesLoaded.osu && 'opacity-0',
                         details === 'from-osu'
                            ? 'card-front go-front'
@@ -78,7 +83,7 @@ export default function LandingPage() {
                   </div>
                   <div
                      className={tw(
-                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer transition-all duration-700 overflow-hidden',
+                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer overflow-hidden',
                         !imagesLoaded.spotify && 'opacity-0',
                         details === 'from-spotify'
                            ? 'card-front go-front'
@@ -106,35 +111,43 @@ export default function LandingPage() {
                   </span>
                </div>
             </div>
-            <nav className="flex gap-44 text-xl font-medium _mb-11 _mt-20 [@media(max-width:1300px)]:gap-8">
-               <Link href="/from-osu/select">
-                  <Button
-                     className={tw(
-                        'w-70 py-2 text-black ',
-                        details === 'from-osu' &&
-                           'scale-105 animate-border-from-osu [box-shadow:0_0_100px_3px_var(--color-animated-border)]',
-                        details !== 'from-osu' && 'border-from-osu',
-                     )}
-                  >
-                     Beatmaps to Spotify
-                  </Button>
-               </Link>
-               <Link href="/from-spotify/select">
-                  <Button
-                     className={tw(
-                        'w-70 py-2 text-black ',
-                        details === 'from-spotify' &&
-                           'scale-105 animate-border-from-spotify [box-shadow:0_0_100px_3px_var(--color-animated-border)]',
-                        details !== 'from-spotify' && 'border-from-spotify',
-                     )}
-                  >
-                     Spotify to beatmaps
-                  </Button>
-               </Link>
-            </nav>
+            <div className="hidden landing:block w-[740px]">
+               <NavigationButtons details={details} />
+            </div>
          </div>
          <Footer />
       </div>
    )
 }
 // bg-gradient-to-l from-brand-spotify to-brand-osu
+
+function NavigationButtons({ details }: { details: string }) {
+   return (
+      <nav className="w-full grow items-center max-sm:text-base max-sm:-mt-2 flex justify-between text-lg font-medium max-sm:flex-col max-sm:gap-4 max-sm:items-center">
+         <Link href="/from-osu/select">
+            <Button
+               className={tw(
+                  'w-70 py-2 text-black max-sm:w-fit',
+                  details === 'from-osu' &&
+                     'scale-105 animate-border-from-osu [box-shadow:0_0_60px_1px_var(--color-animated-border)]',
+                  details !== 'from-osu' && 'border-from-osu',
+               )}
+            >
+               Beatmaps to Spotify
+            </Button>
+         </Link>
+         <Link href="/from-spotify/select">
+            <Button
+               className={tw(
+                  'w-70 py-2 text-black max-sm:w-fit',
+                  details === 'from-spotify' &&
+                     'scale-105 animate-border-from-spotify [box-shadow:0_0_60px_1px_var(--color-animated-border)]',
+                  details !== 'from-spotify' && 'border-from-spotify',
+               )}
+            >
+               Spotify to beatmaps
+            </Button>
+         </Link>
+      </nav>
+   )
+}

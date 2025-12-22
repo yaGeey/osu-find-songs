@@ -35,6 +35,7 @@
    --color-white-50: #d9d9d9;
 
    --breakpoint-lgx: 75rem;
+   --breakpoint-landing: 1220px;
 
    --font-inter: 'Inter', sans-serif;
    --font-inter-tight: 'Inter Tight', sans-serif;
@@ -134,37 +135,6 @@
          linear-gradient(transparent, var(--color-dialog) 60px, var(--color-dialog) 100%),
          url(/osu/tris2.png) no-repeat top right,
          var(--color-dialog);
-   }
-
-   .animate-border-from-spotify {
-      border: 3px solid #0000;
-      background:
-         linear-gradient(to right, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
-         linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
-      animation: 5s rotate linear infinite;
-      transition: all 0.3s ease;
-   }
-   .border-from-spotify {
-      border: 3px solid #0000;
-      background:
-         linear-gradient(to right, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
-         linear-gradient(var(--angle), var(--color-main-border), var(--color-main-border)) border-box;
-      transition: all 0.3s ease;
-   }
-   .animate-border-from-osu {
-      border: 3px solid #0000;
-      background:
-         linear-gradient(to left, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
-         linear-gradient(var(--angle), var(--color-main-border), var(--color-animated-border)) border-box;
-      animation: 5s rotate linear infinite;
-      transition: all 0.3s ease;
-   }
-   .border-from-osu {
-      border: 3px solid #0000;
-      background:
-         linear-gradient(to left, var(--color-brand-spotify), var(--color-brand-osu)) padding-box,
-         linear-gradient(var(--angle), var(--color-main-border), var(--color-main-border)) border-box;
-      transition: all 0.3s ease;
    }
 }
 

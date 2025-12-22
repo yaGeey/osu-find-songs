@@ -10,7 +10,7 @@ import Script from 'next/script'
 // This ensures that the icon CSS is loaded immediately before attempting to render icons
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { config } from '@fortawesome/fontawesome-svg-core'
-import MobileDeviceCheck from '@/components/MobileDeviceCheck'
+// import MobileDeviceCheck from '@/components/MobileDeviceCheck'
 import Telemetry from '@/components/Telemetry'
 import { Suspense } from 'react'
 import { metadataObj, JsonLd } from './metadata'
@@ -54,7 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             )}
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
                <Providers>
-                  <MobileDeviceCheck />
+                  {/* <MobileDeviceCheck /> */}
                   <Telemetry />
                   {children}
                </Providers>

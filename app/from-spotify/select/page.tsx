@@ -33,12 +33,14 @@ export default function SelectPage() {
    })
 
    return (
-      <div className="flex flex-col justify-center items-center min-h-screen text-white">
+      <div className="flex flex-col justify-center items-center min-h-screen text-white p-5">
          <BgImage />
-         <div className="flex flex-col justify-center items-center flex-1 text-nowrap mt-1">
-            <h1 className="text-4xl tracking-tight font-semibold mb-3">Select a public playlist</h1>
-            <h3 className="text-lg text-white/60">*NOT Albums, Daily Mixes, or Private playlists</h3>
-            <h2 className="text-xl mt-7 mb-3">Right-click the playlist → Share → Copy link to playlist</h2>
+         <div className="flex flex-col justify-center items-center flex-1 sm:text-nowrap mt-1">
+            <h1 className="text-4xl max-sm:text-2xl tracking-tight font-semibold mb-3">Select a public playlist</h1>
+            <h3 className="text-lg max-sm:text-sm text-white/60">*NOT Albums, Daily Mixes, or Private playlists</h3>
+            <h2 className="text-xl max-sm:text-base mt-7 mb-3 text-center">
+               Right-click the playlist → Share → Copy link to playlist
+            </h2>
 
             <div className="relative w-full">
                <input

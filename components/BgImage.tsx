@@ -26,6 +26,7 @@ export default function BgImage({ image, className }: { image?: string; brightne
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             onLoad={() => setIsLoaded(true)}
             suppressHydrationWarning
+            priority
          />
          {!isLoaded && <div className="absolute top-0 left-0 w-full h-full bg-main-border"></div>}
       </div>

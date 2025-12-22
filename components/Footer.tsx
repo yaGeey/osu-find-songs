@@ -27,13 +27,13 @@ export default function Footer() {
       },
    })
    return (
-      <footer className="mt-auto mb-8">
-         <p className="text-lg">Consider staring ⭐ a GitHub repo if you like this app!</p>
+      <footer className="mt-auto">
+         <p className="text-base max-sm:text-[13px] px-1 text-center">Consider staring ⭐ a GitHub repo if you like this app!</p>
          {lastUpdated && stargazeCount && (
             <a
                href="https://github.com/yaGeey/osu-find-songs"
                target="_blank"
-               className="flex px-2 justify-center items-center text-base text-white/60 animate-in fade-in duration-500 hover:underline"
+               className="text-sm max-sm:text-[13px] flex px-2 justify-center items-center text-white/60 hover:underline"
             >
                GitHub
                <FontAwesomeIcon icon={faStar} className="text-[10px] mx-1" />
