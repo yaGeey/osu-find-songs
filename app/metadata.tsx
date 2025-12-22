@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import { WebApplication, WithContext } from 'schema-dts'
+
 const description =
-   'Easily find songs on Spotify and YouTube. Instantly create a Spotify playlist with all your songs in one click. Discover beatmaps from any Spotify playlist and enhance your osu! experience.'
-const title = 'osu! find songs – Search & Convert 🎵'
+   'osufindsongs is the easiest way to find songs on Spotify and YouTube for osu!. Instantly create Spotify playlists and discover beatmaps from any playlist to enhance your osu! experience.'
+const title = 'osufindsongs – find osu! songs & convert 🎵'
+const url = 'https://osu.yageey.me'
+
 export const metadataObj: Metadata = {
    title,
    description,
@@ -36,7 +39,7 @@ export const metadataObj: Metadata = {
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://osu-find-songs.vercel.app/icon.png'],
+      images: [`${url}/icon.png`],
    },
    robots: {
       follow: true,
@@ -55,10 +58,11 @@ export function JsonLd() {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
       name: title,
-      url: 'https://osufindsongs.vercel.app',
+      url,
       description,
       applicationCategory: 'MultimediaApplication',
-      screenshot: 'https://osufindsongs.vercel.app/preview.png',
+      screenshot: `${url}/preview.png`,
+      operatingSystem: "Windows, macOS, Linux, Web",
       featureList: [
          'Convert Spotify playlists to osu! beatmaps',
          'Scan osu! beatmaps and create Spotify playlists',
@@ -73,7 +77,7 @@ export function JsonLd() {
       },
       subjectOf: {
          '@type': 'VideoObject',
-         name: 'ThunderBirdo featured osu! find songs in his video',
+         name: 'ThunderBirdo featured osufindsongs in his video',
          contentUrl: 'https://www.youtube.com/watch?v=0uZ4RehxDO4',
       },
    }
