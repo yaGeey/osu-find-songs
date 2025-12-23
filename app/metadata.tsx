@@ -120,7 +120,7 @@ export function JsonLd() {
                '@type': 'Organization',
                name: 'Reddit',
             },
-            datePublished: '2025-03-21',
+            datePublished: '2025-03-21T20:28:02+02:00',
             author: {
                '@type': 'Person',
                name: 'Old-Dish-7104',
@@ -138,7 +138,7 @@ export function JsonLd() {
                '@type': 'Organization',
                name: 'Reddit',
             },
-            datePublished: '2025-07-21',
+            datePublished: '2025-07-21T22:06:33+02:00',
             author: {
                '@type': 'Person',
                name: 'Old-Dish-7104',
