@@ -120,6 +120,13 @@ export function JsonLd() {
                '@type': 'Organization',
                name: 'Reddit',
             },
+            datePublished: '2025-03-21',
+            author: {
+               '@type': 'Person',
+               name: 'Old-Dish-7104',
+               url: 'https://www.reddit.com/user/Old-Dish-7104/',
+               sameAs: ['https://yageey.me', 'https://github.com/yaGeey'],
+            },
          },
          // 3. Reddit Пост (Update/Fix)
          {
@@ -130,6 +137,13 @@ export function JsonLd() {
             publisher: {
                '@type': 'Organization',
                name: 'Reddit',
+            },
+            datePublished: '2025-07-21',
+            author: {
+               '@type': 'Person',
+               name: 'Old-Dish-7104',
+               url: 'https://www.reddit.com/user/Old-Dish-7104/',
+               sameAs: ['https://yageey.me', 'https://github.com/yaGeey'],
             },
          },
          // 4. Каталог osuck.net
