@@ -11,10 +11,12 @@ export type ProgressNotifyHandle = {
 export default function ProgressNotify({
    children,
    color = 'text-accent',
+   textBgColor = 'bg-accent/30',
    ref,
 }: {
    children?: React.ReactNode
    color?: string
+   textBgColor?: string
    ref: React.Ref<ProgressNotifyHandle | null>
 }) {
    const [visible, setVisible] = useState<boolean>(false)
@@ -53,7 +55,8 @@ export default function ProgressNotify({
          <LinearProgress variant="determinate" value={100} color="inherit" />
          <div
             className={tw(
-               'absolute top-1 right-0 z-1000 bg-accent/30 text-gray-800 text-xs px-1 rounded-bl-sm min-w-[100px] text-end pointer-events-auto',
+               'absolute top-1 right-0 z-1000 text-gray-800 text-xs px-1 rounded-bl-sm min-w-[100px] text-end pointer-events-auto',
+               textBgColor,
             )}
          >
             {children}

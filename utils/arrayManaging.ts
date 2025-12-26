@@ -160,7 +160,10 @@ export function mergeGroupedArrays<T>(grouped: Record<string, any[]>[]) {
    return grouped.reduce(
       (acc, obj) => {
          for (const [key, value] of Object.entries(obj)) {
-            acc[key] = [...(acc[key] || []), ...(value || [])]
+            // ❌ НЕБЕЗПЕЧНО: Spread operator на великих масивах
+            // acc[key] = [...(acc[key] || []), ...(value || [])]
+            // ✅ БЕЗПЕЧНО: Використання concat (створює новий масив, не використовуючи стек)
+            acc[key] = (acc[key] || []).concat(value || [])
          }
          return acc
       },

@@ -23,10 +23,10 @@ export default function Filters({
    const [sort, setSort] = useQueryState('sort', { defaultValue: '' })
 
    return (
-      <div className="relative">
+      <div className="relative flex flex-col gap-3 text-[15px]">
          {/* Main filters */}
-         <div className="flex justify-between text-[15px] ">
-            <div className="flex items-center gap-6.5 text-[15px]">
+         <div className="flex justify-between ">
+            <div className="flex items-center gap-6.5">
                <h4>Mode</h4>
                <SwitchFullDict
                   className="font-inter"
@@ -44,7 +44,7 @@ export default function Filters({
             </div>
             <Search onSearch={onSearch} disabled={disabled} />
          </div>
-         <section className="flex items-center gap-7.5 mt-3 text-[15px]">
+         <section className="flex items-center gap-7.5">
             <h4>State</h4>
             <SwitchFullDict
                className="font-inter"
@@ -61,11 +61,11 @@ export default function Filters({
                onChange={(val) => setS(val)}
             />
          </section>
-         <section className="flex items-center gap-5.5 mt-3 text-[15px]">
+         <section className="flex items-center gap-5.5">
             <h4>Filters</h4>
             <DropdownFilterMulti onSelected={(opt) => onFilterChange(opt)} />
          </section>
-         <section className="flex items-center gap-4 mt-3 text-[15px]">
+         <section className="flex items-center gap-4">
             <h4>Sort by</h4>
             <SwitchSort
                options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites', 'date added']}
@@ -78,9 +78,7 @@ export default function Filters({
             />
          </section>
          {foundString && !disabled && (
-            <div className="absolute animate-in fade-in right-4 bottom-2 text-white/70 font-outline-sm tracking-wider text-sm hidden lg:block">
-               {foundString} <span className="text-sm">found</span>
-            </div>
+            <div className="absolute right-2 bottom-1 text-white tracking-wide text-sm hidden md:block">{foundString}</div>
          )}
       </div>
    )

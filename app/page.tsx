@@ -34,7 +34,7 @@ export default function LandingPage() {
                      key={details ?? 'none'}
                   >
                      {!details &&
-                        'A tool that links osu! with Spotify: scan your beatmaps to build playlists and find songs, or find beatmaps from playlists and download them.'}
+                        'osu! find songs is the tool that links osu! with Spotify: scan your beatmaps to build playlists and find songs, or find beatmaps from playlists and download them.'}
                      {details === 'from-spotify' &&
                         "Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can filter, sort and search results with all the options provided by osu search queries and even custom one. Once you're happy with the results, you can download each beatmap individually — or grab them all in a single zip archive."}
                      {details === 'from-osu' &&
