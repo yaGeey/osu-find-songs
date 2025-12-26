@@ -9,28 +9,28 @@ export default function HomeBtn() {
 
    return (
       <>
-         <div className="relative w-[30px] h-[30px]" onClick={() => setIsHomeRedirectModalVisible(true)}>
-            <Image src="/icons/home.svg" fill sizes="100" alt="settings" className="hover:scale-110 transition-all" />
+         <div className="relative w-[30px] h-[30px]" onClick={() => router.push('/')}>
+            <Image src="/icons/home.svg" fill sizes="100" alt="settings" className="hover:scale-105 transition-all" />
          </div>
-         <Modal
+         {/* <Modal
             isOpen={isHomeRedirectModalVisible}
             status="warning"
             buttons={[
                {
                   onClick: () => router.push('/'),
-                  text: 'Redirect',
+                  children: 'Redirect',
                   className: 'bg-success',
                },
                {
                   onClick: () => setIsHomeRedirectModalVisible(false),
-                  text: 'Stay',
+                  children: 'Stay',
                   className: 'bg-main-dark',
                },
             ]}
          >
             <h4>You are about to be redirected to the landing page</h4>
             <p>Your progress will not be saved</p>
-         </Modal>
+         </Modal> */}
       </>
    )
 }

@@ -94,7 +94,7 @@ export default function LandingPage() {
                      )}
                   >
                      <Image
-                        src="/from-spotify.png"
+                        src="/fs.png"
                         alt="From Spotify to osu!"
                         fill
                         priority

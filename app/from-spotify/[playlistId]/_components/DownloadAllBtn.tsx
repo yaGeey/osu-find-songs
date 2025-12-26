@@ -1,11 +1,9 @@
 import { Button } from '@/components/buttons/Buttons'
-import Modal from '@/components/Modal'
-import Progress from '@/components/state/Progress'
-import useDownloadAll from '@/hooks/useDownloadAll'
+import Modal, { ModalProps } from '@/components/Modal'
 import { BeatmapSet } from '@/types/Osu'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 export default function DownloadAllBtn({
    disabled,
@@ -19,10 +17,65 @@ export default function DownloadAllBtn({
    handleDownloadAll: () => void
 }) {
    const [modal, setModal] = useState<null | { type: string; data?: any }>(null)
+
+   const modalConfig = useMemo((): Omit<ModalProps, 'isOpen'> | undefined => {
+      const def = {
+         title: 'Download All Beatmaps',
+         className: 'w-150 h-50',
+         setIsOpen: () => setModal(null),
+      }
+      const closeBtn = {
+         onClick: () => setModal(null),
+         children: 'Okay',
+         className: 'bg-main-dark',
+      }
+      switch (modal?.type) {
+         case 'confirm-download':
+            return {
+               ...def,
+               status: 'info',
+               buttons: [
+                  {
+                     onClick: () => setModal(null),
+                     children: 'Cancel',
+                     className: 'bg-error w-30',
+                  },
+                  {
+                     onClick: () => {
+                        setModal({ type: 'downloading' })
+                        handleDownloadAll()
+                     },
+                     children: 'Download',
+                     className: 'bg-success w-30',
+                  },
+               ],
+               children: (
+                  <p>
+                     If there is more than one beatmap set for a song, the first one based on your search{' '}
+                     <span className="underline ">filters</span> will be downloaded
+                  </p>
+               ),
+            }
+         case 'downloading':
+            if (progress !== null) {
+               return {
+                  ...def,
+                  buttons: [closeBtn],
+                  children: "Please wait, this may take some time. Don't close this page",
+                  status: 'info',
+               }
+            } else {
+               return {
+                  ...def,
+                  status: 'success',
+                  children: 'Downloaded successfully',
+                  buttons: [closeBtn],
+               }
+            }
+      }
+   }, [modal])
    return (
       <>
-         {/* download all progress */}
-
          <Button
             onClick={() => setModal({ type: 'confirm-download' })}
             className="text-white py-0.5 px-5 bg-main-dark _invisible"
@@ -33,57 +86,18 @@ export default function DownloadAllBtn({
             <FontAwesomeIcon icon={faDownload} className="ml-2" />
          </Button>
 
-         <Modal
-            isOpen={modal?.type === 'confirm-download'}
-            buttons={[
-               {
-                  onClick: () => setModal(null),
-                  text: 'Cancel',
-                  className: 'bg-error',
-               },
-               {
-                  onClick: () => {
-                     setModal({ type: 'downloading' })
-                     handleDownloadAll()
-                  },
-                  text: 'Download',
-                  className: 'bg-success',
-               },
-            ]}
-            status="info"
-         >
-            <p className="text-balance text-center">
-               If there is more than one beatmap set for a song, the first one based on your search{' '}
-               <span className="text-accent font-outline-sm">filters</span> will be downloaded
-            </p>
-            {/* <p className=" text-center">Download with <span className="text-highlight font-outline">video</span>? It will take up more space.</p> */}
-         </Modal>
-         <Modal
-            isOpen={modal?.type === 'downloading' && progress !== null}
-            buttons={[
-               {
-                  onClick: () => setModal(null),
-                  text: 'Okay',
-                  className: 'bg-main-dark',
-               },
-            ]}
-            status="info"
-         >
-            Please wait, this may take some time. Don&apos;t close this page
-         </Modal>
-         <Modal
-            isOpen={modal?.type === 'downloading' && progress === null}
-            buttons={[
-               {
-                  onClick: () => setModal(null),
-                  text: 'Close',
-                  className: 'bg-main-dark',
-               },
-            ]}
-            status="success"
-         >
-            Downloaded successfully
-         </Modal>
+         {modalConfig && (
+            <Modal
+               isOpen={true}
+               setIsOpen={modalConfig.setIsOpen}
+               title={modalConfig.title}
+               status={modalConfig.status}
+               buttons={modalConfig.buttons}
+               className={modalConfig.className}
+            >
+               {modalConfig.children}
+            </Modal>
+         )}
       </>
    )
 }

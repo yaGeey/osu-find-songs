@@ -53,6 +53,7 @@ export default function Info({ data, onClose, className }: Props) {
       enabled: selection == 'youtube',
    })
 
+   // TODO wiki is enabled
    const wikiQuery = useQuery({
       queryKey: ['wiki', local.author],
       queryFn: async () => {
@@ -62,6 +63,7 @@ export default function Info({ data, onClose, className }: Props) {
          if (!content) return null
          return { title, url, content }
       },
+      enabled: false,
    })
 
    return (

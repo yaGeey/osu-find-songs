@@ -59,9 +59,7 @@ export default function OsuCardSet({
             ReactDom.createPortal(
                <div className={`fixed top-0 left-0 w-screen h-screen bg-black/40 z-1000`} onClick={onClose}>
                   <div
-                     className={
-                        'overflow-hidden absolute w-2/3 min-w-[685px] min-h-[500px] h-4/5 bg-main-darker rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001'
-                     }
+                     className="overflow-hidden absolute w-[685px] min-h-[500px] h-4/5 bg-main-darker rounded-xl border-4 border-main-border top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex-col z-1001"
                      onClick={(e) => e.stopPropagation()}
                   >
                      <div className="[background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r-t.svg)_no-repeat_top_right,var(--color-main-dark)] flex items-center justify-center gap-4 text-[15px] text-white p-4 w-full border-b-3 border-main-border">

@@ -13,7 +13,7 @@ export default function ExternalLink({
       <a
          href={href}
          target="_blank"
-         className={tw('selected hover:underline flex items-center', className, disabled ? 'pointer-events-none opacity-50' : '')}
+         className={tw('hover:underline flex items-center', className, disabled ? 'pointer-events-none opacity-50' : '')}
          {...props}
       >
          {props.children}

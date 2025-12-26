@@ -93,12 +93,11 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             .then(() => {
                handleModal(
                   <>
-                     <h1 className="text-lg font-semibold">Success!</h1>
                      <p>
                         ❤️ Like the playlist to save it to your library, <br /> 🔁 or copy tracks with Ctrl+A, C, then V in your
                         playlist.
                      </p>
-                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black animate-pulse font-outline">
+                     <ExternalLink href={playlist!.external_urls.spotify} className="text-black underline">
                         {playlist!.external_urls.spotify}
                      </ExternalLink>
                   </>,
@@ -133,16 +132,18 @@ export default function CreatePlaylistButton({ data, className, isDisabled, ...p
             buttons={[
                {
                   onClick: () => setIsModalOpen(false),
-                  text: 'Close',
+                  children: 'Close',
                   className: 'bg-main-dark',
                },
                {
                   onClick: onOkayFn,
-                  text: onOkayText,
+                  children: onOkayText,
                   className: 'bg-success',
                },
             ]}
             status={state}
+            setIsOpen={() => setIsModalOpen(false)}
+            title="Create Spotify Playlist"
          >
             {modalContent}
          </Modal>

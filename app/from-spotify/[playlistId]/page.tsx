@@ -180,7 +180,7 @@ export default function PlaylistPage() {
    useEffect(() => {
       if (progress === -1) setError('An error occurred during the download process.')
    }, [progress])
-   
+
    return (
       <div className="min-w-[690px] font-inter overflow-hidden">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
@@ -210,7 +210,7 @@ export default function PlaylistPage() {
             <section className="flex items-center gap-4">
                <HomeBtn />
                <a href="https://github.com/yaGeey/osu-find-songs" target="_blank" rel="noopener noreferrer">
-                  <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1" />
+                  <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1 hover:scale-105 transition-transform" />
                </a>
             </section>
             {playlistInfo?.name && (

@@ -220,7 +220,7 @@ export default function FromOsu() {
                   setValue={setExactSpotify}
                   disabled={isLoading}
                   text={{ on: 'Exact Spotify match', off: 'Any Spotify match' }}
-                  width={130}
+                  width={175}
                />
                <Dropdown
                   onSelected={(option) => {

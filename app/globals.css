@@ -125,16 +125,31 @@
    }
    .bg-triangles-faded {
       background:
-         linear-gradient(transparent, var(--color-dialog) 60px, var(--color-dialog) 100%),
+         linear-gradient(transparent, var(--color-dialog) 70px, var(--color-dialog) 100%),
          url(/osu/tris.png) no-repeat,
          url(/osu/tris2.png) no-repeat top right,
          var(--color-dialog);
    }
    .bg-triangles-faded-right {
       background:
-         linear-gradient(transparent, var(--color-dialog) 60px, var(--color-dialog) 100%),
+         linear-gradient(transparent, var(--color-dialog) 70px, var(--color-dialog) 100%),
          url(/osu/tris2.png) no-repeat top right,
          var(--color-dialog);
+   }
+
+   .no-jump {
+      /* Змушує створити новий шар композиції (GPU) */
+      transform: translateZ(0);
+
+      /* Приховує зворотний бік, що часто фіксить тремтіння в WebKit */
+      backface-visibility: hidden;
+
+      /* Додаткова підказка браузеру про майбутні зміни */
+      will-change: transform;
+
+      /* Фіксація згладжування шрифту (особливо для macOS/iOS) */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
    }
 }
 

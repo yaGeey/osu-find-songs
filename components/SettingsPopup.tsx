@@ -8,7 +8,7 @@ export default function SettingsPopup({ className }: { className?: string }) {
    return (
       <div
          className={tw(
-            'transition-all z-100 absolute top-14 left-0 shadow-2xl animate-in slide-in-from-left bg-main border-4  border-main-border min-w-65 w-1/4 flex flex-col gap-4 p-4 rounded-xl rounded-t-none rounded-l-none border-t-0 border-l-0',
+            'transition-all z-100 absolute top-12 left-0 shadow-2xl animate-in slide-in-from-left bg-main border-4  border-main-border min-w-65 w-1/4 flex flex-col gap-4 p-4 rounded-xl rounded-t-none rounded-l-none border-t-0 border-l-0',
             className,
          )}
       >

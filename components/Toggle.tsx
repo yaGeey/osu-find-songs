@@ -17,7 +17,7 @@ export default function Toggle({
 }) {
    return (
       <div
-         className={tw('input-parent flex', disabled && 'brightness-75 pointer-events-none')}
+         className={tw('input-parent flex select-none', disabled && 'brightness-75 pointer-events-none')}
          onClick={() => setValue((p) => !p)}
          style={{ width }}
       >
