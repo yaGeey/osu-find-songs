@@ -1,5 +1,5 @@
 import { LinearProgress } from '@mui/material'
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 
 export default function Progress({
@@ -18,11 +18,20 @@ export default function Progress({
    defaultVariant?: 'determinate' | 'indeterminate'
 }) {
    const [variant, setVariant] = useState<'determinate' | 'indeterminate'>(defaultVariant)
+   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
    useEffect(() => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+
       setVariant(defaultVariant)
-      const timeout = setTimeout(() => setVariant('indeterminate'), 4000)
-      return () => clearTimeout(timeout)
+      if (isVisible) {
+         timeoutRef.current = setTimeout(() => {
+            setVariant('indeterminate')
+         }, 4000)
+      }
+      return () => {
+         if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      }
    }, [value, defaultVariant])
 
    if (!isVisible) return <div className="h-0.75 fixed top-0 bg-main-darker w-screen z-1000"></div>
