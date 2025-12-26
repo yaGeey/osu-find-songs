@@ -12,8 +12,9 @@ export default function MobileDeviceCheck() {
    return (
       <Modal
          isOpen={isVisible}
-         buttons={[{ onClick: () => setIsVisible(false), text: 'Proceed', className: 'bg-error' }]}
+         buttons={[{ onClick: () => setIsVisible(false), children: 'Proceed', className: 'bg-error' }]}
          status="warning"
+         setIsOpen={() => setIsVisible(false)}
       >
          You are connecting from a phone! The website is not designed for mobile use, as there is no practical need for it. Expect
          interface bugs and overall instability.
