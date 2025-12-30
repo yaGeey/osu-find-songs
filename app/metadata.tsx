@@ -14,7 +14,7 @@ export const metadataObj: Metadata = {
    authors: [{ name: 'yageey', url: 'https://yageey.me' }],
    creator: 'yageey',
    alternates: {
-      canonical: '/',
+      canonical: 'https://osu.yageey.me',
    },
    // prettier-ignore
    keywords: [
