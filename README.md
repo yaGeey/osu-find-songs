@@ -1,10 +1,10 @@
 <div align="center">
 
-# [osufindsongs](https://osufindsongs.vercel.app)
+# [osufindsongs](https://osu.yageey.me)
 
 _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or find beatmaps from a playlist_ 🎮🎶
 
-[![Website](https://img.shields.io/badge/🌐_Website-osufindsongs.vercel.app-blue)](https://osufindsongs.vercel.app) [![osuck](https://img.shields.io/badge/-📁_osuck-4d3249)](https://tools.osuck.net/tool/67df097dafb780368707339a) [![os](https://img.shields.io/github/stars/yaGeey/osu-find-songs?logo=github)](https://github.com/yaGeey/osu-find-songs)
+[![Website](https://img.shields.io/badge/🌐_Website-osu.yageey.me-blue)](https://osu.yageey.me) [![osuck](https://img.shields.io/badge/-📁_osuck-4d3249)](https://tools.osuck.net/tool/67df097dafb780368707339a) [![os](https://img.shields.io/github/stars/yaGeey/osu-find-songs?logo=github)](https://github.com/yaGeey/osu-find-songs)
 
 </div>
 
