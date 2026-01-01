@@ -1,0 +1,15 @@
+{
+   "redirects": [
+      {
+         "source": "/(.*)",
+         "has": [
+            {
+               "type": "host",
+               "value": "osufindsongs.vercel.app"
+            }
+         ],
+         "destination": "https://osu.yageey.me/$1",
+         "permanent": true
+      }
+   ]
+}
