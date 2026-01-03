@@ -5,7 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
 export default function Footer() {
-   // GitHub
+   const isBot = typeof navigator !== 'undefined' && /bot|crawler|spider|crawling/i.test(navigator.userAgent)
+
    const { data: lastUpdated } = useQuery({
       queryKey: ['lastUpdated'],
       queryFn: async () => {
@@ -18,6 +19,7 @@ export default function Footer() {
             url: data[0].html_url,
          }
       },
+      enabled: !isBot,
    })
    const { data: stargazeCount } = useQuery({
       queryKey: ['stargazeCount'],
@@ -25,6 +27,7 @@ export default function Footer() {
          const { data } = await axios('https://api.github.com/repos/yaGeey/osu-find-songs')
          return data.stargazers_count
       },
+      enabled: !isBot,
    })
    return (
       <footer className="mt-auto">

@@ -22,7 +22,7 @@ function makeQueryClient() {
             toast.error(`Something went wrong ${error instanceof Error ? `: ${error.message}` : ''}`)
             console.error(`Error in query ${query.queryKey}:`, error)
          },
-      })
+      }),
    })
 }
 
