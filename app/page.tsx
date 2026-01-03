@@ -24,6 +24,9 @@ export default function LandingPage() {
                         height={80}
                         alt="osufindsongs - tool for osu and spotify"
                         className="drop-shadow-sm max-sm:scale-80"
+                        onError={(e) => {
+                           console.error('Icon image error:', e)
+                        }}
                      />
                      <h1 className="text-4xl/[48px] w-[260px] max-sm:text-2xl max-sm:w-full max-landing:text-center max-sm:-mt-5 tracking-tight font-semibold">
                         osufindsongs - find & convert
@@ -79,7 +82,16 @@ export default function LandingPage() {
                         fill
                         priority
                         className="object-cover"
-                        onLoad={() => setImagesLoaded((p) => ({ ...p, osu: true }))}
+                        onLoad={() => {
+                           try {
+                              setImagesLoaded((p) => ({ ...p, osu: true }))
+                           } catch (e) {
+                              console.error('Image load error:', e)
+                           }
+                        }}
+                        onError={(e) => {
+                           console.error('Image error:', e)
+                        }}
                      />
                   </div>
                   <div
@@ -99,7 +111,16 @@ export default function LandingPage() {
                         fill
                         priority
                         className="object-cover"
-                        onLoad={() => setImagesLoaded((p) => ({ ...p, spotify: true }))}
+                        onLoad={() => {
+                           try {
+                              setImagesLoaded((p) => ({ ...p, spotify: true }))
+                           } catch (e) {
+                              console.error('Image load error:', e)
+                           }
+                        }}
+                        onError={(e) => {
+                           console.error('Image error:', e)
+                        }}
                      />
                   </div>
 

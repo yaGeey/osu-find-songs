@@ -34,6 +34,20 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <html lang="en">
          <head>
             <JsonLd />
+            <Script id="error-handler" strategy="beforeInteractive">
+               {`
+                  window.addEventListener('error', function(event) {
+                     // Suppress errors from third-party libraries that might break in bots/crawlers
+                     if (event.error && event.error.message && 
+                         (event.error.message.includes('getAttribute') || 
+                          event.error.message.includes('is not a function'))) {
+                        console.warn('Suppressed third-party error:', event.error.message);
+                        event.preventDefault();
+                        return false;
+                     }
+                  }, true);
+               `}
+            </Script>
          </head>
          <body
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
