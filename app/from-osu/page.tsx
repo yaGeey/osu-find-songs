@@ -31,6 +31,7 @@ import DropdownSort from '@/components/selectors/DropdownSort'
 import Search from '@/components/Search'
 import Toggle from '@/components/Toggle'
 import { FO_CHUNK_SIZE } from '@/variables'
+import useFoTelemetry from './_components/FoTelemetry'
 
 export default function FromOsu() {
    const router = useRouter()
@@ -172,6 +173,13 @@ export default function FromOsu() {
 
       return items
    }, [groupedDict, selectedGroup, exactSpotify, search])
+
+   // Telemetry
+   useFoTelemetry({
+      spotifyQueries,
+      osuQueries,
+      songsLength: songs.length,
+   })
 
    return (
       <div className="overflow-hidden">
