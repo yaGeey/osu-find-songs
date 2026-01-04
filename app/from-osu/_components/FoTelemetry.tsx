@@ -16,14 +16,14 @@ export default function useFoTelemetry({
    const isSpotifyFetching = spotifyQueries.some((q) => q.isFetching)
    const hasInitialized = useRef(false)
 
-   const sessionId = useMemo(() => Cookies.get('sessionId'), [])
+   const sessionId = useMemo(() => localStorage.getItem('sessionId'), [])
    const telemetryIdRef = useRef<number | null>(null)
    useEffect(() => {
-      // if (process.env.NODE_ENV === 'development') return
+      if (process.env.NODE_ENV === 'development') return
       if (hasInitialized.current) return
       hasInitialized.current = true
 
-      foTelemetryStart(songsLength, sessionId)
+      foTelemetryStart(songsLength, sessionId!)
          .then((id) => {
             telemetryIdRef.current = id
          })
@@ -31,14 +31,14 @@ export default function useFoTelemetry({
    }, [])
 
    useEffect(() => {
-      // if (process.env.NODE_ENV === 'development') return
+      if (process.env.NODE_ENV === 'development') return
       if (!telemetryIdRef.current) return
       if (!isSpotifyFetching) foTelemetryFinishedSpotify(telemetryIdRef.current).catch(console.error)
       if (!isOsuFetching) foTelemetryFinishedOsu(telemetryIdRef.current).catch(console.error)
    }, [isSpotifyFetching, isOsuFetching])
 
    useEffect(() => {
-      // if (process.env.NODE_ENV === 'development') return
+      if (process.env.NODE_ENV === 'development') return
       if (!telemetryIdRef.current) return
       const hasErrors = spotifyQueries.some((q) => q.isError) || osuQueries.some((q) => q.isError)
       if (hasErrors) {

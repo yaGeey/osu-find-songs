@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import axios from 'axios'
 const botRegex =
-   /bot|crawler|spider|slurp|facebookexternalhit|bingpreview|embedly|quora|baidu|yandex|sogou|exabot|rogerbot|uptime/i
+   /bot|crawler|vercel|spider|slurp|facebookexternalhit|bingpreview|embedly|quora|baidu|yandex|sogou|exabot|rogerbot|uptime/i
 
 export default function Telemetry() {
    const pathname = usePathname()
