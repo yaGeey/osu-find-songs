@@ -31,6 +31,7 @@ import DownloadAllBtn from './_components/DownloadAllBtn'
 import ProgressMapDownload from './_components/ProgressMapDownload'
 import { SelectedOption } from '@/components/selectors/FilterOptions'
 import Image from 'next/image'
+import { CardRenderer } from './_components/CardRenderer'
 
 export default function PlaylistPage() {
    const params = useParams()
@@ -244,23 +245,15 @@ export default function PlaylistPage() {
                </div>
 
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
-                  <div className="flex p-3 gap-3 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar">
-                     {maps.map((data, i) =>
-                        data.length > 1 && (data.length < 18 || data[0].artist === data[1].artist) ? (
-                           <OsuCardSet
-                              key={data[0].id + i}
-                              beatmapsets={data}
-                              sortQuery={searchParams.get('sort') || 'relevance_asc'}
-                              className="flex-grow animate-in fade-in duration-200"
-                           />
-                        ) : (
-                           <OsuCard
-                              key={data[0].id}
-                              beatmapset={data[0]}
-                              className="flex-grow animate-in fade-in duration-200 shadow-sm"
-                           />
-                        ),
-                     )}
+                  <div className="flex p-3 gap-3 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar pb-4">
+                     {maps.map((data, i) => (
+                        <CardRenderer
+                           key={data[0].id}
+                           data={data}
+                           sortQuery={searchParams.get('sort') || 'relevance_asc'}
+                           className="animate-in fade-in duration-200"
+                        />
+                     ))}
                      {!!(maps.length % 2) && <div className="flex-grow h-26 min-w-[386px] w-[464px]" />}
                   </div>
                ) : (
