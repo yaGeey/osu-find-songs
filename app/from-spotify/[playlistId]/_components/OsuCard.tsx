@@ -21,7 +21,10 @@ export default function OsuCard({
    onHover?: boolean
    className?: string
 }) {
-   const mutation = useNoVideoAxios(beatmapset.id, `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
+   const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
+   const mutationNoVideo = useNoVideoAxios(beatmapset.id, fileName, false)
+   const mutationVideo = useNoVideoAxios(beatmapset.id, fileName, true)
+
    const { add } = useMapDownloadStore()
    const ref = useRef<HTMLDivElement>(null)
    const { currentUrl, play, stop } = useAudioStore()
@@ -37,10 +40,13 @@ export default function OsuCard({
       .map(([k, v]) => `${k} ${new Date(v!).toLocaleDateString()}`)
       .join(' | ')
 
-   function handleDownload() {
+   function handleDownload(video: boolean) {
       add(beatmapset.id, `${beatmapset.artist} - ${beatmapset.title}`)
-      mutation.mutate()
+      if (video) mutationVideo.mutate()
+      else mutationNoVideo.mutate()
    }
+
+   const isPending = mutationNoVideo.isPending || mutationVideo.isPending
    return (
       <div
          ref={ref}
@@ -163,18 +169,30 @@ export default function OsuCard({
             className={tw(
                'absolute top-0 right-0 w-7 h-full transition-all bg-main-darker opacity-0 flex flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 overflow-hidden',
                onHover && 'group-hover:opacity-100',
-               mutation.isPending && 'opacity-100',
+               isPending && 'opacity-100',
             )}
          >
-            {!mutation.isPending ? (
-               <FontAwesomeIcon
-                  icon={beatmapset.video ? faFileVideo : faDownload}
-                  onClick={handleDownload}
-                  className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
-                  data-tooltip-id={'tooltip'}
-                  data-tooltip-content={beatmapset.video ? 'Download with video' : 'Download without video'}
-                  data-tooltip-delay-show={400}
-               />
+            {!isPending ? (
+               <>
+                  <FontAwesomeIcon
+                     icon={faDownload}
+                     onClick={() => handleDownload(false)}
+                     className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
+                     data-tooltip-id="tooltip"
+                     data-tooltip-content="Download without video"
+                     data-tooltip-delay-show={400}
+                  />
+                  {beatmapset.video && (
+                     <FontAwesomeIcon
+                        icon={faFileVideo}
+                        onClick={() => handleDownload(true)}
+                        className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Download with video"
+                        data-tooltip-delay-show={400}
+                     />
+                  )}
+               </>
             ) : (
                <Loading color="4b2e2e" radius={15} />
             )}

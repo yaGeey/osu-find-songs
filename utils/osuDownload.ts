@@ -21,7 +21,7 @@ export function download(blob: Blob, filename: string) {
    window.URL.revokeObjectURL(url)
 }
 
-const sendTemeletry = async (mapId: string) => {
+const sendTemeletry = async (mapId: number) => {
    try {
       const sessionId = localStorage.getItem('sessionId')
       if (!sessionId) return
@@ -56,21 +56,36 @@ const getBeatmap = async <T extends BaseLimiter>(
    return res.data
 }
 
-export const useNoVideoAxios = (id: number, filename: string) => {
+export const useNoVideoAxios = (id: number, filename: string, video: boolean) => {
    const { remove, update } = useMapDownloadStore()
    const managerCatboy = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
-   //? https://nerinyan.stoplight.io/docs/nerinyan-api/df11b327494c9-download-beatmapset
    const managerNerinyan = RateLimitWithWindowManager.getInstance('nerinyan', { avg: 25, burst: 100, durationMs: 60000 })
 
    return useMutation({
       mutationFn: async () => {
-         await sendTemeletry(id.toString())
-         try {
-            return await getBeatmap(managerCatboy, `https://catboy.best/d/${id}`, id, update)
-         } catch (err) {
-            console.warn('Catboy failed, falling back to Nerinyan', err)
-            return await getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}`, id, update)
+         await sendTemeletry(id)
+
+         const sources = video
+            ? [
+                 { name: 'Catboy', fn: () => getBeatmap(managerCatboy, `https://catboy.best/d/${id}`, id, update) },
+                 { name: 'Nerinyan', fn: () => getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}?nv=0`, id, update) },
+              ]
+            : [
+                 {
+                    name: 'Nerinyan (no video)',
+                    fn: () => getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}?nv=1`, id, update),
+                 },
+              ]
+
+         for (const source of sources) {
+            try {
+               return await source.fn()
+            } catch (err) {
+               console.warn(`${source.name} failed:`, err)
+               if (source === sources[sources.length - 1]) throw err
+            }
          }
+         throw new Error('All download sources failed')
       },
       onError: (error: any) => {
          remove(id)

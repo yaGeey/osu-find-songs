@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { customAxios } from '@/lib/axios'
 import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/api/RateLimitManager'
+import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 
 const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
 
@@ -28,6 +29,14 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
             responseType: 'blob',
             timeout: 15000,
          })
+
+         // telemetry
+         sendMapDownloadTelemetry({
+            sessionId: localStorage.getItem('sessionId')!,
+            mapId: b.id,
+            playlistId: window.location.pathname.split('/')[2]!,
+            all: true,
+         }).catch(() => {})
 
          // UI
          count++
