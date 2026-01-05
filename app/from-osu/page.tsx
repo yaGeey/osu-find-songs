@@ -31,7 +31,7 @@ import DropdownSort from '@/components/selectors/DropdownSort'
 import Search from '@/components/Search'
 import Toggle from '@/components/Toggle'
 import { FO_CHUNK_SIZE } from '@/variables'
-import useFoTelemetry from './_components/FoTelemetry'
+import useFoTelemetry from './_components/useFoTelemetry'
 
 export default function FromOsu() {
    const router = useRouter()

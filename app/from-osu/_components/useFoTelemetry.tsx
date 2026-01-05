@@ -16,8 +16,12 @@ export default function useFoTelemetry({
    const isSpotifyFetching = spotifyQueries.some((q) => q.isFetching)
    const hasInitialized = useRef(false)
 
-   const sessionId = useMemo(() => localStorage.getItem('sessionId'), [])
+   const sessionId = useMemo(() => {
+      if (typeof window === 'undefined') return null
+      return localStorage.getItem('sessionId')
+   }, [])
    const telemetryIdRef = useRef<number | null>(null)
+   
    useEffect(() => {
       if (process.env.NODE_ENV === 'development') return
       if (hasInitialized.current) return
