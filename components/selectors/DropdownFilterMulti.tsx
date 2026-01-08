@@ -44,7 +44,7 @@ export default function DropdownFilterMultiDropdownFilter({
          onKeyDown={(e) => {
             if (e.key !== 'Enter') return
             if (query && value) addItem()
-            else setQuery(filtered[0].label[0])
+            else if (filtered.length > 0) setQuery(filtered[0].label[0])
             setIsOpen(false)
          }}
       >
