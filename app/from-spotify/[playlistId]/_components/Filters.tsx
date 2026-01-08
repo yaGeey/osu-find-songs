@@ -68,7 +68,7 @@ export default function Filters({
          <section className="flex items-center gap-4">
             <h4>Sort by</h4>
             <SwitchSort
-               options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites', 'date added']}
+               options={['title', 'artist', 'difficulty', 'date submitted', 'rating', 'plays', 'favorites', 'date in playlist']}
                onChange={(val, sort) => {
                   if (val) setSort(`${val}_${sort}`)
                }}
@@ -78,7 +78,9 @@ export default function Filters({
             />
          </section>
          {foundString && !disabled && (
-            <div className="absolute right-2 bottom-1 text-white tracking-wide text-sm hidden md:block">{foundString}</div>
+            <div className="absolute right-2 bottom-1 text-white tracking-wide text-sm hidden [@media(min-width:830px)]:block">
+               {foundString}
+            </div>
          )}
       </div>
    )

@@ -65,7 +65,7 @@ export default function OsuCardSet({
                      <div className="[background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r-t.svg)_no-repeat_top_right,var(--color-main-dark)] flex items-center justify-center gap-4 text-[15px] text-white p-4 w-full border-b-3 border-main-border">
                         <h4>Sort by</h4>
                         <SwitchSort
-                           options={['title', 'artist', 'difficulty', 'date ranked', 'rating', 'plays', 'favorites']}
+                           options={['title', 'artist', 'difficulty', 'date submitted', 'rating', 'plays', 'favorites']}
                            onChange={(val, sort) => setSortFnString(val + '_' + sort)}
                            defaultOption={sortQuery.split('_')[0] || 'plays'}
                            defaultSort={sortQuery.split('_')[1] || 'desc'}

@@ -21,12 +21,12 @@ const sortFn = (sortQuery: string) => (a: BeatmapSet, b: BeatmapSet) => {
          if (!a.ranked_date) return 1
          if (!b.ranked_date) return -1
          return sign * (new Date(a.ranked_date).getTime() - new Date(b.ranked_date).getTime())
+      case 'date submitted':
+         return sign * (new Date(a.submitted_date).getTime() - new Date(b.submitted_date).getTime())
       case 'plays':
          return sign * (a.play_count - b.play_count)
       case 'favorites':
          return sign * (a.favourite_count - b.favourite_count)
-      case 'date added':
-         return sign
       default:
          return 0
    }
