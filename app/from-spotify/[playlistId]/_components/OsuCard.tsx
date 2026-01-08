@@ -1,7 +1,7 @@
 import { BeatmapSet } from '@/types/Osu'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHeart, faCirclePlay, faCircleCheck, faStar } from '@fortawesome/free-regular-svg-icons'
+import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
@@ -81,6 +81,7 @@ export default function OsuCard({
                style={{ objectFit: 'cover' }}
                sizes="100%"
                loading="lazy"
+               fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
             />
          </button>
          <div className="relative flex-grow flex justify-end overflow-hidden">
@@ -91,6 +92,7 @@ export default function OsuCard({
                height={100}
                className="z-10 w-max-[286px] h-auto"
                loading="lazy"
+               fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
             />
             <div className="absolute top-0 right-0 w-[289px] h-full bg-gradient-to-r from-main to-main/70 z-15"></div>
          </div>
@@ -114,9 +116,13 @@ export default function OsuCard({
                <span className="-ml-1.75 -mb-0.25">{beatmapset.favourite_count}</span>
                <FontAwesomeIcon icon={faCirclePlay} />
                <span className="-ml-1.75 -mb-0.25">{beatmapset.play_count.toLocaleString(undefined)}</span>
-               <FontAwesomeIcon icon={faStar} />
-               <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
-               <FontAwesomeIcon icon={faCircleCheck} />
+               {beatmapset.ranked_date && (
+                  <>
+                     <FontAwesomeIcon icon={faStar} />
+                     <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
+                  </>
+               )}
+               <FontAwesomeIcon icon={beatmapset.ranked_date ? faCircleCheck : faClock} />
                <span className="-ml-1.75 -mb-0.25" data-tooltip-id={'tooltip'} data-tooltip-content={dateString}>
                   {new Date(beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date).toLocaleDateString()}
                </span>
@@ -125,12 +131,12 @@ export default function OsuCard({
                {/* STATE */}
                <h4
                   className={tw(
-                     'text-xs text-main-gray w-fit px-1 rounded-full font-medium',
-                     beatmapset.status === 'ranked' && 'bg-[#B3FF66]',
-                     beatmapset.status === 'approved' && 'bg-[#B3FF66',
-                     beatmapset.status === 'qualified' && 'bg-[#FFD966]',
-                     beatmapset.status === 'loved' && 'bg-[#FF66AB]',
-                     beatmapset.status === 'graveyard' && 'bg-main-gray text-main-light',
+                     'text-xs w-fit px-1 rounded-full font-medium',
+                     'bg-main-gray text-main-light',
+                     beatmapset.status === 'ranked' && 'bg-[#B3FF66] text-main-gray',
+                     beatmapset.status === 'approved' && 'bg-[#B3FF66 text-main-gray',
+                     beatmapset.status === 'qualified' && 'bg-[#FFD966] text-main-gray',
+                     beatmapset.status === 'loved' && 'bg-[#FF66AB] text-main-gray',
                   )}
                >
                   {beatmapset.status.toUpperCase()}

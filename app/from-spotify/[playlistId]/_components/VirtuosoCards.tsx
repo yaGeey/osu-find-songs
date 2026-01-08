@@ -5,19 +5,12 @@ import { CardRenderer } from './CardRenderer'
 
 const ListContainer = ({ style, children, ref, ...props }: React.ComponentProps<'div'>) => {
    return (
-      <div ref={ref} {...props} className="flex flex-wrap gap-3 p-3 content-start pb-3" style={style}>
+      <div ref={ref} {...props} className="grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 p-2.5" style={style}>
          {children}
       </div>
    )
 }
 ListContainer.displayName = 'ListContainer'
-
-const ItemContainer = ({ style, children, ref, ...props }: React.ComponentProps<'div'>) => (
-   <div ref={ref} {...props} style={{ ...style, minWidth: '400px', flex: '1 1 400px' }}>
-      {children}
-   </div>
-)
-ItemContainer.displayName = 'ItemContainer'
 
 export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; maps: BeatmapSet[][] }) {
    return (
@@ -27,12 +20,10 @@ export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; 
          data={maps}
          components={{
             List: ListContainer,
-            Item: ItemContainer,
             Header: () => <div className="h-3" />,
-            Footer: () => <div className="h-4" />,
+            Footer: () => <div className="h-3" />,
          }}
          overscan={200}
-         height={105}
          totalCount={Math.round(maps.length / 2)}
          itemContent={(_, data) => <CardRenderer key={data[0].id} data={data} sortQuery={sortQuery} />}
       />

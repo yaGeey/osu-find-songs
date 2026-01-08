@@ -183,7 +183,7 @@ export default function PlaylistPage() {
    }, [progress])
 
    return (
-      <div className="min-w-[690px] font-inter overflow-hidden">
+      <div className="min-w-[710px] font-inter overflow-hidden">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
          <BgImage className="brightness-[.75]" />
 
@@ -205,7 +205,7 @@ export default function PlaylistPage() {
 
          <header
             className={tw(
-               'min-w-[690px] bg-triangles [--color-dialog:var(--color-main])] fixed z-100 w-screen h-12 flex justify-between items-center px-4 gap-10 border-b-3 border-main-darker',
+               'min-w-[710px] bg-triangles [--color-dialog:var(--color-main])] fixed z-100 w-screen h-12 flex justify-between items-center px-4 gap-10 border-b-3 border-main-darker',
             )}
          >
             <section className="flex items-center gap-4">
@@ -225,7 +225,7 @@ export default function PlaylistPage() {
          </header>
 
          <main className="flex justify-center mt-12">
-            <div className="relative h-[calc(100dvh-3rem)] w-full max-w-[980px] min-w-[690px] bg-main-darker">
+            <div className="relative h-[calc(100dvh-3rem)] w-full max-w-[980px] min-w-[710px] bg-main-darker">
                <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
                   {maps.length > 0 && (
                      <Image
@@ -245,7 +245,7 @@ export default function PlaylistPage() {
                </div>
 
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
-                  <div className="flex p-3 gap-3 flex-wrap bg-main-darker overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar pb-4">
+                  <div className="grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 p-2.5 bg-main-darker overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar">
                      {maps.map((data, i) => (
                         <CardRenderer
                            key={data[0].id}
@@ -254,7 +254,6 @@ export default function PlaylistPage() {
                            className="animate-in fade-in duration-200"
                         />
                      ))}
-                     {!!(maps.length % 2) && <div className="flex-grow h-26 min-w-[386px] w-[464px]" />}
                   </div>
                ) : (
                   <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />

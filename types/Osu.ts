@@ -84,4 +84,4 @@ export type BeatmapSet = {
    submitted_date: string
    rating: number
 }
-type Status = 'ranked' | 'approved' | 'qualified' | 'loved' | 'pending' | 'graveyard'
+type Status = 'ranked' | 'approved' | 'qualified' | 'loved' | 'pending' | 'graveyard' | 'wip'

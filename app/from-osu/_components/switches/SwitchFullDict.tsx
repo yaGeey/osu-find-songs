@@ -37,7 +37,7 @@ export default function SwitchFull({
       >
          {!required && <CursorBtn setIsDisabled={setIsDisabled} isDisabled={isDisabled} />}
 
-         <div className="bg-main-subtle text white h-full p-1 rounded-full flex items-center gap-2.5 px-2.5 select-none">
+         <div className="bg-main-subtle text white h-full p-1 rounded-full flex items-center gap-3 px-3 select-none">
             {Object.entries(options).map(([key, val], index) => (
                <button
                   key={index}
