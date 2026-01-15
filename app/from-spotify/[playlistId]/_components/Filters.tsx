@@ -40,6 +40,7 @@ export default function Filters({
                      'osu!mania': '3',
                   }}
                   onChange={(val) => setM(val)}
+                  disabled={disabled}
                />
             </div>
             <Search onSearch={onSearch} disabled={disabled} />
@@ -59,11 +60,12 @@ export default function Filters({
                   pending: 'pending',
                }}
                onChange={(val) => setS(val)}
+               disabled={disabled}
             />
          </section>
          <section className="flex items-center gap-5.5">
             <h4>Filters</h4>
-            <DropdownFilterMulti onSelected={(opt) => onFilterChange(opt)} />
+            <DropdownFilterMulti onSelected={(opt) => onFilterChange(opt)} disabled={disabled} />
          </section>
          <section className="flex items-center gap-4">
             <h4>Sort by</h4>
