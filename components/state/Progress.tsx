@@ -27,7 +27,7 @@ export default function Progress({
       if (isVisible) {
          timeoutRef.current = setTimeout(() => {
             setVariant('indeterminate')
-         }, 4000)
+         }, 7000)
       }
       return () => {
          if (timeoutRef.current) clearTimeout(timeoutRef.current)

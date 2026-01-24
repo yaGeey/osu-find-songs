@@ -98,11 +98,13 @@ export default function PlaylistPage() {
          queryKey: ['search-from-spotify', chunk?.[0]?.track?.id ?? 'err'],
          queryFn: async ({ signal }: QueryFunctionContext) => {
             const t0 = performance.now()
-            // if (!item.track) return [] //? odd error rarely occurs
             const body = {
-               qs: chunk.map(
-                  (item) => `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}`,
-               ),
+               qs: chunk
+                  .map((item) => {
+                     if (!item.track) return
+                     return `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}}`
+                  })
+                  .filter(Boolean),
                m: searchParams.get('m'),
                // s: searchParams.get('s'),
                s: 'any',
