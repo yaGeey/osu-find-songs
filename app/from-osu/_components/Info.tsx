@@ -4,13 +4,11 @@ import { CombinedSingleSimple } from '@/types/types'
 import { Button } from '../../../components/buttons/Buttons'
 import { Spotify } from 'react-spotify-embed'
 import axios from 'axios'
-import { HTMLAttributes, Ref, use, useEffect, useRef, useState } from 'react'
-import { useQueries, useQuery } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Media } from '@/types/yt'
 import { applyAlwaysConditions } from '@/utils/spotifySearchConditions'
 import AuthorString from './AuthorString'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
 import Cookies from 'js-cookie'
 import YtVideo from '../../../components/embeds/YtVideo'
 import SpotifyEmbed from '../../../components/embeds/Spotify'
@@ -21,15 +19,11 @@ import { wikiSearchExact, wikiSearchMusicianTitle } from '@/lib/wiki'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWikipediaW } from '@fortawesome/free-brands-svg-icons'
 import ExternalLink from '../../../components/ExternalLink'
-gsap.registerPlugin(useGSAP)
+import useFoStore from '@/contexts/useFoStore'
 // TODO remove queries yt and wiki when 0 info
-interface Props extends HTMLAttributes<HTMLDivElement> {
-   data: CombinedSingleSimple
-   onClose: () => void
-}
 
-export default function Info({ data, onClose, className }: Props) {
-   const { spotify, osu, local } = data
+export default function Info({ data }: { data: CombinedSingleSimple }) {
+   const { local, spotify, osu } = data
    const [selection, setSelection] = useState<'spotify' | 'youtube' | 'other'>('spotify')
    const container = useRef<HTMLDivElement>(null)
 
@@ -71,14 +65,13 @@ export default function Info({ data, onClose, className }: Props) {
          ref={container}
          id="info-card"
          className={tw(
-            'relative opacity-95 animate-in slide-in-from-left flex flex-col border-5 border-l-0 rounded-xl rounded-l-none border-main-border p-4  text-white min-w-[600px] max-w-[600px] min-h-[300px] h-[550px]',
+            'relative opacity-95 flex flex-col border-5 border-l-0 rounded-xl rounded-l-none border-main-border p-4  text-white min-w-[600px] max-w-[600px] min-h-[300px] h-[550px]',
             'bg-triangles-faded-right [--color-dialog:var(--color-main)]',
-            className,
          )}
       >
          <div
             className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all z-100"
-            onClick={onClose}
+            onClick={() => useFoStore.setState({ current: null })}
          >
             <Image src="/icons/close.svg" layout="fill" alt="close" />
          </div>

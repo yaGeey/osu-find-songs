@@ -48,11 +48,20 @@ export type CombinedSingle = { local: Song; error?: string } & WithLoading<Beatm
 // TODO fix types
 export type CombinedSingleSimple = {
    local: Song
-   spotify?: Track[] | null
-   osu?: BeatmapSet | null
+   spotify: Track[] | null
+   osu: BeatmapSet | null
    isSpotifyLoading: boolean
    isOsuLoading: boolean
-   error?: string
+   error: string | null
+}
+
+export interface CombinedItem {
+   local: Song
+   spotify: Track[] | null
+   osu: BeatmapSet | null
+   isSpotifyLoading: boolean
+   isOsuLoading: boolean
+   error?: string | null
 }
 // export type SongDataQueried = {
 //    local: Song[]

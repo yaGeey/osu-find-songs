@@ -45,10 +45,10 @@ export default function LandingPage() {
                   </h2>
                   <div className="sr-only">
                      <section>
-                        Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You
-                        can filter, sort and search results with all the options provided by osu search queries and even custom
-                        one. Once you&apos;re happy with the results, you can download each beatmap individually — or grab them
-                        all in a single zip archive.
+                        Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can
+                        filter, sort and search results with all the options provided by osu search queries and even custom one.
+                        Once you&apos;re happy with the results, you can download each beatmap individually — or grab them all in
+                        a single zip archive.
                      </section>
                      <section>
                         The app will scan all your .osu files to extract track metadata. It then automatically searches for those

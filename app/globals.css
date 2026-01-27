@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+body {
+   @apply bg-[#391f1f];
+}
+
 @theme inline {
    /* Primary */
    --color-main-white: oklch(0.9 0.05 20); /* scrollbar */

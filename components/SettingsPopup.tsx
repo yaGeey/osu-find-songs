@@ -1,8 +1,5 @@
-import { languageOptions } from '@/utils/selectOptions'
 import Cookies from 'js-cookie'
-import dynamic from 'next/dynamic'
 import { twMerge as tw } from 'tailwind-merge'
-const Select = dynamic(() => import('react-select'), { ssr: false })
 
 export default function SettingsPopup({ className }: { className?: string }) {
    return (
@@ -12,15 +9,6 @@ export default function SettingsPopup({ className }: { className?: string }) {
             className,
          )}
       >
-         {/* <section className="flex items-center gap-2">
-            <Select isDisabled
-               id="select-language"
-               placeholder='Language'
-               defaultValue={languageOptions[0]}
-               options={languageOptions}
-            />
-            <label htmlFor="select-language">Language</label>
-         </section> */}
          <section className="flex flex-col ">
             <h2 className="mb-1 font-semibold">Performance</h2>
             <section className="flex items-center gap-2">

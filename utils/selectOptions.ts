@@ -1,5 +1,3 @@
-import { CSSObject } from '@emotion/react'
-
 export const _sortOptions = [
    { value: 'sort-date', label: 'Default' },
    { value: 'sort-artist', label: 'By Artist' },
@@ -46,17 +44,3 @@ export const languageOptions = [
    { value: 'ru', label: 'Русский' },
    { value: 'uk', label: 'Українська' },
 ]
-
-export const selectStyles = {
-   control: (base: CSSObject) => ({
-      ...base,
-      height: 35,
-      minHeight: 35,
-      fontSize: '14px',
-      borderRadius: '8px',
-   }),
-   menu: (base: CSSObject) => ({
-      ...base,
-      fontSize: '14px',
-   }),
-}

@@ -178,7 +178,7 @@ export default function PlaylistPage() {
          setError(errorMsg)
          notiryErrRef.current?.blink(4000)
       }
-   }, [beatmapsetQueries])
+   }, [beatmapsetQueries.map((q) => q.isError).join(',')])
 
    useEffect(() => {
       if (progress === -1) setError('An error occurred during the download process.')

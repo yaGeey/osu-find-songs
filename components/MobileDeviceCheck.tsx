@@ -3,12 +3,9 @@ import { useEffect, useState } from 'react'
 import Modal from './Modal'
 
 export default function MobileDeviceCheck() {
-   const [isVisible, setIsVisible] = useState(false)
-   useEffect(() => {
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|OperaMini/i.test(navigator.userAgent)) {
-         setIsVisible(true)
-      }
-   }, [])
+   const [isVisible, setIsVisible] = useState(
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|OperaMini/i.test(navigator.userAgent),
+   )
    return (
       <Modal
          isOpen={isVisible}

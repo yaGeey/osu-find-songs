@@ -12,23 +12,21 @@ const links = [
 
 export default function BgImage({ image, className }: { image?: string; brightness?: number; className?: string }) {
    const [isLoaded, setIsLoaded] = useState(false)
-   const [number] = useState(() => Math.floor(Math.random() * links.length))
+
    return (
-      <div className={tw('fixed -z-10 top-0 left-0 w-full h-full brightness-[.5]', className)}>
+      <div className={tw('fixed top-0 left-0 w-full h-full -z-10 brightness-[.5]', className)}>
          <Image
-            // src={image || links[number]}
             src={image || '/bg.svg'}
             alt="bg"
-            width={0}
-            height={0}
+            fill
+            className="object-cover"
             sizes="100vw"
             quality={100}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             onLoad={() => setIsLoaded(true)}
             suppressHydrationWarning
             priority
          />
-         {!isLoaded && <div className="absolute top-0 left-0 w-full h-full bg-main-border"></div>}
+         {!isLoaded && <div className="fixed top-0 left-0 w-full h-full bg-main-border"></div>}
       </div>
    )
 }

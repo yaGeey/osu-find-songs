@@ -1,6 +1,5 @@
 import { UseQueryResult } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef } from 'react'
-import Cookies from 'js-cookie'
 import { foTelemetryStart, foTelemetryError, foTelemetryFinishedSpotify, foTelemetryFinishedOsu } from '@/lib/telemetry'
 
 export default function useFoTelemetry({
@@ -21,7 +20,7 @@ export default function useFoTelemetry({
       return localStorage.getItem('sessionId')
    }, [])
    const telemetryIdRef = useRef<number | null>(null)
-   
+
    useEffect(() => {
       if (process.env.NODE_ENV === 'development') return
       if (hasInitialized.current) return

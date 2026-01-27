@@ -1,55 +1,51 @@
 'use client'
-import { use, useEffect, useMemo, useRef, useState } from 'react'
-import { CombinedSingle, CombinedSingleSimple, SongData, SongDataQueried } from '@/types/types'
+import { useEffect, useMemo, useState } from 'react'
+import { CombinedSingleSimple } from '@/types/types'
 import Image from 'next/image'
-import Card from './_components/Card'
 import Info from './_components/Info'
 import { twMerge as tw } from 'tailwind-merge'
-import dynamic from 'next/dynamic'
 import { useQueries } from '@tanstack/react-query'
 import { Track } from '@/types/Spotify'
 import { BeatmapSet } from '@/types/Osu'
-import { groupOptions, sortOptions, selectStyles } from '@/utils/selectOptions'
+import { groupOptions } from '@/utils/selectOptions'
 import { useSongContext } from '@/contexts/SongContext'
 import SettingsPopup from '@/components/SettingsPopup'
 import { useRouter } from 'next/navigation'
 import CreatePlaylistButton from './_components/CreatePlaylistButton'
-import GroupSeparator from './_components/GroupSeparator'
-import TextSwitch from '@/components/TextSwitch'
 import HomeBtn from '@/components/buttons/HomeBtn'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowDownWideShort, faArrowUpShortWide, faSearch } from '@fortawesome/free-solid-svg-icons'
-import { filterFn, searchFilterFn, groupArray, chunkArray, mergeGroupedArrays, flatCombinedArray } from '@/utils/arrayManaging'
+import { filterFn, searchFilterFn, groupArray, chunkArray, flatCombinedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
-import DynamicBg from './_components/DynamicBg'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { Virtuoso } from 'react-virtuoso'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import Dropdown from '@/components/selectors/Dropdown'
 import DropdownSort from '@/components/selectors/DropdownSort'
 import Search from '@/components/Search'
 import Toggle from '@/components/Toggle'
 import { FO_CHUNK_SIZE } from '@/variables'
-import useFoTelemetry from './_components/useFoTelemetry'
+import useFoTelemetry from '../../hooks/useFoTelemetry'
+import useFoStore from '@/contexts/useFoStore'
+import VirtuosoCardFO from './_components/VirtuosoCardFO'
+import { motion, AnimatePresence } from 'framer-motion'
+import BgImage from '@/components/BgImage'
+
+export type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
 
 export default function FromOsu() {
    const router = useRouter()
    const { songs, setSongs } = useSongContext()
    useEffect(() => {
-      if (!songs.length) {
-         router.push('/from-osu/select')
-      }
+      if (!songs.length) router.replace('/from-osu/select')
    }, [songs, setSongs, router])
-   const chunkedLocal = chunkArray(songs, FO_CHUNK_SIZE)
+   const chunkedLocal = useMemo(() => chunkArray(songs, FO_CHUNK_SIZE), [songs])
 
-   const [info, setInfo] = useState<CombinedSingleSimple | null>(null)
+   const sortFnName = useFoStore((state) => state.sortFnName)
+   const selectedGroup = useFoStore((state) => state.selectedGroup)
+   const current = useFoStore((state) => state.current)
+
    const [exactSpotify, setExactSpotify] = useState(false)
    const [groupFn, setGroupFn] = useState<string>('no')
-   const [sortFn, setSortFn] = useState('sort-date')
    const [isSettingsVisible, setIsSettingsVisible] = useState(false)
-   const [groupedDict, setGroupedDict] = useState<Record<string, CombinedSingleSimple[]>>({ '': [] })
-   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
 
@@ -58,8 +54,8 @@ export default function FromOsu() {
    }, [])
 
    useEffect(() => {
-      setInfo(null)
-   }, [exactSpotify, groupFn, sortFn])
+      useFoStore.setState({ current: null })
+   }, [exactSpotify, groupFn, sortFnName])
 
    // queries
    const spotifyQueries = useQueries({
@@ -129,35 +125,14 @@ export default function FromOsu() {
    ])
    const isLoading = combined.some((q) => q.spotifyQuery.isLoading || q.osuQuery.isLoading)
 
-   // Grouping and sorting
-   useEffect(() => {
+   const groupedDict = useMemo(() => {
       const flattened = combined.flatMap((item) => flatCombinedArray(item))
-      if (isLoading) {
-         setGroupedDict({ '': flattened })
-         return
-      }
-      // ) // TODO sort by popularity
-      const sortedGroupedArray = groupArray(groupFn, sortOrder, sortFn, flattened)
-      setGroupedDict(sortedGroupedArray)
-   }, [
-      groupFn,
-      sortFn,
-      sortOrder,
-      combined,
-      osuQueries.filter((q) => q.isLoading).length,
-      spotifyQueries.filter((q) => q.isLoading).length,
-   ])
+      if (isLoading) return { '': flattened }
+      return groupArray(groupFn, sortOrder, sortFnName, flattened)
+   }, [groupFn, sortFnName, sortOrder, combined, isLoading])
 
-   function handleCardClick(props: CombinedSingleSimple) {
-      if (info?.local.id === props.local.id) setInfo(null)
-      else setInfo({ ...props })
-   }
-
-   // for virtual list
-   // TODO розібратися
-   type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
-
-   const virtualListItems: ListItem[] = useMemo(() => {
+   // prepara data for virtuoso
+   const virtualListItems = useMemo(() => {
       const items: ListItem[] = []
 
       for (const group of Object.keys(groupedDict || {})) {
@@ -181,9 +156,25 @@ export default function FromOsu() {
       songsLength: songs.length,
    })
 
+   const src = useFoStore((state) => (state.current ? state.current.local.image : undefined))
    return (
       <div className="overflow-hidden">
-         <DynamicBg src={info?.local.image} />
+         <BgImage />
+         <AnimatePresence>
+            {src && (
+               <motion.div
+                  key="bg"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.1 }}
+                  className="-z-9 pointer-events-none fixed inset-0"
+               >
+                  <BgImage image={src} />
+               </motion.div>
+            )}
+         </AnimatePresence>
+
          <Progress
             isVisible={isLoading}
             value={
@@ -211,7 +202,10 @@ export default function FromOsu() {
                   className={tw('hover:animate-spin hover:duration-2000 cursor-pointer', isSettingsVisible && 'brightness-130')}
                />
                <CreatePlaylistButton
-                  data={combined.flatMap((item) => flatCombinedArray(item)).map((item) => item.spotify)}
+                  data={combined
+                     .flatMap((item) => flatCombinedArray(item))
+                     .filter((item) => item.spotify !== null)
+                     .map((item) => item.spotify as Track[])}
                   isDisabled={!isLoggedWithSpotify || isLoading}
                   data-tooltip-id={!isLoggedWithSpotify || isLoading ? 'tooltip' : undefined}
                   data-tooltip-content={
@@ -242,7 +236,7 @@ export default function FromOsu() {
                />
                <DropdownSort
                   onSelected={({ query, order }) => {
-                     setSortFn(query ?? 'no')
+                     useFoStore.setState({ sortFnName: query ?? 'sort-date' })
                      setSortOrder(order)
                   }}
                />
@@ -253,41 +247,21 @@ export default function FromOsu() {
          {/* content */}
          <main className="max-h-[calc(100dvh-48px)] flex justify-center sm:justify-end">
             <div className="h-[calc(100dvh-48px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-12">
-               {info && <Info data={info} onClose={() => setInfo(null)} />}
+               <AnimatePresence>
+                  {current && (
+                     <motion.div
+                        key="modal"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.1 }}
+                     >
+                        <Info data={current} />
+                     </motion.div>
+                  )}
+               </AnimatePresence>
             </div>
-
-            <Virtuoso
-               key={virtualListItems.length}
-               data={virtualListItems}
-               //  TODO components={{}}
-               itemContent={(index, item) => (
-                  // TODO without wrapper no transition effect, but even with this padding top don't work.. why? and how virtuoso work
-                  //? padding не робе, бо весь список симулюється через нього або translate-y
-                  <div className={tw('flex justify-end w-full', virtualListItems.indexOf(item) === 0 && 'mt-3')}>
-                     {item.type === 'group' ? (
-                        <GroupSeparator
-                           className="-mt-3"
-                           selected={item.key === selectedGroup}
-                           onClick={() => setSelectedGroup(item.key === selectedGroup ? null : item.key)}
-                        >
-                           {item.key}
-                        </GroupSeparator>
-                     ) : item.type === 'card' ? (
-                        <Card
-                           data={item.data}
-                           sortFn={sortFn}
-                           className="-mt-3 "
-                           selected={info?.local.id === item.data.local.id}
-                           onClick={handleCardClick}
-                        />
-                     ) : null}
-                  </div>
-               )}
-               className="scrollbar w-full"
-               style={{ height: 'calc(100dvh - 48px)' }}
-               overscan={300}
-               defaultItemHeight={85}
-            />
+            <VirtuosoCardFO data={virtualListItems} />
          </main>
       </div>
    )

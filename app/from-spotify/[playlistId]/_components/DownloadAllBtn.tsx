@@ -73,7 +73,7 @@ export default function DownloadAllBtn({
                }
             }
       }
-   }, [modal])
+   }, [modal, handleDownloadAll])
    return (
       <>
          <Button

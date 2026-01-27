@@ -1,4 +1,5 @@
 import { BeatmapSet } from '@/types/Osu'
+import { Track } from '@/types/Spotify'
 import { Combined, CombinedQueried, CombinedSingle, CombinedSingleSimple, Song, SongDataQueried } from '@/types/types'
 
 // filters
@@ -65,15 +66,14 @@ export function uniqueArray<T>(arr: T[], key: keyof T) {
    })
 }
 
-export function flatCombinedArray(arr: CombinedQueried): any[] {
-   // TODO fix types
+export function flatCombinedArray(arr: CombinedQueried): CombinedSingleSimple[] {
    return arr.local.map((item, i) => ({
       local: item,
-      spotify: arr.spotifyQuery.data?.[i],
-      osu: arr.osuQuery.data?.[i],
+      spotify: arr.spotifyQuery.data?.[i] ?? null,
+      osu: arr.osuQuery.data?.[i] ?? null,
       isSpotifyLoading: arr.spotifyQuery.isLoading,
       isOsuLoading: arr.osuQuery.isLoading,
-      error: arr.spotifyQuery.error?.message ?? arr.osuQuery.error?.message,
+      error: arr.spotifyQuery.error?.message ?? arr.osuQuery.error?.message ?? null,
    }))
 }
 
