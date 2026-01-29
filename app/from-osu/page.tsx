@@ -69,6 +69,7 @@ export default function FromOsu() {
          },
       })),
    })
+   const isSpotifyFetching = spotifyQueries.some((q) => q.isFetching)
 
    const osuQueries = useQueries({
       queries: chunkedLocal.map((localChunk) => ({
@@ -86,14 +87,18 @@ export default function FromOsu() {
          },
       })),
    })
+   const isOsuFetching = osuQueries.some((q) => q.isFetching)
+
+   const isLoading = isOsuFetching || isSpotifyFetching
 
    // Re-fetch osu and spotify queries if any of them has null data
+   // TODO why?
    useEffect(() => {
       osuQueries.forEach((query) => {
-         if (query.data?.some((bs) => !bs)) query.refetch()
+         if (query.data?.some((bs) => bs === null)) query.refetch()
       })
       spotifyQueries.forEach((query) => {
-         if (query.data?.some((tracks) => !tracks)) query.refetch()
+         if (query.data?.some((tracks) => tracks === null)) query.refetch()
       })
    }, [])
 
@@ -123,7 +128,6 @@ export default function FromOsu() {
       osuQueries.map((q) => q.dataUpdatedAt).join(','),
       spotifyQueries.map((q) => q.dataUpdatedAt).join(','),
    ])
-   const isLoading = combined.some((q) => q.spotifyQuery.isLoading || q.osuQuery.isLoading)
 
    const groupedDict = useMemo(() => {
       const flattened = combined.flatMap((item) => flatCombinedArray(item))
@@ -158,7 +162,7 @@ export default function FromOsu() {
 
    const src = useFoStore((state) => (state.current ? state.current.local.image : undefined))
    return (
-      <div className="overflow-hidden">
+      <div className="overflow-hidden" translate="no">
          <BgImage />
          <AnimatePresence>
             {src && (

@@ -185,7 +185,7 @@ export default function PlaylistPage() {
    }, [progress])
 
    return (
-      <div className="min-w-[710px] font-inter overflow-hidden">
+      <div className="min-w-[710px] font-inter overflow-hidden" translate="no">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
          <BgImage className="brightness-[.75]" />
 
