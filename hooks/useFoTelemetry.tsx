@@ -26,7 +26,7 @@ export default function useFoTelemetry({
       if (hasInitialized.current) return
       hasInitialized.current = true
 
-      foTelemetryStart(songsLength, sessionId!)
+      foTelemetryStart(songsLength, sessionId ?? 'empty')
          .then((id) => {
             telemetryIdRef.current = id
          })

@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@source '../**/*.{ts,tsx}';
 
 body {
    @apply bg-[#391f1f];
@@ -25,6 +26,7 @@ body {
    /* Accent / secondary */
    /* --color-accent: oklch(0.6 0.15 290); */
    --color-accent: oklch(0.8 0.16 250);
+   --color-accent-light: oklch(0.92 0.1 250);
 
    --color-animated-body: var(--color-main-light);
    /* --color-animated-border: oklch(0.6 0.2 320); */
@@ -142,18 +144,50 @@ body {
    }
 
    .no-jump {
-      /* Змушує створити новий шар композиції (GPU) */
-      transform: translateZ(0);
+      transform: translateZ(0); /* set render to a new GPU layer*/
+      will-change: transform; /* browser hint for optimizations */
 
-      /* Приховує зворотний бік, що часто фіксить тремтіння в WebKit */
-      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      -webkit-background-clip: padding-box; /* Допомагає відсікати фон по межі бордера */
+      background-clip: padding-box;
 
-      /* Додаткова підказка браузеру про майбутні зміни */
-      will-change: transform;
+      backface-visibility: hidden; /* fix flickering at the end of transition (in webkit) */
 
-      /* Фіксація згладжування шрифту (особливо для macOS/iOS) */
+      isolation: isolate; /* create a new stacking context (stabilize z-index) */
+
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+   }
+   .no-jump-hover {
+      transform-style: preserve-3d;
+      -webkit-background-clip: padding-box;
+      background-clip: padding-box;
+
+      backface-visibility: hidden;
+
+      isolation: isolate;
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+   }
+   .no-jump-hover:hover {
+      transform: translateZ(0) translateY(-1px);
+      will-change: transform;
+   }
+
+   .halftone {
+      filter: brightness(0.8) blur(3px) contrast(999);
+   }
+   .halftone img {
+      filter: grayscale(1) blur(1px);
+   }
+   .halftone::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(10px at center, black, white);
+      background-size: 20px 20px;
+      mix-blend-mode: screen;
    }
 }
 

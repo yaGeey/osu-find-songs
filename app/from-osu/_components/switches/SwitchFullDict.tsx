@@ -42,9 +42,9 @@ export default function SwitchFull({
                <button
                   key={index}
                   className={tw(
-                     'cursor-pointer mb-0.5 text-sm hover:selected transition-all',
+                     'cursor-pointer mb-0.5 text-sm hover:selected transition-all hover:text-accent',
                      isDisabled && 'pointer-events-none',
-                     selection == val && 'selected',
+                     selection == val && 'text-accent',
                   )}
                   onClick={() => setSelection(val)}
                >

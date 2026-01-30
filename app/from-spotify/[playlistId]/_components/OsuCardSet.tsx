@@ -44,14 +44,19 @@ export default function OsuCardSet({
                   key={maps[0].id}
                   beatmapset={maps[0]}
                   onHover={false}
-                  className="z-2 w-full even:top-[5px] even:opacity-35 pointer-events-none group-hover/set:even:top-[7px] group-hover/set:last:top-[14px]"
+                  className="z-2 w-full pointer-events-none group-hover/set:h-24"
                />
             )}
             {maps.slice(1, 3).map((beatmapset, i) => (
                <DummyCard
                   key={beatmapset.id}
                   beatmapset={beatmapset}
-                  className="w-full absolute even:top-[5px] last:top-[10px] even:opacity-35 last:opacity-10 pointer-events-none group-hover/set:even:top-[7px] group-hover/set:last:top-[14px] transition-all"
+                  className={tw(
+                     'w-full absolute pointer-events-none transition-all',
+                     i == 0 && 'top-[5px] z-1 group-hover/set:top-[1px] opacity-50',
+                     i == 1 && 'top-[8px] z-0 opacity-20',
+                  )}
+                  // className="w-full absolute even:top-[5px] last:top-[8px] even:opacity-35 last:opacity-10 pointer-events-none group-hover/set:even:top-[1px] group-hover/set:last:top-[7px] transition-all"
                />
             ))}
          </div>

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons'
-import { twMerge as tw } from 'tailwind-merge'
+import { twMerge as tw, twJoin } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef, useState } from 'react'
@@ -51,13 +51,14 @@ export default function OsuCard({
       <div
          ref={ref}
          className={tw(
-            'group select-none relative h-26 font-inter overflow-hidden rounded-2xl min-w-[386px] w-[464px] bg-main flex border-2 border-main-border hover:brightness-110 transition-all z-0',
+            'no-jump select-none group relative h-26 font-inter overflow-hidden rounded-2xl min-w-[386px] w-[464px] bg-main-border flex _border-2 _border-main-border outline-3 outline-main-border -outline-offset-1 transition-all z-0',
+            '_hover:-translate-y-[2px] _hover:shadow-[0_4px_0_0_var(--color-main-border)]',
             className,
          )}
       >
          {/* IMAGES */}
          <button
-            className="relative w-[100px] h-full overflow-hidden z-0 group/play"
+            className="bg-main-border relative w-21 h-full overflow-hidden z-0 group/play"
             onClick={() => {
                if (currentUrl === beatmapset.preview_url) stop()
                else play(beatmapset.preview_url)
@@ -66,42 +67,64 @@ export default function OsuCard({
             {currentUrl === beatmapset.preview_url ? (
                <FontAwesomeIcon
                   icon={faPause}
-                  className="text-4xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_3px_3px_rgba(0,0,0,1)] z-20"
+                  className="text-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white stroke-[25px] stroke-main-border/80 z-20"
                />
             ) : (
                <FontAwesomeIcon
                   icon={faPlay}
-                  className="text-4xl group-hover/play:visible invisible absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white drop-shadow-[0_3px_3px_rgba(0,0,0,1)] z-20"
+                  className="text-3xl group-hover:visible invisible absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white stroke-[25px] stroke-main-border/80 z-20"
                />
             )}
             <ImageFallback
                src={beatmapset.covers.list}
                alt="list"
                fill
-               style={{ objectFit: 'cover' }}
                sizes="100%"
                loading="lazy"
                fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
+               className={twJoin(
+                  'group-hover:brightness-80 group-hover/play:scale-107 transition-transform duration-300 ease-in-out object-cover min-h-[104px]',
+                  currentUrl === beatmapset.preview_url && 'scale-107 brightness-80',
+               )}
             />
          </button>
-         <div className="relative flex-grow flex justify-end overflow-hidden">
+         <div
+            className={twJoin(
+               'relative flex-grow flex justify-end bg-main group-hover:brightness-90 transition-[filter]',
+               'transition-[clip-path] will-change-[clip-path] duration-300 ease-out',
+
+               // inset(0 0 0 0 round 0) -> Не обрізаємо нічого, кути гострі (або спадкують батьківські)
+               '[clip-path:inset(0_0_0_0_round_0)]',
+
+               // inset(top right bottom left round TL TR BR BL)
+               // - Обрізаємо 1.5rem (24px = w-6) справа.
+               // - round ...: задаємо нові скруглення для утворених кутів.
+               // - 0 1rem 1rem 0: Скруглюємо тільки праві кути (Top-Right і Bottom-Right) на 1rem (rounded-2xl)
+               'group-hover:[clip-path:inset(0_1.5rem_0_0_round_0_1rem_1rem_0)]',
+               isPending && '[clip-path:inset(0_1.5rem_0_0_round_0_1rem_1rem_0)]',
+            )}
+         >
             <ImageFallback
                src={beatmapset.covers.card}
                alt="cover"
                width={286}
                height={100}
-               className="z-10 w-max-[286px] h-auto"
+               className="z-10 w-max-[286px] h-full object-cover min-h-[104px]"
                loading="lazy"
                fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
             />
-            <div className="absolute top-0 right-0 w-[289px] h-full bg-gradient-to-r from-main to-main/70 z-15"></div>
+            <div
+               className={twJoin(
+                  'absolute top-0 right-0 w-[289px] h-full z-15 pointer-events-none',
+                  'bg-gradient-to-r from-main to-main/70',
+                  'group-hover:to-main/55 transition-colors duration-300',
+               )}
+            ></div>
          </div>
-
-         <div className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full bg-main z-1"></div>
          <a
             target="_blank"
             href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
-            className="absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white hover:w-[calc(100%-5.25rem-1.75rem)] hover:rounded-r-[14px]"
+            className="no-jump select-none absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white hover:w-[calc(100%-5.25rem-1.75rem)] hover:rounded-r-[14px]"
          >
             {/* INFORMATION */}
             <div className="truncate drop-shadow-xs/30">
@@ -173,9 +196,9 @@ export default function OsuCard({
          {/* download buttons */}
          <div
             className={tw(
-               'absolute top-0 right-0 w-7 h-full transition-all bg-main-darker opacity-0 flex flex-col items-center justify-center gap-5  text-black/50 text-sm z-100 overflow-hidden',
-               onHover && 'group-hover:opacity-100',
-               isPending && 'opacity-100',
+               'absolute -right-6 top-0 w-5.5 z-1000 h-full transition-[right] flex flex-col items-center justify-center gap-5 text-main-white text-sm overflow-hidden',
+               onHover && 'group-hover:right-0',
+               isPending && 'right-0',
             )}
          >
             {!isPending ? (
@@ -183,7 +206,7 @@ export default function OsuCard({
                   <FontAwesomeIcon
                      icon={faDownload}
                      onClick={() => handleDownload(false)}
-                     className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
+                     className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-[scale]"
                      data-tooltip-id="tooltip"
                      data-tooltip-content="Download without video"
                      data-tooltip-delay-show={400}
@@ -192,7 +215,7 @@ export default function OsuCard({
                      <FontAwesomeIcon
                         icon={faFileVideo}
                         onClick={() => handleDownload(true)}
-                        className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-all"
+                        className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-[scale]"
                         data-tooltip-id="tooltip"
                         data-tooltip-content="Download with video"
                         data-tooltip-delay-show={400}
@@ -200,7 +223,7 @@ export default function OsuCard({
                   )}
                </>
             ) : (
-               <Loading color="4b2e2e" radius={15} />
+               <Loading color="#fed2d0" radius={15} />
             )}
          </div>
       </div>

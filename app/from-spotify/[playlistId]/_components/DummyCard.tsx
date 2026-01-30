@@ -10,7 +10,7 @@ export default function DummyCard({ beatmapset, className }: { beatmapset: Beatm
             className,
          )}
       >
-         <div className="relative w-[100px] h-full bg-main-darker">
+         <div className="relative w-21 h-full bg-main-darker">
             <ImageFallback src={beatmapset.covers.list} alt="" fill style={{ objectFit: 'cover' }} />
          </div>
          <div className="relative flex-grow flex justify-end">

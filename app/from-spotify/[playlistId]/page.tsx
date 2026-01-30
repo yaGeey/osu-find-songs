@@ -32,6 +32,7 @@ import ProgressMapDownload from './_components/ProgressMapDownload'
 import { SelectedOption } from '@/components/selectors/FilterOptions'
 import Image from 'next/image'
 import { CardRenderer } from './_components/CardRenderer'
+import CustomLink from '@/components/CustomLink'
 
 export default function PlaylistPage() {
    const params = useParams()
@@ -218,7 +219,15 @@ export default function PlaylistPage() {
             </section>
             {playlistInfo?.name && (
                <p className="absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray bg-main/40 px-3 py-1 rounded-md max-w-[30%] w-full min-w-fit text-center overflow-hidden text-ellipsis">
-                  <span className={tw(isLoading && 'animate-pulse')}>{playlistInfo?.name}</span>
+                  <CustomLink
+                     href={`https://open.spotify.com/playlist/${playlistId}`}
+                     className={tw(
+                        isLoading && 'animate-pulse ease-[cubic-bezier(0.4,0,0.6,1)] duration-1500',
+                        'hover:text-main-gray focus:text-main-gray after:bg-main-gray/80',
+                     )}
+                  >
+                     {playlistInfo?.name}
+                  </CustomLink>
                </p>
             )}
             <div className="_invisible">
@@ -230,13 +239,24 @@ export default function PlaylistPage() {
             <div className="relative h-[calc(100dvh-3rem)] w-full max-w-[980px] min-w-[710px] bg-main-darker">
                <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
                   {maps.length > 0 && (
-                     <Image
-                        src={maps[0][0]?.covers.slimcover}
-                        alt="bg"
-                        fill
-                        className="object-cover opacity-5 pointer-events-none"
-                        sizes="100vw"
-                     />
+                     <>
+                        <Image
+                           src={maps[0][0]?.covers.slimcover}
+                           alt="bg"
+                           fill
+                           className="object-cover opacity-5 pointer-events-none"
+                           sizes="100vw"
+                        />
+                        {/* <div className="mix-blend-multiply halftone w-full h-full absolute top-0 left-0 pointer-events-none overflow-hidden opacity-3">
+                           <Image
+                              src={maps[0][0]?.covers.slimcover}
+                              alt="bg"
+                              fill
+                              className="object-cover opacity-100 pointer-events-none"
+                              sizes="100vw"
+                           />
+                        </div> */}
+                     </>
                   )}
                   <Filters
                      foundString={Array.isArray(maps) && maps.length ? `${maps.length}/${tracks.length} found` : ''}

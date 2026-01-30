@@ -39,7 +39,7 @@ export default function SwitchSort({
             <button
                key={i}
                className={tw(
-                  'cursor-pointer flex mb-0.5 text-sm hover:selected transition-all',
+                  'cursor-pointer flex mb-0.5 text-sm transition-colors hover:text-accent',
                   selection == option && 'selected',
                )}
                onClick={() => {
