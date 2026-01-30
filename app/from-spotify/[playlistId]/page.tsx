@@ -190,6 +190,7 @@ export default function PlaylistPage() {
    // It fires synchronously after DOM mutations but BEFORE the browser paints,
    // ensuring the initial animation state (opacity: 0) is applied before the user sees the elements.
    useLayoutEffect(() => {
+      if (!scope.current) return
       if (!maps.length) return
       animate(
          'li',
@@ -201,7 +202,7 @@ export default function PlaylistPage() {
             bounce: 0.3,
          },
       )
-   }, [maps])
+   }, [maps, animate, scope])
 
    return (
       <div className="min-w-[710px] font-inter overflow-hidden" translate="no">
