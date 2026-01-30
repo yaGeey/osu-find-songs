@@ -1,16 +1,14 @@
 'use client'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
-import OsuCard from './_components/OsuCard'
-import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query'
 import { fetchWithToken, getPlaylist } from '@/lib/Spotify'
 import type { PlaylistPage } from '@/types/Spotify'
 import HomeBtn from '@/components/buttons/HomeBtn'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { BeatmapSet } from '@/types/Osu'
-import OsuCardSet from './_components/OsuCardSet'
-import { toast, ToastContainer } from 'react-toastify'
+import { ToastContainer } from 'react-toastify'
 import Filters from './_components/Filters'
 import Progress from '@/components/state/Progress'
 import BgImage from '@/components/BgImage'
@@ -33,6 +31,7 @@ import { SelectedOption } from '@/components/selectors/FilterOptions'
 import Image from 'next/image'
 import { CardRenderer } from './_components/CardRenderer'
 import CustomLink from '@/components/CustomLink'
+import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
 
 export default function PlaylistPage() {
    const params = useParams()
@@ -185,6 +184,25 @@ export default function PlaylistPage() {
       if (progress === -1) setError('An error occurred during the download process.')
    }, [progress])
 
+   // animation
+   const [scope, animate] = useAnimate()
+   // We use useLayoutEffect instead of useEffect to prevent visual flickering.
+   // It fires synchronously after DOM mutations but BEFORE the browser paints,
+   // ensuring the initial animation state (opacity: 0) is applied before the user sees the elements.
+   useLayoutEffect(() => {
+      if (!maps.length) return
+      animate(
+         'li',
+         { opacity: [0, 1], y: [8, 0], scale: [0.96, 1] },
+         {
+            delay: stagger(0.03, { ease: 'easeOut' }),
+            type: 'spring',
+            duration: 0.5,
+            bounce: 0.3,
+         },
+      )
+   }, [maps])
+
    return (
       <div className="min-w-[710px] font-inter overflow-hidden" translate="no">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
@@ -238,26 +256,35 @@ export default function PlaylistPage() {
          <main className="flex justify-center mt-12">
             <div className="relative h-[calc(100dvh-3rem)] w-full max-w-[980px] min-w-[710px] bg-main-darker">
                <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
-                  {maps.length > 0 && (
-                     <>
-                        <Image
-                           src={maps[0][0]?.covers.slimcover}
-                           alt="bg"
-                           fill
-                           className="object-cover opacity-5 pointer-events-none"
-                           sizes="100vw"
-                        />
-                        {/* <div className="mix-blend-multiply halftone w-full h-full absolute top-0 left-0 pointer-events-none overflow-hidden opacity-3">
+                  <AnimatePresence mode="popLayout">
+                     {maps.length > 0 && (
+                        <motion.div
+                           key={maps[0][0]?.covers.slimcover}
+                           initial={{ opacity: 0 }}
+                           animate={{ opacity: 1 }}
+                           exit={{ opacity: 0 }}
+                           transition={{ duration: 0.1 }}
+                        >
                            <Image
                               src={maps[0][0]?.covers.slimcover}
                               alt="bg"
                               fill
-                              className="object-cover opacity-100 pointer-events-none"
+                              className="object-cover opacity-5 pointer-events-none"
                               sizes="100vw"
+                              priority
                            />
-                        </div> */}
-                     </>
-                  )}
+                           {/* <div className="mix-blend-multiply halftone w-full h-full absolute top-0 left-0 pointer-events-none overflow-hidden opacity-3">
+                              <Image
+                                 src={maps[0][0]?.covers.slimcover}
+                                 alt="bg"
+                                 fill
+                                 className="object-cover opacity-100 pointer-events-none"
+                                 sizes="100vw"
+                              />
+                           </div> */}
+                        </motion.div>
+                     )}
+                  </AnimatePresence>
                   <Filters
                      foundString={Array.isArray(maps) && maps.length ? `${maps.length}/${tracks.length} found` : ''}
                      disabled={isLoading}
@@ -267,21 +294,21 @@ export default function PlaylistPage() {
                </div>
 
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
-                  <div className="grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 p-2.5 bg-main-darker overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar">
+                  <div
+                     ref={scope}
+                     className="list-none grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 p-2.5 pb-3.5 overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar"
+                  >
                      {maps.map((data, i) => (
-                        <CardRenderer
-                           key={data[0].id}
-                           data={data}
-                           sortQuery={searchParams.get('sort') || 'relevance_asc'}
-                           className="animate-in fade-in duration-200"
-                        />
+                        <li key={data[0].id} className="opacity-0">
+                           <CardRenderer data={data} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
+                        </li>
                      ))}
                   </div>
                ) : (
                   <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
                )}
                {!isLoading && !initialLoading && !maps.length && (
-                  <div className="text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
+                  <div className="no-jump text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
                      No results found
                      <p className="text-base">Try setting the state to &apos;any&apos; to see unranked maps</p>
                   </div>

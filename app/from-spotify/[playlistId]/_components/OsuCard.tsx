@@ -2,11 +2,11 @@ import { BeatmapSet } from '@/types/Osu'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
-import { faDownload, faFileVideo, faPlay, faPause, faStop } from '@fortawesome/free-solid-svg-icons'
+import { faDownload, faFileVideo, faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw, twJoin } from 'tailwind-merge'
 import { useNoVideoAxios } from '@/utils/osuDownload'
 import { groupBy } from '@/utils/arrayManaging'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import ImageFallback from '@/components/ImageFallback'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
@@ -91,7 +91,7 @@ export default function OsuCard({
          <div
             className={twJoin(
                'relative flex-grow flex justify-end bg-main group-hover:brightness-90 transition-[filter]',
-               'transition-[clip-path] will-change-[clip-path] duration-300 ease-out',
+               'transition-all will-change-[clip-path] duration-300 ease-out',
 
                // inset(0 0 0 0 round 0) -> Не обрізаємо нічого, кути гострі (або спадкують батьківські)
                '[clip-path:inset(0_0_0_0_round_0)]',
