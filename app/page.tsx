@@ -13,8 +13,8 @@ import icon from '@/public/icon.png'
 export default function LandingPage() {
    const [details, setDetails] = useState('')
    return (
-      <main className="flex flex-col justify-center items-center [min-height:100dvh] text-white -z-1 gap-16 p-5">
-         <div className="flex flex-col gap-20 max-sm:gap-0 items-center mt-19 max-landing:mt-12 max-landing:w-fit max-landing:max-w-4/5 max-sm:w-full">
+      <main className="flex flex-col justify-center items-center [min-height:100dvh] text-white p-5">
+         <div className="flex-grow flex flex-col gap-20 max-sm:gap-0 items-center mt-19 max-landing:mt-12 max-landing:w-fit max-landing:max-w-4/5 max-sm:w-full">
             <div className="h-[400px] max-sm:h-fit max-landing:h-auto flex gap-1 justify-center items-center max-landing:flex-col max-landing:gap-11">
                <div className="max-w-[600px] max-landing:max-w-full h-full max-landing:h-auto px-5 py-10 max-landing:py-0">
                   <div className="flex gap-6 items-center max-sm:flex-col max-landing:justify-center">
