@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWikipediaW } from '@fortawesome/free-brands-svg-icons'
 import ExternalLink from '../../../components/ExternalLink'
 import useFoStore from '@/contexts/useFoStore'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 // TODO remove queries yt and wiki when 0 info
 
 export default function Info({ data }: { data: CombinedSingleSimple }) {
@@ -69,12 +70,11 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
             'bg-triangles-faded-right [--color-dialog:var(--color-main)]',
          )}
       >
-         <div
-            className="absolute top-2 right-2 cursor-pointer w-10 h-10 opacity-100 lgx:opacity-0 transition-all z-100"
+         <FontAwesomeIcon
+            icon={faXmark}
+            className="cursor-pointer bg-main-dark-vivid border-3 border-main-border p-2 px-2.5 rounded-full absolute right-2 top-2 visible lgx:invisible transition-none"
             onClick={() => useFoStore.setState({ current: null })}
-         >
-            <Image src="/icons/close.svg" layout="fill" alt="close" />
-         </div>
+         />
          <div className="flex gap-4 h-[120px]">
             <div className="min-w-[120px] max-w-[120px] h-[120px]">
                <Image
@@ -159,7 +159,7 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
          </div>
 
          {selection === 'spotify' && (
-            <li className="relative scrollbar flex flex-col gap-2 mt-3 bg-main-darker w-full h-full p-2 rounded-lg border-4 border-[#159A44] overflow-auto">
+            <li className="relative scrollbar flex flex-col gap-2 mt-3 bg-main-darker w-full h-full py-2 rounded-lg border-4 border-[#159A44] overflow-auto">
                {spotify?.length == 20 && (
                   <div className="flex gap-2">
                      <span className="text-5xl text-red-500 font-bold">!</span>
@@ -178,7 +178,7 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
             </li>
          )}
          {selection === 'youtube' && (
-            <li className="relative scrollbar flex flex-wrap gap-2 mt-3 bg-main-darker box-border w-full h-full p-2 rounded-lg border-4 border-main-lightest overflow-auto">
+            <li className="relative scrollbar flex flex-wrap gap-2 mt-3 bg-main-darker box-border w-full h-full py-2 rounded-lg border-4 border-main-lightest overflow-auto">
                {yt.isLoading && <Loading />}
                {yt.data?.map((media: Media, i: number) => {
                   if (Cookies.get('showYouTubeEmbeds') == 'true') {

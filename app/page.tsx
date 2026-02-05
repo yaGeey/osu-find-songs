@@ -1,39 +1,37 @@
 'use client'
 import Link from 'next/link'
 import { Button } from '@/components/buttons/Buttons'
-import BgImage from '@/components/BgImage'
 import Image from 'next/image'
 import Footer from '@/components/Footer'
 import { twMerge as tw } from 'tailwind-merge'
 import { useState } from 'react'
 import './page.css'
+import fsImage from '@/public/fs.webp'
+import fromOsuImage from '@/public/from-osu.webp'
+import icon from '@/public/icon.png'
 
 export default function LandingPage() {
    const [details, setDetails] = useState('')
-   const [imagesLoaded, setImagesLoaded] = useState({ osu: false, spotify: false })
    return (
       <main className="flex flex-col justify-center items-center [min-height:100dvh] text-white -z-1 gap-16 p-5">
-         <BgImage />
          <div className="flex flex-col gap-20 max-sm:gap-0 items-center mt-19 max-landing:mt-12 max-landing:w-fit max-landing:max-w-4/5 max-sm:w-full">
             <div className="h-[400px] max-sm:h-fit max-landing:h-auto flex gap-1 justify-center items-center max-landing:flex-col max-landing:gap-11">
                <div className="max-w-[600px] max-landing:max-w-full h-full max-landing:h-auto px-5 py-10 max-landing:py-0">
                   <div className="flex gap-6 items-center max-sm:flex-col max-landing:justify-center">
                      <Image
-                        src="/icon.png"
+                        src={icon}
                         width={80}
                         height={80}
                         alt="osufindsongs - tool for osu and spotify"
                         className="drop-shadow-sm max-sm:scale-80"
-                        onError={(e) => {
-                           console.error('Icon image error:', e)
-                        }}
+                        placeholder="blur"
                      />
                      <h1 className="text-4xl/[48px] w-[260px] max-sm:text-2xl max-sm:w-full max-landing:text-center max-sm:-mt-5 tracking-tight font-semibold">
                         osufindsongs - find & convert
                      </h1>
                   </div>
                   <h2
-                     className="text-lg/[30px] max-landing:text-center text-balance max-sm:text-base mt-[1.95rem] animate-in fade-in slide-in-from-bottom-2.5 duration-1000"
+                     className="transition-none text-lg/[30px] max-landing:text-center text-balance max-sm:text-base mt-[1.95rem] animate-in fade-in slide-in-from-bottom-2.5 duration-1000"
                      key={details ?? 'none'}
                   >
                      {!details &&
@@ -67,8 +65,7 @@ export default function LandingPage() {
                >
                   <div
                      className={tw(
-                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer overflow-hidden',
-                        !imagesLoaded.osu && 'opacity-0',
+                        'hover:border-accent hover:scale-101 transition-all w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main bg-main rounded-2xl cursor-pointer overflow-hidden',
                         details === 'from-osu'
                            ? 'card-front go-front'
                            : details === 'from-spotify'
@@ -77,27 +74,17 @@ export default function LandingPage() {
                      )}
                   >
                      <Image
-                        src="/from-osu.png"
+                        src={fromOsuImage}
                         alt="From osu! to Spotify"
                         fill
                         priority
                         className="object-cover"
-                        onLoad={() => {
-                           try {
-                              setImagesLoaded((p) => ({ ...p, osu: true }))
-                           } catch (e) {
-                              console.error('Image load error:', e)
-                           }
-                        }}
-                        onError={(e) => {
-                           console.error('Image error:', e)
-                        }}
+                        placeholder="blur"
                      />
                   </div>
                   <div
                      className={tw(
-                        'w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main rounded-2xl cursor-pointer overflow-hidden',
-                        !imagesLoaded.spotify && 'opacity-0',
+                        'hover:border-accent hover:scale-101 transition-all w-[560px] h-[350px] absolute bottom-0 right-0 border-4 border-main bg-main rounded-2xl cursor-pointer overflow-hidden',
                         details === 'from-spotify'
                            ? 'card-front go-front'
                            : details === 'from-osu'
@@ -105,23 +92,7 @@ export default function LandingPage() {
                              : 'card-front',
                      )}
                   >
-                     <Image
-                        src="/fs.png"
-                        alt="From Spotify to osu!"
-                        fill
-                        priority
-                        className="object-cover"
-                        onLoad={() => {
-                           try {
-                              setImagesLoaded((p) => ({ ...p, spotify: true }))
-                           } catch (e) {
-                              console.error('Image load error:', e)
-                           }
-                        }}
-                        onError={(e) => {
-                           console.error('Image error:', e)
-                        }}
-                     />
+                     <Image src={fsImage} alt="From Spotify to osu!" fill priority className="object-cover" placeholder="blur" />
                   </div>
 
                   <span className="absolute -bottom-7 right-0 text-base text-white/60 flex gap-2">

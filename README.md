@@ -14,7 +14,7 @@ _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or 
    <strong style="font-size: 20px;">🎧 From Spotify to osu!</strong>
 </p>
 <div align="center">
-  <img src="./public/preview.png" width="600" alt="Spotify to osu! feature"/>
+  <img src="./public/fs.webp" width="600" alt="Spotify to osu! feature"/>
 </div>
 
 <br>
@@ -29,7 +29,7 @@ _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or 
    <strong style="font-size: 20px;">🎮 From osu! to Spotify</strong>
 </p>
 <div align="center">
-  <img src="./public/from-osu.png" width="600" alt="osu! to Spotify feature"/>
+  <img src="./public/from-osu.webp" width="600" alt="osu! to Spotify feature"/>
 </div>
 
 <br>

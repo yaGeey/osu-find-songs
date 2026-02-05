@@ -11,7 +11,6 @@ import { BeatmapSet } from '@/types/Osu'
 import { ToastContainer } from 'react-toastify'
 import Filters from './_components/Filters'
 import Progress from '@/components/state/Progress'
-import BgImage from '@/components/BgImage'
 import { sortBeatmapsMatrix } from './_utils/sortBeatmapsMatrix'
 import { chunkArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
 import useDownloadAll from '@/hooks/useDownloadAll'
@@ -207,7 +206,11 @@ export default function PlaylistPage() {
    return (
       <div className="min-w-[710px] font-inter overflow-hidden" translate="no">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
-         <BgImage className="brightness-[.75]" />
+         <style>{`
+         body {
+            --bg-brightness: .25;
+         }
+         `}</style>
 
          <Progress isVisible={isLoading} value={spotifyTotal > 0 ? Math.min((mapsFetched / spotifyTotal) * 100, 100) : 0}>
             {msLeft > 5000 && (
@@ -256,7 +259,7 @@ export default function PlaylistPage() {
 
          <main className="flex justify-center mt-12">
             <div className="relative h-[calc(100dvh-3rem)] w-full max-w-[980px] min-w-[710px] bg-main-darker">
-               <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full px-5 py-2 text-white shadow-tight text-nowrap border-b-2 border-b-main-border">
+               <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full px-5 py-2 text-white [box-shadow:0px_4px_4px_rgba(0,0,0,0.2)] text-nowrap border-b-2 border-b-main-border">
                   <AnimatePresence mode="popLayout">
                      {maps.length > 0 && (
                         <motion.div
@@ -297,7 +300,7 @@ export default function PlaylistPage() {
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
                   <div
                      ref={scope}
-                     className="list-none grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 p-2.5 pb-3.5 overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar"
+                     className="list-none grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 pt-2.5 pb-3.5 px-[5px] overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar"
                   >
                      {maps.map((data, i) => (
                         <li key={data[0].id} className="opacity-0">

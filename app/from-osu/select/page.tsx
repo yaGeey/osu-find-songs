@@ -1,9 +1,8 @@
 'use client'
-import BgImage from '@/components/BgImage'
 import { Song } from '@/types/types'
 import { useSongContext } from '@/contexts/SongContext'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Cookies from 'js-cookie'
 import { ToastContainer, toast } from 'react-toastify'
 import { getServerToken } from '@/lib/Spotify'
@@ -96,7 +95,6 @@ export default function SelectPage() {
 
    return (
       <div className="flex flex-col justify-center items-center min-h-screen text-white">
-         <BgImage />
          <div className="flex flex-col justify-center items-center flex-1 text-nowrap">
             <h1 className="text-4xl tracking-tight font-semibold mb-3">Select your osu! beatmaps folder</h1>
             <h3 className="text-lg text-white/60">This may take some time</h3>
@@ -117,10 +115,9 @@ export default function SelectPage() {
                   <FontAwesomeIcon icon={faUpload} className="text-5xl mb-3" />
                   <div className="text-lg font-medium">Click to select folder</div>
                </div>
-               {/* @ts-expect-error directory exists*/}
-               <input directory=""
-                  webkitdirectory=""
+               <input
                   type="file"
+                  {...({ directory: '', webkitdirectory: '' } as any)}
                   onChange={(e) => {
                      toast.promise(handleFileChange(e), {
                         pending: 'Loading beatmaps...',

@@ -2,7 +2,12 @@
 @source '../**/*.{ts,tsx}';
 
 body {
-   @apply bg-[#391f1f];
+   background-color: #391f1f;
+   background-image: linear-gradient(rgba(0, 0, 0, var(--bg-brightness)), rgba(0, 0, 0, var(--bg-brightness))), url('/bg.svg');
+   background-repeat: no-repeat;
+   background-size: cover;
+   background-position: center;
+   background-attachment: fixed;
 }
 
 @theme inline {
@@ -40,6 +45,8 @@ body {
    --color-dialog: var(--color-main-light);
    --color-white-50: #d9d9d9;
 
+   --bg-brightness: 0.5;
+
    --breakpoint-lgx: 75rem;
    --breakpoint-landing: 1220px;
 
@@ -76,24 +83,14 @@ body {
       inherits: false;
    }
 
-   .scrollbar::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
+   .scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in oklch, var(--color-main-light) 50%, transparent) transparent;
+      scrollbar-gutter: stable both-edges; /* 7px */
    }
-
-   .scrollbar::-webkit-scrollbar-track {
-      border-radius: 100vh;
-      background: var(--color-main-white);
-   }
-
-   .scrollbar::-webkit-scrollbar-thumb {
-      background: var(--color-main-lightest);
-      border-radius: 100vh;
-      border: 3px solid var(--color-main-white);
-   }
-
-   .scrollbar::-webkit-scrollbar-thumb:hover {
-      background: var(--color-main-light);
+   .scrollbar-default {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-main-light) var(--color-main-border);
    }
 
    .selected {
@@ -101,9 +98,6 @@ body {
       @apply text-accent text-shadow-2xs/20;
    }
 
-   .shadow-tight {
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
-   }
    /* text-shadow-2xs/30*/
    .font-outline {
       @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)];
@@ -123,23 +117,10 @@ body {
          url(/osu/tris-r-t.svg) no-repeat top right,
          var(--color-dialog);
    }
-   .bg-test {
-      background-color: var(--color-main);
-      background-image: url('https://osu.ppy.sh/assets/images/nav2-background-hue0.1aba1596.png');
-      background-blend-mode: luminosity;
-      filter: none;
-   }
-   .bg-triangles-faded {
-      background:
-         linear-gradient(transparent, var(--color-dialog) 70px, var(--color-dialog) 100%),
-         url(/osu/tris.png) no-repeat,
-         url(/osu/tris2.png) no-repeat top right,
-         var(--color-dialog);
-   }
    .bg-triangles-faded-right {
       background:
          linear-gradient(transparent, var(--color-dialog) 70px, var(--color-dialog) 100%),
-         url(/osu/tris2.png) no-repeat top right,
+         url(/osu/tris-r-t.svg) no-repeat top right,
          var(--color-dialog);
    }
 
@@ -154,25 +135,6 @@ body {
       backface-visibility: hidden; /* fix flickering at the end of transition (in webkit) */
 
       isolation: isolate; /* create a new stacking context (stabilize z-index) */
-
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-   }
-   .no-jump-hover {
-      transform-style: preserve-3d;
-      -webkit-background-clip: padding-box;
-      background-clip: padding-box;
-
-      backface-visibility: hidden;
-
-      isolation: isolate;
-
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-   }
-   .no-jump-hover:hover {
-      transform: translateZ(0) translateY(-1px);
-      will-change: transform;
    }
 
    .halftone {
@@ -191,5 +153,5 @@ body {
    }
 }
 
-@plugin 'tailwind-scrollbar';
+/* @plugin 'tailwind-scrollbar'; */
 @plugin 'tailwindcss-animate';

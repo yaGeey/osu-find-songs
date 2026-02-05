@@ -53,15 +53,15 @@ function Card({
    return (
       <div
          className={tw(
-            'last:rounded-b-lg first:hover:pt-0 hover:py-2 transition-all duration-300 ease-in-out',
-            selected && 'first:pt-0 py-2',
+            'last:rounded-b-lg hover:py-2 hover:px-3 transition-all duration-300 ease-in-out',
+            selected && 'py-2 hover:px-0',
             (isSpotifyLoading || error || spotify === null) && 'pointer-events-none',
          )}
       >
          <div
             className={tw(
                'bg-triangles-faded-right [--color-dialog:var(--color-main-dark)] select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:opacity-85',
-               selected && 'opacity-85 sm:mr-20 rounded-lg',
+               selected && 'opacity-85 sm:mr-20 rounded-lg hover:sm:mr-17',
                className,
             )}
             onClick={handleClick}

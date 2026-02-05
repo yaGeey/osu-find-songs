@@ -77,7 +77,7 @@ export default function OsuCardSet({
                         />
                         <FontAwesomeIcon
                            icon={faXmark}
-                           className="cursor-pointer bg-error p-2 px-2.5 rounded-full absolute right-4"
+                           className="cursor-pointer bg-main-dark-vivid border-3 border-main-border p-2 px-2.5 rounded-full absolute right-4"
                            onClick={onClose}
                         />
                      </div>

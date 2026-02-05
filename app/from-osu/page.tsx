@@ -163,11 +163,10 @@ export default function FromOsu() {
    const src = useFoStore((state) => (state.current ? state.current.local.image : undefined))
    return (
       <div className="overflow-hidden" translate="no">
-         <BgImage />
          <AnimatePresence>
             {src && (
                <motion.div
-                  key="bg"
+                  key={src}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import BgImage from '@/components/BgImage'
 import { Button } from '@/components/buttons/Buttons'
+import cat from '@/public/cat.avif'
 
 export default function NotFound() {
    return (
       <div className="flex items-center h-screen">
-         <BgImage />
          <div className="bg-main-light flex w-[750px] rounded-xl shadow-lg mx-auto overflow-hidden border-4 border-main-border">
-            <Image src="/cat.gif" width={350} height={350} alt="404" />
+            <Image src={cat} unoptimized width={350} height={350} alt="404" />
             <div className="flex flex-col justify-center items-center flex-grow">
                <h2 className="text-6xl font-bold">404</h2>
                <p className="font-semibold">Page not found</p>

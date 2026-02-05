@@ -30,20 +30,18 @@ export default function Footer() {
       enabled: !isBot,
    })
    return (
-      <footer className="mt-auto">
+      <footer className="mt-auto pb-3">
          <p className="text-base max-sm:text-[13px] px-1 text-center">Consider staring ⭐ a GitHub repo if you like this app!</p>
-         {lastUpdated && stargazeCount && (
-            <a
-               href="https://github.com/yaGeey/osu-find-songs"
-               target="_blank"
-               className="text-sm max-sm:text-[13px] flex px-2 justify-center items-center text-white/60 hover:underline"
-            >
-               GitHub
-               <FontAwesomeIcon icon={faStar} className="text-[10px] mx-1" />
-               {stargazeCount} · Last update: {lastUpdated.date.split(', ')[0]}{' '}
-               <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px] ml-1" />
-            </a>
-         )}
+         <a
+            href="https://github.com/yaGeey/osu-find-songs"
+            target="_blank"
+            className="text-sm max-sm:text-[13px] flex px-2 justify-center items-center text-white/60 hover:underline"
+         >
+            GitHub
+            <FontAwesomeIcon icon={faStar} className="text-[10px] mx-1" />
+            {stargazeCount || 'xx'} · Last update: {lastUpdated ? lastUpdated.date.split(', ')[0] : 'x/xx/xx'}{' '}
+            <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px] ml-1" />
+         </a>
       </footer>
    )
 }

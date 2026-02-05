@@ -16,7 +16,7 @@ export default function VirtuosoCardFO({ data }: { data: ListItem[] }) {
             Header: () => <div className="h-3" />,
          }}
          itemContent={(_, item) => <Row item={item} />}
-         className="scrollbar w-full"
+         className="scrollbar-default w-full"
          style={{ height: 'calc(100dvh - 48px)' }}
          overscan={200}
          defaultItemHeight={85}

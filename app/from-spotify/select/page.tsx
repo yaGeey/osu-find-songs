@@ -1,6 +1,5 @@
 'use client'
-import BgImage from '@/components/BgImage'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
@@ -34,7 +33,6 @@ export default function SelectPage() {
 
    return (
       <div className="flex flex-col justify-center items-center min-h-screen text-white p-5">
-         <BgImage />
          <div className="flex flex-col justify-center items-center flex-1 sm:text-nowrap mt-1">
             <h1 className="text-4xl max-sm:text-2xl tracking-tight font-semibold mb-3">Select a public playlist</h1>
             <h3 className="text-lg max-sm:text-sm text-white/60">*NOT Albums, Daily Mixes, or Private playlists</h3>
