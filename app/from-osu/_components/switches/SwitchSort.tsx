@@ -25,6 +25,11 @@ export default function SwitchSort({
       onChange(selection, sort)
    }, [selection, sort])
 
+   const getVariant = (option: string) => {
+      if (selection !== option) return 'hidden'
+      return sort === 'asc' ? 'flip' : 'visible'
+   }
+   
    return (
       <div
          {...props}
@@ -53,9 +58,9 @@ export default function SwitchSort({
                <div className="text-xs/[5px] ml-1">
                   <motion.div
                      className="h-full"
-                     variants={{ initial: { rotate: 0, opacity: 1 }, flip: { rotate: 180, opacity: 1 }, hidden: { opacity: 0 } }}
-                     initial="initial"
-                     animate={selection === option ? (sort === 'asc' ? 'flip' : 'initial') : 'hidden'}
+                     variants={{ visible: { rotate: 0, opacity: 1 }, flip: { rotate: 180, opacity: 1 }, hidden: { opacity: 0 } }}
+                     initial={getVariant(option)}
+                     animate={getVariant(option)}
                   >
                      <FontAwesomeIcon icon={faSortDown} className="mt-0.5" />
                   </motion.div>

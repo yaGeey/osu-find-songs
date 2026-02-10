@@ -18,32 +18,23 @@ export default function SwitchFull({
    defaultValue?: string
    className?: string
 }) {
-   const [isDisabled, setIsDisabled] = useState(disabled)
    const [selection, setSelection] = useState<string | null>(defaultValue ? options[defaultValue] : null)
-   useEffect(() => {
-      if (isDisabled) onChange('')
-      else onChange(selection || '')
-   }, [selection, isDisabled])
-
    return (
       <div
          className={tw(
             'font-inter-tight border-2 border-main-border rounded-full flex items-center gap-1 h-[26px] cursor-pointer',
-            isDisabled && 'brightness-60',
+            disabled && 'brightness-75',
             !required && 'pl-1.5 bg-gray-200',
             className,
          )}
-         onClick={() => isDisabled && setIsDisabled(false)}
       >
-         {!required && <CursorBtn setIsDisabled={setIsDisabled} isDisabled={isDisabled} />}
-
          <div className="bg-main-subtle text white h-full p-1 rounded-full flex items-center gap-3 px-3 select-none">
             {Object.entries(options).map(([key, val], index) => (
                <button
                   key={index}
                   className={tw(
                      'cursor-pointer mb-0.5 text-sm hover:selected transition-all hover:text-accent',
-                     isDisabled && 'pointer-events-none',
+                     disabled && 'pointer-events-none',
                      selection == val && 'text-accent',
                   )}
                   onClick={() => setSelection(val)}
