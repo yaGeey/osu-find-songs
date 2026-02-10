@@ -21,6 +21,7 @@ import { faWikipediaW } from '@fortawesome/free-brands-svg-icons'
 import ExternalLink from '../../../components/ExternalLink'
 import useFoStore from '@/contexts/useFoStore'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import CloseBtn from '@/components/buttons/CloseBtn'
 // TODO remove queries yt and wiki when 0 info
 
 export default function Info({ data }: { data: CombinedSingleSimple }) {
@@ -70,10 +71,9 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
             'bg-triangles-faded-right [--color-dialog:var(--color-main)]',
          )}
       >
-         <FontAwesomeIcon
-            icon={faXmark}
-            className="cursor-pointer bg-main-dark-vivid border-3 border-main-border p-2 px-2.5 rounded-full absolute right-2 top-2 visible lgx:invisible transition-none"
+         <CloseBtn
             onClick={() => useFoStore.setState({ current: null })}
+            className="absolute right-2 top-2 visible lgx:invisible "
          />
          <div className="flex gap-4 h-[120px]">
             <div className="min-w-[120px] max-w-[120px] h-[120px]">

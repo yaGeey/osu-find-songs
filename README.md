@@ -4,7 +4,7 @@
 
 _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or find beatmaps from a playlist_ 🎮🎶
 
-[![Website](https://img.shields.io/badge/🌐_Website-osu.yageey.me-blue)](https://osu.yageey.me) [![osuck](https://img.shields.io/badge/-📁_osuck-4d3249)](https://tools.osuck.net/tool/67df097dafb780368707339a) [![os](https://img.shields.io/github/stars/yaGeey/osu-find-songs?logo=github)](https://github.com/yaGeey/osu-find-songs)
+[![Website](https://img.shields.io/badge/🌐_Website-osu.yageey.me-blue)](https://osu.yageey.me) [![osuck](https://img.shields.io/badge/-📁_osuck-4d3249)](https://tools.osuck.net/tool/67df097dafb780368707339a) [![support](https://img.shields.io/badge/🤝_Support-KoFi-l)](https://ko-fi.com/yageey) [![os](https://img.shields.io/github/stars/yaGeey/osu-find-songs?logo=github)](https://github.com/yaGeey/osu-find-songs)
 
 </div>
 

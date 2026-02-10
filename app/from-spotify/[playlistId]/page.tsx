@@ -128,10 +128,12 @@ export default function PlaylistPage() {
    const { addTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // full data
-   const mapsFlatten = beatmapsetQueries
-      .map((q) => q.data)
-      .flat()
-      .filter((item) => item != null)
+   const mapsFlatten = useMemo(() => {
+      return beatmapsetQueries
+         .map((q) => q.data)
+         .flat()
+         .filter((item) => item != null)
+   }, [beatmapsetQueries.map((q) => q.data).join(',')])
    const mapsFetched = mapsFlatten.length
 
    // prepara data for display
@@ -203,6 +205,15 @@ export default function PlaylistPage() {
       )
    }, [maps, animate, scope])
 
+   const sortQuery = searchParams.get('sort') || 'relevance_asc'
+   const renderedGrid = useMemo(() => {
+      return maps.map((data, i) => (
+         <li key={data[0].id} className="opacity-0">
+            <CardRenderer data={data} sortQuery={sortQuery} />
+         </li>
+      ))
+   }, [maps, sortQuery])
+
    return (
       <div className="min-w-[710px] font-inter overflow-hidden" translate="no">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
@@ -259,7 +270,7 @@ export default function PlaylistPage() {
 
          <main className="flex justify-center mt-12">
             <div className="relative h-[calc(100dvh-3rem)] w-full max-w-[980px] min-w-[710px] bg-main-darker">
-               <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] z-110 w-full px-5 py-2 text-white [box-shadow:0px_4px_4px_rgba(0,0,0,0.2)] text-nowrap border-b-2 border-b-main-border">
+               <div className="relative [background:url(/osu/tris-l-t.svg)_no-repeat,url(/osu/tris-r.svg)_no-repeat_bottom_right,var(--color-main-dark)] w-full px-5 py-2 text-white [box-shadow:0px_4px_4px_rgba(0,0,0,0.2)] text-nowrap border-b-2 border-b-main-border">
                   <AnimatePresence mode="popLayout">
                      {maps.length > 0 && (
                         <motion.div
@@ -302,11 +313,7 @@ export default function PlaylistPage() {
                      ref={scope}
                      className="list-none grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 pt-2.5 pb-3.5 px-[5px] overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar"
                   >
-                     {maps.map((data, i) => (
-                        <li key={data[0].id} className="opacity-0">
-                           <CardRenderer data={data} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
-                        </li>
-                     ))}
+                     {renderedGrid}
                   </div>
                ) : (
                   <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
