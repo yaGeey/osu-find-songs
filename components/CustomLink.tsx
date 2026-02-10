@@ -16,10 +16,11 @@ export default function CustomLink({
          target="_blank"
          {...props}
          className={twMerge(
-            'relative inline-block bg-transparent text-[18px] cursor-pointer no-underline',
+            // 'hover:text-main-gray focus:text-main-gray after:bg-main-gray/80',
+            'relative inline-block bg-transparent text-base cursor-pointer no-underline',
             'transition-colors duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)]',
-            'hover:text-accent focus:text-accent outline-none',
-            "after:content-[''] after:absolute after:bottom-[-2px] after:left-1/2 after:w-0 after:h-[2px] after:bg-accent after:pointer-events-none",
+            'hover:text-black focus:text-black outline-none',
+            "after:content-[''] after:absolute after:bottom-[-2px] after:left-1/2 after:w-0 after:h-[2px] after:bg-black/80 after:pointer-events-none",
             'after:transition-all after:duration-400 after:ease-[cubic-bezier(0.25,0.8,0.25,1)]',
             'hover:after:w-full hover:after:left-0 focus:after:w-full focus:after:left-0',
             disabled && 'pointer-events-none opacity-50',

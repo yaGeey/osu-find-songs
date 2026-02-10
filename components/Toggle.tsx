@@ -8,16 +8,18 @@ export default function Toggle({
    disabled = false,
    text,
    width,
+   className
 }: {
    value: boolean
    setValue: React.Dispatch<React.SetStateAction<boolean>>
    disabled?: boolean
    text: { on: string; off: string }
-   width?: number
+      width?: number
+   className?: string
 }) {
    return (
       <div
-         className={tw('input-parent flex select-none', disabled && 'brightness-75 pointer-events-none')}
+         className={tw('input-parent flex select-none', disabled && 'brightness-75 pointer-events-none', className)}
          onClick={() => setValue((p) => !p)}
          style={{ width }}
       >

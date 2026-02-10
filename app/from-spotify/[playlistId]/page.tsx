@@ -31,6 +31,10 @@ import Image from 'next/image'
 import { CardRenderer } from './_components/CardRenderer'
 import CustomLink from '@/components/CustomLink'
 import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
+import SupportIcon from '@/components/SupportIcon'
+import Link from 'next/link'
+import { Github, House } from 'lucide-react'
+import IconsSection from '@/components/IconsSection'
 
 export default function PlaylistPage() {
    const params = useParams()
@@ -244,20 +248,19 @@ export default function PlaylistPage() {
                'min-w-[710px] bg-triangles [--color-dialog:var(--color-main])] fixed z-100 w-screen h-12 flex justify-between items-center px-4 gap-10 border-b-3 border-main-darker',
             )}
          >
-            <section className="flex items-center gap-4">
-               <HomeBtn />
-               <a href="https://github.com/yaGeey/osu-find-songs" target="_blank" rel="noopener noreferrer">
-                  <FontAwesomeIcon icon={faGithub} className="text-3xl -mb-1 hover:scale-105 transition-transform" />
-               </a>
-            </section>
+            <IconsSection />
             <AnimatePresence>
                {playlistInfo?.name && (
-                  <motion.p initial={{opacity:0, y:10, scale:.95}} animate={{opacity:1, y:0, scale:1}} className="absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray bg-main/40 px-3 py-1 rounded-md max-w-[30%] w-full min-w-fit text-center overflow-hidden text-ellipsis">
+                  <motion.p
+                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                     animate={{ opacity: 1, y: 0, scale: 1 }}
+                     className="absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray bg-main/40 px-3 py-1 rounded-md max-w-[30%] w-full min-w-fit text-center overflow-hidden text-ellipsis"
+                  >
                      <CustomLink
                         href={`https://open.spotify.com/playlist/${playlistId}`}
                         className={tw(
                            isLoading && 'animate-pulse ease-[cubic-bezier(0.4,0,0.6,1)] duration-1500',
-                           'hover:text-main-gray focus:text-main-gray after:bg-main-gray/80',
+                           'hover:text-main-gray focus:text-main-gray after:bg-main-gray/80 text-[18px]',
                         )}
                      >
                         {playlistInfo?.name}

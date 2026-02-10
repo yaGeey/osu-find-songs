@@ -10,6 +10,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import sortFn from '../_utils/sortBeatmaps'
 import DummyCard from './DummyCard'
+import CloseBtn from '@/components/buttons/CloseBtn'
 
 // TODO https://gemini.google.com/share/aa975ed497a9
 
@@ -75,11 +76,7 @@ export default function OsuCardSet({
                            defaultOption={sortQuery.split('_')[0] || 'plays'}
                            defaultSort={sortQuery.split('_')[1] || 'desc'}
                         />
-                        <FontAwesomeIcon
-                           icon={faXmark}
-                           className="cursor-pointer bg-main-dark-vivid border-3 border-main-border p-2 px-2.5 rounded-full absolute right-4"
-                           onClick={onClose}
-                        />
+                        <CloseBtn className="absolute right-4" onClick={onClose} />
                      </div>
                      <div className="h-full bg-main-darker overflow-y-auto scrollbar">
                         <div className="flex p-4 gap-4 flex-wrap pb-20">

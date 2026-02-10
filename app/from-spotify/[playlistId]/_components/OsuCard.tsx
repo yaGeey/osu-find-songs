@@ -176,9 +176,11 @@ export default function OsuCard({
                                  [mode].sort((a, b) => a.difficulty_rating - b.difficulty_rating)
                                  .map((beatmap, j) => (
                                     <div
-                                       style={getColor(beatmap.difficulty_rating)}
+                                       style={getDifficultyColor(beatmap.difficulty_rating)}
                                        data-tooltip-id={'tooltip'}
-                                       data-tooltip-content={`${beatmap.mode} | ${beatmap.difficulty_rating} - ${beatmap.version}`}
+                                       data-tooltip-content={`${beatmap.mode} | ${
+                                          Math.round((beatmap.difficulty_rating + Number.EPSILON) * 100) / 100
+                                       } - ${beatmap.version}`}
                                        key={j}
                                        className="h-[15px] w-[8px] rounded-full drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.15)]"
                                     ></div>
@@ -230,12 +232,61 @@ export default function OsuCard({
    )
 }
 
-function getColor(diff: number) {
-   const clamped = Math.max(0, Math.min(diff, 9))
-   const hue = 250 - (250 * clamped) / 6
+const hexToRgb = (hex: string) => {
+   const bigint = parseInt(hex.slice(1), 16) // 4290FB (as 16bit) (r-g-b: 42-90-FB) -> 4,362,491 (10bit) -> 01000010(R) 10010000(G) 11111011(B) (2bit)
+   // зсувом отримуєм канал, AND 255 (11111111) щоб отримати тільки останні 8 бітів
+   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255]
+}
+
+// example: for each channel: 246 + 0.55 * (255 - 246) = 246 + 5 = 251 (55% between two colors)
+const interpolate = (start: number[], end: number[], factor: number) => {
+   return start.map((startChannel, i) => Math.round(startChannel + factor * (end[i] - startChannel)))
+}
+
+const difficultySpectrum: [number, string][] = [
+   [0.1, '#4290FB'],
+   [1.25, '#4FC0FF'],
+   [2.11, '#5bffc1'],
+   [2.48, '#7bff58'],
+   [3.3, '#F6F05C'],
+   [3.84, '#fbb763'],
+   [4.2, '#FF8068'],
+   [4.9, '#fe4e71'],
+   [5.7, '#cb46b4'],
+   [5.93, '#bb4abe'],
+   [6.18, '#a554c9'],
+   [7, '#5453c7'],
+   [7.8, '#171488'],
+   [9.0, '#000000'],
+]
+
+export function getDifficultyColor(diff: number) {
+   const textColor = diff > 6.5 ? '#FFD700' : '#000000'
+
+   if (diff >= 9) return { backgroundColor: '#000000', color: textColor, fontWeight: 600 }
+
+   // interval search to find where the difficulty falls in the spectrum
+   let startColor = difficultySpectrum[0]
+   let endColor = difficultySpectrum.at(-1)!
+
+   for (let i = 0; i < difficultySpectrum.length - 1; i++) {
+      if (diff >= difficultySpectrum[i][0] && diff < difficultySpectrum[i + 1][0]) {
+         startColor = difficultySpectrum[i]
+         endColor = difficultySpectrum[i + 1]
+         break
+      }
+   }
+
+   // progress between two colors in 0 to 1
+   const range = endColor[0] - startColor[0]
+   const progress = (diff - startColor[0]) / range
+
+   const rgb = interpolate(hexToRgb(startColor[1]), hexToRgb(endColor[1]), progress)
+   const backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
+
    return {
-      backgroundColor: `hsl(${hue}, 70%, 50%)`,
-      color: diff > 5.8 ? '#FFD700' : 'black',
+      backgroundColor,
+      color: textColor,
       fontWeight: 600,
    }
 }

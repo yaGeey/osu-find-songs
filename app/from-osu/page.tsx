@@ -28,6 +28,8 @@ import useFoStore from '@/contexts/useFoStore'
 import VirtuosoCardFO from './_components/VirtuosoCardFO'
 import { motion, AnimatePresence } from 'framer-motion'
 import BgImage from '@/components/BgImage'
+import IconsSection from '@/components/IconsSection'
+import { Settings } from 'lucide-react'
 
 export type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
 
@@ -194,15 +196,13 @@ export default function FromOsu() {
 
          <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-12 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
-               <HomeBtn />
-               <Image
-                  src="/icons/settings.svg"
-                  width={30}
-                  height={30}
-                  alt="settings"
+               <IconsSection />
+               <Settings
+                  className={tw(
+                     'size-[30px] hover:animate-spin hover:duration-2000 cursor-pointer',
+                     isSettingsVisible && 'animate-spin duration-2000',
+                  )}
                   onClick={() => setIsSettingsVisible((p) => !p)}
-                  //TODO Зробити щоб можна змінювалась коли isSettingsVisible. Тре svg не імпорт а в окремий компонент можна
-                  className={tw('hover:animate-spin hover:duration-2000 cursor-pointer', isSettingsVisible && 'brightness-130')}
                />
                <CreatePlaylistButton
                   data={combined
@@ -226,6 +226,7 @@ export default function FromOsu() {
                   disabled={isLoading}
                   text={{ on: 'Exact Spotify match', off: 'Any Spotify match' }}
                   width={175}
+                  className="max-[1075px]:!hidden"
                />
                <Dropdown
                   onSelected={(option) => {
