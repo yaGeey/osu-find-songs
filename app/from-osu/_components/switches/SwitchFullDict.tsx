@@ -37,7 +37,10 @@ export default function SwitchFull({
                      disabled && 'pointer-events-none',
                      selection == val && 'text-accent',
                   )}
-                  onClick={() => setSelection(val)}
+                  onClick={() => {
+                     setSelection(val)
+                     onChange(val)
+                  }}
                >
                   {key}
                </button>
