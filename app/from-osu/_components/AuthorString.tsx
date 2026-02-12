@@ -15,7 +15,7 @@ export default function AuthorString({ artists, beatmapset }: { artists: Artist[
                {i < artists.length - 1 && ', '}
             </span>
          ))}
-         {!artists.some((artist) => artist.name.toLowerCase() == beatmapset.artist.toLowerCase()) && (
+         {!artists.some((artist) => artist.name?.toLowerCase() == beatmapset.artist?.toLowerCase()) && (
             <span> {'//'} {beatmapset.artist}</span>
          )}
       </div>

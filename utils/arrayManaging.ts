@@ -14,9 +14,9 @@ export const searchFilterFn = (search: string) => (a: CombinedSingleSimple) => {
    if (!search.length || !a.osu) return true
    const str = search.toLowerCase()
    return (
-      a.local.title.toLowerCase().includes(str) ||
-      a.local.author.toLowerCase().includes(str) ||
-      a.osu.creator.toLowerCase().includes(str)
+      a.local.title?.toLowerCase().includes(str) ||
+      a.local.author?.toLowerCase().includes(str) ||
+      a.osu.creator?.toLowerCase().includes(str)
    )
 }
 
