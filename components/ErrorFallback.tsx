@@ -2,25 +2,18 @@ import { useEffect } from 'react'
 import { Button } from './buttons/Buttons'
 import Image from 'next/image'
 import Link from 'next/link'
-import { sendTelegramError } from '@/lib/notify'
+import { sendUnknownError } from '@/lib/client-axios'
 
 export default function ErrorCallback({
    error,
    resetErrorBoundary,
 }: {
-   error: Error & { digest?: string }
+   error: unknown
    resetErrorBoundary: () => void
 }) {
    useEffect(() => {
       console.error(error)
-      if (process.env.NODE_ENV !== 'development') {
-         sendTelegramError(`
-            🚨 <b>App Error</b>
-            <b>URL:</b> ${window.location.href}
-            <b>Message:</b> ${error.message}
-            <pre><code class="language-json">${JSON.stringify(error, null, 2)}</code></pre>
-         `)
-      }
+      if (process.env.NODE_ENV !== 'development') sendUnknownError(error, 'ERROR_BOUNDARY')
    }, [error])
 
    return (

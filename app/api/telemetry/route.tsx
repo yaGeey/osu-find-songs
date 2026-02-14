@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import axios from 'axios'
+import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
+import { customAxios } from '@/lib/axios'
 
 export async function POST(req: Request) {
    const body = await req.json()
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
    if ((!country || !city) && ip !== '::1') {
       try {
-         const { data } = await axios.get(`https://ipapi.co/${ip}/json/`)
+         const { data } = await customAxios.get(`https://ipapi.co/${ip}/json/`)
          country = data.country
          city = data.city
       } catch (err) {

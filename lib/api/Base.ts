@@ -1,5 +1,6 @@
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosResponse, isAxiosError } from 'axios'
 import PQueue from 'p-queue'
+import { sendUnknownError } from '../client-axios'
 // TODO розрібратись з тайпскриптом
 export class SingletonInstance<T> {
    protected id: string
@@ -89,18 +90,18 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                }
 
                return result
-            } catch (err: any) {
-               const axiosErr = err as AxiosError
-               if (axiosErr.response?.status === 429 || axiosErr.status === 429) {
-                  if (!this.q.isPaused && axiosErr.response) {
-                     const ms = this.getWaitTimeMs(axiosErr.response) + 100
+            } catch (err) {
+               if (isAxiosError(err) && (err?.response?.status === 429 || err?.status === 429)) {
+                  if (!this.q.isPaused && err.response) {
+                     const ms = this.getWaitTimeMs(err.response) + 100
                      console.error(`[${this.id}] ⛔ 429. Retrying in ${ms}ms`)
                      this.pauseQueue(ms)
                   }
                   // Retry with higher priority
                   return this.execute(task, 1)
                }
-               throw err
+               sendUnknownError(err, `${this.id}_LIMITER`)
+               throw err || new Error('Task failed with undefined error')
             }
          },
          { priority },

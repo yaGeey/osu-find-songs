@@ -2,7 +2,7 @@
 import { faArrowUpRightFromSquare, faStar } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import clientAxios from '@/lib/client-axios'
 
 export default function Footer() {
    const isBot = typeof navigator !== 'undefined' && /bot|crawler|spider|crawling/i.test(navigator.userAgent)
@@ -10,7 +10,7 @@ export default function Footer() {
    const { data: lastUpdated } = useQuery({
       queryKey: ['lastUpdated'],
       queryFn: async () => {
-         const { data } = await axios(`https://api.github.com/repos/yaGeey/osu-find-songs/commits?per_page=1`)
+         const { data } = await clientAxios(`https://api.github.com/repos/yaGeey/osu-find-songs/commits?per_page=1`)
          return {
             date: new Date(data[0].commit.author.date).toLocaleString('en-US', {
                dateStyle: 'short',
@@ -24,7 +24,7 @@ export default function Footer() {
    const { data: stargazeCount } = useQuery({
       queryKey: ['stargazeCount'],
       queryFn: async () => {
-         const { data } = await axios('https://api.github.com/repos/yaGeey/osu-find-songs')
+         const { data } = await clientAxios('https://api.github.com/repos/yaGeey/osu-find-songs')
          return data.stargazers_count
       },
       enabled: !isBot,
