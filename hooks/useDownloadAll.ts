@@ -4,10 +4,10 @@ import { download } from '@/utils/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { customAxios } from '@/lib/axios'
 import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
+import clientAxios from '@/lib/client-axios'
 
 const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
 
@@ -25,7 +25,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
       const tasks = valid.map((set) => async () => {
          const b: BeatmapSet = [...set].sort(sortFn(sortQuery))[0]
          const filename = `${b.id} ${b.artist} - ${b.title}.osz`
-         const res = await customAxios.get(`https://catboy.best/d/${b.id}`, {
+         const res = await clientAxios.get(`https://catboy.best/d/${b.id}`, {
             responseType: 'blob',
             timeout: 15000,
          })
