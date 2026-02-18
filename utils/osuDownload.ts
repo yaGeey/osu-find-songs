@@ -56,26 +56,45 @@ const getBeatmap = async <T extends BaseLimiter>(
    return res.data
 }
 
-export const useNoVideoAxios = (id: number, filename: string, video: boolean) => {
+type UseNoVideoAxiosOptions = {
+   id: number
+   fileName: string
+} & ({ video: true; onlyNoVideo?: never } | { video: false; onlyNoVideo?: boolean })
+export const useNoVideoAxios = ({ id, fileName, video, onlyNoVideo }: UseNoVideoAxiosOptions) => {
    const { remove, update } = useMapDownloadStore()
    const managerCatboy = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
+   const managerAkatsuki = RateLimitManager.getInstance('akatsuki', { maxConcurrency: 1 })
+   const managerGatari = RateLimitManager.getInstance('gatari', { maxConcurrency: 1 })
+   const managerBeatconnect = RateLimitManager.getInstance('beatconnect', { maxConcurrency: 1 })
+   // const managerSayobot = RateLimitManager.getInstance('sayobot', { maxConcurrency: 1 })
    const managerNerinyan = RateLimitWithWindowManager.getInstance('nerinyan', { avg: 25, burst: 100, durationMs: 60000 })
 
    return useMutation({
       mutationFn: async () => {
          await sendTemeletry(id)
 
-         const sources = video
-            ? [
-                 { name: 'Catboy', fn: () => getBeatmap(managerCatboy, `https://catboy.best/d/${id}`, id, update) },
-                 { name: 'Nerinyan', fn: () => getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}?nv=0`, id, update) },
-              ]
-            : [
-                 {
-                    name: 'Nerinyan (no video)',
-                    fn: () => getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}?nv=1`, id, update),
-                 },
-              ]
+         const sources =
+            video || onlyNoVideo
+               ? [
+                    { name: 'catboy', fn: () => getBeatmap(managerCatboy, `https://catboy.best/d/${id}`, id, update) },
+                    {
+                       name: 'nerinyan',
+                       fn: () => getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}?nv=0`, id, update),
+                    },
+                    { name: 'akatsuki', fn: () => getBeatmap(managerAkatsuki, `https://akatsuki.gg/d/${id}`, id, update) },
+                    {
+                       name: 'beatconnect',
+                       fn: () => getBeatmap(managerBeatconnect, `https://beatconnect.io/b/${id}/`, id, update),
+                    },
+                    //   { name: 'sayobot', fn: () => getBeatmap(managerSayobot, `https://akatsuki.gg/d/${id}`, id, update) },
+                 ]
+               : [
+                    {
+                       name: 'nerinyan (nv)',
+                       fn: () => getBeatmap(managerNerinyan, `https://api.nerinyan.moe/d/${id}?nv=1`, id, update),
+                    },
+                    { name: 'gatari (nv)', fn: () => getBeatmap(managerGatari, `https://osu.gatari.pw/d/${id}`, id, update) },
+                 ]
 
          for (const source of sources) {
             try {
@@ -94,7 +113,7 @@ export const useNoVideoAxios = (id: number, filename: string, video: boolean) =>
       },
       onSuccess: (data: Blob) => {
          remove(id)
-         download(data, filename)
+         download(data, fileName)
 
          const { pending, progressBlinkRef } = useMapDownloadStore.getState()
          if (progressBlinkRef && progressBlinkRef.current && !Object.values(pending).length) {

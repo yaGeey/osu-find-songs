@@ -22,8 +22,8 @@ export default function OsuCard({
    className?: string
 }) {
    const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
-   const mutationNoVideo = useNoVideoAxios(beatmapset.id, fileName, false)
-   const mutationVideo = useNoVideoAxios(beatmapset.id, fileName, true)
+   const mutationNoVideo = useNoVideoAxios({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video })
+   const mutationVideo = useNoVideoAxios({ id: beatmapset.id, fileName, video: true })
 
    const { add } = useMapDownloadStore()
    const ref = useRef<HTMLDivElement>(null)
