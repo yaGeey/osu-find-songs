@@ -1,26 +1,25 @@
 'use server'
 import { cookies } from 'next/headers'
-import { Song } from '@/types/types'
-import { conditions, hardConditions, applyAlwaysConditions } from '../utils/spotifySearchConditions'
-import { Playlist, SpotifyAuthResponse, SpotifyError, TrackFull } from '@/types/Spotify'
+import { SpotifyAuthResponse, SpotifyError } from '@/types/Spotify'
 import { isAxiosError } from 'axios'
-import { customAxios as axios } from './axios'
+import { customAxios as axios } from '../axios'
 
 export async function getServerToken(): Promise<string> {
-   let token = (await cookies()).get('spotifyToken')?.value
+   let token = (await cookies()).get('spotify_token')?.value
    if (!token) token = await revalidateSpotifyToken()
    return token
 }
+
 async function getUserToken(): Promise<string> {
-   let token = (await cookies()).get('spotify_oauth_access_token')?.value
+   let token = (await cookies()).get('spotify_oauth_token')?.value
    if (!token) token = await refreshToken()
    return token
 }
 
-export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUserToken: boolean = false): Promise<T> {
+export async function fetchSpotify<T>(func: (token: string) => Promise<T>, tokenType: 'api' | 'oauth' = 'api'): Promise<T> {
    let token: string | undefined
    try {
-      token = isUserToken ? await getUserToken() : await getServerToken()
+      token = tokenType === 'api' ? await getServerToken() : await getUserToken()
       return await func(token)
    } catch (err) {
       if (isAxiosError<SpotifyError>(err)) {
@@ -38,33 +37,14 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, isUse
 
 export const findSong = async (query: string) => {
    return fetchSpotify(async (token) => {
-      const res = await axios.get<SpotifyApi.TrackSearchResponse>(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`, {
-         headers: { Authorization: `Bearer ${token}` },
-      })
+      const res = await axios.get<SpotifyApi.TrackSearchResponse>(
+         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`,
+         {
+            headers: { Authorization: `Bearer ${token}` },
+         },
+      )
       return res.data
    })
-}
-
-export const searchSongWithConditions = async (song: Song) => {
-   let modifiedSong = applyAlwaysConditions(song)
-
-   for (const condition of conditions) {
-      const conditionSearch = condition(modifiedSong)
-      if (!conditionSearch) continue
-      else modifiedSong = conditionSearch
-
-      const result = await findSong(`artist:${modifiedSong.author} track:${modifiedSong.title}`)
-      if (result.tracks.items.length) return result.tracks.items
-   }
-
-   for (const condition of hardConditions) {
-      const hardSearch = condition(modifiedSong)
-
-      const result = await findSong(`${hardSearch.author} - ${hardSearch.title}`)
-      if (result.tracks.items.length) return result.tracks.items
-      console.warn(`Song not found after HARD: ${hardSearch.author} - ${hardSearch.title}`)
-   }
-   return null
 }
 
 export async function refreshToken(): Promise<string> {
@@ -97,10 +77,9 @@ export async function revalidateSpotifyToken(): Promise<string> {
    const { data } = await axios.post<SpotifyAuthResponse>('https://accounts.spotify.com/api/token', body.toString(), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
    })
-   console.log('spotify token request', data)
 
    const storage = await cookies()
-   storage.set('spotifyToken', data.access_token, {
+   storage.set('spotify_token', data.access_token, {
       path: '/',
       expires: new Date(Date.now() + data.expires_in * 1000),
    })
@@ -122,7 +101,7 @@ export async function fetchMyProfile() {
          headers: { Authorization: `Bearer ${token}` },
       })
       return res.data
-   }, true)
+   }, 'oauth')
 }
 
 export async function createPlaylist({
@@ -150,7 +129,7 @@ export async function createPlaylist({
          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
       )
       return data
-   }, true)
+   }, 'oauth')
 }
 
 export async function addItemsToPlaylist(playlistId: string, uris: string[]) {
@@ -163,7 +142,7 @@ export async function addItemsToPlaylist(playlistId: string, uris: string[]) {
          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
       )
       return res.data
-   }, true)
+   }, 'oauth')
 }
 
 export async function OAuthAuthorization(code: string) {

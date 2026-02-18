@@ -1,49 +1,23 @@
-import { searchSongWithConditions } from '@/lib/Spotify'
+import { searchSongWithConditions } from '@/lib/spotify/helpers'
 import { Song } from '@/types/types'
-import axios from 'axios'
-const BATCH_SIZE = 50
+import { OSU_BATCH_SIZE } from '@/variables'
+import pLimit from 'p-limit'
+const limit = pLimit(3)
 
 export async function POST(req: Request) {
    const songs: Song[] = await req.json()
 
-   if (!songs.length || songs.length > BATCH_SIZE)
-      return new Response(`No songs provided or more than ${BATCH_SIZE}`, {
+   if (!songs.length || songs.length > OSU_BATCH_SIZE)
+      return new Response(`No songs provided or more than ${OSU_BATCH_SIZE}`, {
          status: 400,
       })
 
-   // TODO implement reject reason handle
-   const promises = await Promise.allSettled(songs.map((song) => searchSongWithConditions(song))) //? returns { status: 'fulfilled' | 'rejected', value?: T, reason?: any }
-   const results = promises.map((r) =>
-      r.status === 'fulfilled' && r.value !== null && r.value !== undefined && Array.isArray(r.value) && r.value.length > 0
-         ? r.value
-         : null,
-   )
+   //TODO implement reject reason handle
+   //? we are not using RateLimitManager as it's interal API, there is no restrictions
+   const tasks = songs.map((song) => limit(() => searchSongWithConditions(song).catch((err) => null)))
+   const res = await Promise.all(tasks)
 
-   const simplified = results.map((batch) =>
-      batch?.map((item) => ({
-         album: {
-            album_type: item.album.album_type,
-            external_urls: item.album.external_urls,
-            name: item.album.name,
-            images: item.album.images,
-            release_date: item.album.release_date,
-            release_date_precision: item.album.release_date_precision,
-            type: item.album.type,
-         },
-         artists: item.artists.map((artist) => ({
-            name: artist.name,
-            external_urls: artist.external_urls,
-            href: artist.href,
-         })),
-         duration_ms: item.duration_ms,
-         external_urls: item.external_urls,
-         name: item.name,
-         popularity: item.popularity,
-         uri: item.uri,
-      })),
-   )
-
-   return new Response(JSON.stringify(simplified), {
+   return new Response(JSON.stringify(res), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
    })

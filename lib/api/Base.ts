@@ -101,6 +101,7 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                   return this.execute(task, 1)
                }
                sendUnknownError(err, `${this.id}_LIMITER`)
+               console.error(`[${this.id}] ❌ Task failed:`, err)
                throw err || new Error('Task failed with undefined error')
             }
          },

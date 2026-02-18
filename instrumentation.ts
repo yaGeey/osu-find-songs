@@ -2,7 +2,7 @@ import { H } from '@highlight-run/next/server'
 import { type Instrumentation } from 'next'
 
 export async function register() {
-   if (process.env.NEXT_RUNTIME === 'nodejs') {
+   if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV !== 'development') {
       if (!H.isInitialized()) {
          H.init({
             tracingOrigins: true,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
-import { customAxios } from '@/lib/axios'
+import axios from 'axios'
 
 export async function POST(req: Request) {
    const body = await req.json()
@@ -8,11 +8,15 @@ export async function POST(req: Request) {
 
    let country = req.headers.get('x-vercel-ip-country')
    let city = req.headers.get('x-vercel-ip-city')
-   const ip = req.headers.get('x-forwarded-for')
 
-   if ((!country || !city) && ip !== '::1') {
+   const forwardedFor = req.headers.get('x-forwarded-for')
+   const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : null
+   const isLocalhost = ip === '::1' || ip === '127.0.0.1' || !ip
+
+   if ((!country || !city) && !isLocalhost) {
       try {
-         const { data } = await customAxios.get(`https://ipapi.co/${ip}/json/`)
+         // using default axios as we dont care about errors there
+         const { data } = await axios.get(`https://ipapi.co/${ip}/json/`)
          country = data.country
          city = data.city
       } catch (err) {

@@ -5,8 +5,22 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorCallback from '@/components/ErrorFallback'
 import { Tooltip } from 'react-tooltip'
+import { useEffect, useRef } from 'react'
+import { getInternalTokens } from '@/lib/spotify/innerApi'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+   const hasRunInitialFetch = useRef(false)
+   useEffect(() => {
+      const fetch = async () => {
+         const tokens = await getInternalTokens()
+         console.log(tokens)
+      }
+      if (!hasRunInitialFetch.current) {
+         fetch() // let error throw app
+         hasRunInitialFetch.current = true
+      }
+   }, [])
+
    const content = (
       <QueryProvider>
          <NuqsAdapter>

@@ -1,12 +1,13 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import Footer from '@/components/Footer'
 import { twMerge as tw, twMerge } from 'tailwind-merge'
-import { getPlaylist } from '@/lib/Spotify'
+import { getPlaylist } from '@/lib/spotify/officialApi'
 import { useMutation } from '@tanstack/react-query'
+import { getHash } from '@/lib/spotify/hashes'
 
 export default function SelectPage() {
    const [isLoading, setIsLoading] = useState(false)
@@ -26,7 +27,8 @@ export default function SelectPage() {
          setIsLoading(true)
          router.push('/from-spotify/' + playlistId)
       },
-      onError: () => {
+      onError: (e) => {
+         console.error(e)
          setError('Playlist not found or is private')
       },
    })

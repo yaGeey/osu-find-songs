@@ -12,7 +12,7 @@ export function Button({ onClick, ref, className, textClassName, children, ...pr
          ref={ref}
          {...props}
          className={tw(
-            'no-jump _bg-linear-to-br _from-main-dark _to-main-dark-vivid text-white px-4 py-1 text-nowrap bg-main-dark-vivid border-2 border-main-border rounded-xl flex justify-center items-center gap-1 transition-all',
+            'no-jump select-none  _bg-linear-to-br _from-main-dark _to-main-dark-vivid text-white px-4 py-1 text-nowrap bg-main-dark-vivid border-2 border-main-border rounded-xl flex justify-center items-center gap-1 transition-all',
             'hover:-translate-y-[1px] hover:shadow-[0_1px_0_0_var(--color-main-border)] hover:brightness-110',
             'disabled:brightness-80 active:brightness-90 active:scale-98',
             className,

@@ -8,8 +8,16 @@ export default function CustomLink({
    href,
    disabled,
    showIcon,
+   reverseHover,
+   lowUnderline,
    ...props
-}: React.HTMLAttributes<HTMLAnchorElement> & { href: string; disabled?: boolean; showIcon?: boolean }) {
+}: React.HTMLAttributes<HTMLAnchorElement> & {
+   href: string
+   disabled?: boolean
+   showIcon?: boolean
+   reverseHover?: boolean
+   lowUnderline?: boolean
+}) {
    return (
       <a
          href={href}
@@ -20,9 +28,12 @@ export default function CustomLink({
             'relative inline-block bg-transparent text-base cursor-pointer no-underline',
             'transition-colors duration-400 ease-[cubic-bezier(0.25,0.8,0.25,1)]',
             'hover:text-black focus:text-black outline-none',
-            "after:content-[''] after:absolute after:bottom-[-2px] after:left-1/2 after:w-0 after:h-[2px] after:bg-black/80 after:pointer-events-none",
+            "after:content-[''] after:absolute after:h-[2px] after:bg-black/80 after:pointer-events-none",
             'after:transition-all after:duration-400 after:ease-[cubic-bezier(0.25,0.8,0.25,1)]',
-            'hover:after:w-full hover:after:left-0 focus:after:w-full focus:after:left-0',
+            reverseHover
+               ? 'after:w-full after:left-0 hover:after:w-0 hover:after:left-1/2'
+               : 'after:w-0 after:left-1/2 hover:after:w-full hover:after:left-0 focus:after:w-full focus:after:left-0',
+            !lowUnderline ? 'after:bottom-[2px]' : 'after:bottom-[-2px]',
             disabled && 'pointer-events-none opacity-50',
             className,
          )}

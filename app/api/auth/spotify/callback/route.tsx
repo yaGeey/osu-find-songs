@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import axios, { AxiosError } from 'axios'
-import { handleError } from '@/lib/errorHandlers'
+import { AxiosError } from 'axios'
+import { customAxios } from '@/lib/axios'
 
 export async function GET(req: NextRequest) {
    const searchParams = req.nextUrl.searchParams
@@ -14,9 +14,9 @@ export async function GET(req: NextRequest) {
       client_id: process.env.AUTH_SPOTIFY_ID!,
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
    })
-   
+
    try {
-      const { data } = await axios.post('https://accounts.spotify.com/api/token', body.toString(), {
+      const { data } = await customAxios.post('https://accounts.spotify.com/api/token', body.toString(), {
          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       })
 
@@ -27,7 +27,6 @@ export async function GET(req: NextRequest) {
       })
       return nextResponse
    } catch (error) {
-      handleError(error, 'Spotify OAuth Callback')
       return NextResponse.json(error, { status: (error as AxiosError).response?.status || 500 })
    }
 }

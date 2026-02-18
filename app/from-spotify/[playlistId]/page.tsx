@@ -3,10 +3,6 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
 import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query'
-import { fetchWithToken, getPlaylist } from '@/lib/Spotify'
-import type { PlaylistPage } from '@/types/Spotify'
-import HomeBtn from '@/components/buttons/HomeBtn'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { BeatmapSet } from '@/types/Osu'
 import { ToastContainer } from 'react-toastify'
 import Filters from './_components/Filters'
@@ -14,10 +10,8 @@ import Progress from '@/components/state/Progress'
 import { sortBeatmapsMatrix } from './_utils/sortBeatmapsMatrix'
 import { chunkArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
 import useDownloadAll from '@/hooks/useDownloadAll'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
-import axios from 'axios'
 import Loading from '@/components/state/Loading'
 import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
@@ -31,10 +25,9 @@ import Image from 'next/image'
 import { CardRenderer } from './_components/CardRenderer'
 import CustomLink from '@/components/CustomLink'
 import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
-import SupportIcon from '@/components/SupportIcon'
-import Link from 'next/link'
-import { Github, House } from 'lucide-react'
 import IconsSection from '@/components/IconsSection'
+import { getPlaylistMetadata, getPlaylistPage } from '@/lib/spotify/innerApi'
+import clientAxios from '@/lib/client-axios'
 
 export default function PlaylistPage() {
    const params = useParams()
@@ -58,54 +51,57 @@ export default function PlaylistPage() {
       }
    }, [])
 
-   // const [beatmapsets, setBeatmapsets] = useState<BeatmapSet[][]>([])
    const [filters, setFilters] = useState<SelectedOption[]>([])
    const [searchQuery, setSearchQuery] = useState('')
-   const [spotifyTotal, setSpotifyTotal] = useState<number>(0)
 
    const { data: playlistInfo, isFetching: playlistLoading } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
-      queryFn: async () => getPlaylist(playlistId as string),
+      queryFn: async () => getPlaylistMetadata(playlistId as string),
    })
 
    // fetching playlist
+   //TODO keep in mind - 800+600 ms delay (change it)
    const {
-      data: tracksData,
+      data,
       fetchNextPage,
       hasNextPage,
       isFetchingNextPage,
-      isFetching: isTracksLoading,
+      isFetching: isTracksFetching,
    } = useInfiniteQuery({
-      queryKey: ['spotify-playlist', playlistId], //? idk why but this cause endless fetching on first page load, so...
-      queryFn: async ({ pageParam = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100` }) =>
-         await fetchWithToken(pageParam),
-      getNextPageParam: (lastPage) => {
-         if (!spotifyTotal) setSpotifyTotal(lastPage.total)
-         return lastPage.next ? lastPage.next : undefined
+      queryKey: ['spotify-playlist', playlistId],
+      queryFn: async ({ pageParam = 0 }) => {
+         if (pageParam !== 0) {
+            const delay = Math.floor(Math.random() * 600) + 800
+            await new Promise((r) => setTimeout(r, delay))
+         }
+         return await getPlaylistPage(playlistId as string, pageParam)
       },
-      getPreviousPageParam: (firstPage) => (firstPage.previous ? firstPage.previous : undefined),
-      initialPageParam: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?offset=0&limit=100`,
+      getNextPageParam: (lastPage) => lastPage.nextOffset,
+      initialPageParam: 0,
       retry: 0,
    })
+
+   // continue fetching
    useEffect(() => {
       if (hasNextPage && !isFetchingNextPage) fetchNextPage()
    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-   const tracks = tracksData?.pages.map((page: PlaylistPage) => page.items).flat() || []
-   const isTracksLoadingFinal = isFetchingNextPage || hasNextPage || isTracksLoading || tracks.length < spotifyTotal
+   const tracks = data?.pages.flatMap((page) => page.items.map((i) => i.itemV2.data)) || []
+   const spotifyTotal = data?.pages?.[0]?.total || 0
+   const isTracksLoadingFinal = isFetchingNextPage || hasNextPage || isTracksFetching || tracks.length < spotifyTotal
 
    // beatmapset search
    const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
    const beatmapsetQueries = useQueries({
       queries: chunked.map((chunk) => ({
-         queryKey: ['search-from-spotify', chunk?.[0]?.track?.id ?? 'err'],
+         queryKey: ['search-from-spotify', chunk?.[0]?.uri.split(':').at(-1) ?? 'err'],
          queryFn: async ({ signal }: QueryFunctionContext) => {
             const t0 = performance.now()
             const body = {
                qs: chunk
                   .map((item) => {
-                     if (!item.track) return
-                     return `artist=${item.track.artists[0].name} title=${item.track.name} ${searchParams.get('q') || ''}}`
+                     if (!item) return
+                     return `artist=${item.artists.items[0].profile.name} title=${item.name} ${searchParams.get('q') || ''}}`
                   })
                   .filter(Boolean),
                m: searchParams.get('m'),
@@ -114,7 +110,7 @@ export default function PlaylistPage() {
             }
 
             try {
-               const { data } = await axios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, { signal })
+               const { data } = await clientAxios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, { signal })
                addTimeLeft(performance.now() - t0)
                return data
             } catch (err: any) {
@@ -128,7 +124,7 @@ export default function PlaylistPage() {
    })
 
    const initialLoading = !playlistInfo
-   const isLoading = beatmapsetQueries.some((q) => q.isFetching) || isTracksLoadingFinal || playlistLoading
+   const isLoading = beatmapsetQueries.some((q) => q.isFetching) || playlistLoading || isTracksLoadingFinal
    const { addTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // full data
@@ -262,6 +258,7 @@ export default function PlaylistPage() {
                            isLoading && 'animate-pulse ease-[cubic-bezier(0.4,0,0.6,1)] duration-1500',
                            'hover:text-main-gray focus:text-main-gray after:bg-main-gray/80 text-[18px]',
                         )}
+                        lowUnderline
                      >
                         {playlistInfo?.name}
                      </CustomLink>

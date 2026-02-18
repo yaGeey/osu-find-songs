@@ -5,3 +5,5 @@ export const FO_CHUNK_SIZE = 10
 /**From Spotify */
 export const FS_CHUNK_SIZE = 50
 export const MAPS_AMOUNT_TO_SHOW_VIRTUALIZED = 45
+
+export const OSU_BATCH_SIZE = 50

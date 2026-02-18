@@ -44,11 +44,10 @@ function Card({
    const { local, osu, spotify, isOsuLoading, isSpotifyLoading, error } = data
 
    const handleClick = () => {
-      if (onClick && (osu || spotify)) {
+      if (onClick && spotify) {
          onClick(data)
       }
    }
-   // console.log(error)
 
    return (
       <div
@@ -99,7 +98,7 @@ function Card({
                      </div>
                   )}
                   {spotify && spotify.length == 1 && (
-                     <a className="hover:brightness-120 transition-all" href={spotify[0].external_urls.spotify}>
+                     <a className="hover:brightness-120 transition-all" href={'https://open.spotify.com/track/' + spotify[0].id}>
                         <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className="animation-in fade-in" />
                      </a>
                   )}

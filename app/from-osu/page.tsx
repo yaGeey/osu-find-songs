@@ -1,21 +1,17 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
 import { CombinedSingleSimple } from '@/types/types'
-import Image from 'next/image'
 import Info from './_components/Info'
 import { twMerge as tw } from 'tailwind-merge'
 import { useQueries } from '@tanstack/react-query'
-import { Track } from '@/types/Spotify'
 import { BeatmapSet } from '@/types/Osu'
 import { groupOptions } from '@/utils/selectOptions'
 import { useSongContext } from '@/contexts/SongContext'
 import SettingsPopup from '@/components/SettingsPopup'
 import { useRouter } from 'next/navigation'
 import CreatePlaylistButton from './_components/CreatePlaylistButton'
-import HomeBtn from '@/components/buttons/HomeBtn'
 import { filterFn, searchFilterFn, groupArray, chunkArray, flatCombinedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
-import axios from 'axios'
 import Cookies from 'js-cookie'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import Dropdown from '@/components/selectors/Dropdown'
@@ -30,6 +26,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import BgImage from '@/components/BgImage'
 import IconsSection from '@/components/IconsSection'
 import { Settings } from 'lucide-react'
+import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
+import clientAxios from '@/lib/client-axios'
+import CreatePlaylistDialog from './_components/CreatePlaylistDialog'
+import { faSpotify } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Button } from '@/components/buttons/Buttons'
 
 export type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
 
@@ -51,10 +53,6 @@ export default function FromOsu() {
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
 
-   const isLoggedWithSpotify = useMemo(() => {
-      return Cookies.get('spotify_oauth_access_token') !== undefined
-   }, [])
-
    useEffect(() => {
       useFoStore.setState({ current: null })
    }, [exactSpotify, groupFn, sortFnName])
@@ -65,7 +63,7 @@ export default function FromOsu() {
          queryKey: ['spotifyChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await axios.post<(null | Track[])[]>('/api/batch/spotify', localChunk)
+            const res = await clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', localChunk)
             addTimeSpotify(performance.now() - t0)
             return res.data
          },
@@ -78,7 +76,7 @@ export default function FromOsu() {
          queryKey: ['osuChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await axios.get<BeatmapSet[] | null>(`/api/batch/osu`, {
+            const res = await clientAxios.get<BeatmapSet[] | null>(`/api/batch/osu`, {
                params: {
                   id: localChunk.map((s) => s.id),
                },
@@ -92,17 +90,6 @@ export default function FromOsu() {
    const isOsuFetching = osuQueries.some((q) => q.isFetching)
 
    const isLoading = isOsuFetching || isSpotifyFetching
-
-   // Re-fetch osu and spotify queries if any of them has null data
-   // TODO why?
-   useEffect(() => {
-      osuQueries.forEach((query) => {
-         if (query.data?.some((bs) => bs === null)) query.refetch()
-      })
-      spotifyQueries.forEach((query) => {
-         if (query.data?.some((tracks) => tracks === null)) query.refetch()
-      })
-   }, [])
 
    // Approximate loading time left
    const {
@@ -118,11 +105,13 @@ export default function FromOsu() {
 
    // Combine the arrays
    const combined = useMemo(() => {
-      return chunkedLocal.map((localChunk, i) => ({
-         local: localChunk,
-         spotifyQuery: spotifyQueries[i],
-         osuQuery: osuQueries[i],
-      }))
+      return chunkedLocal
+         .map((localChunk, i) => ({
+            local: localChunk,
+            spotifyQuery: spotifyQueries[i],
+            osuQuery: osuQueries[i],
+         }))
+         .flatMap((item) => flatCombinedArray(item))
    }, [
       songs,
       osuQueries.filter((q) => q.isLoading).length,
@@ -132,9 +121,9 @@ export default function FromOsu() {
    ])
 
    const groupedDict = useMemo(() => {
-      const flattened = combined.flatMap((item) => flatCombinedArray(item))
-      if (isLoading) return { '': flattened }
-      return groupArray(groupFn, sortOrder, sortFnName, flattened)
+      const extractedData = combined.filter((item) => item.spotify !== null)
+      if (isLoading) return { '': extractedData }
+      return groupArray(groupFn, sortOrder, sortFnName, extractedData)
    }, [groupFn, sortFnName, sortOrder, combined, isLoading])
 
    // prepara data for virtuoso
@@ -175,7 +164,7 @@ export default function FromOsu() {
                   transition={{ duration: 0.1 }}
                   className="-z-9 pointer-events-none fixed inset-0"
                >
-                  <BgImage image={src} />
+                  <BgImage image={src} className="brightness-[.4]" />
                </motion.div>
             )}
          </AnimatePresence>
@@ -183,9 +172,7 @@ export default function FromOsu() {
          <Progress
             isVisible={isLoading}
             value={
-               ((combined.filter((q) => !q.osuQuery.isLoading).length +
-                  combined.filter((q) => !q.spotifyQuery.isLoading).length) *
-                  100) /
+               ((combined.filter((q) => !q.isOsuLoading).length + combined.filter((q) => !q.isSpotifyLoading).length) * 100) /
                (combined.length * 2)
             }
          >
@@ -196,26 +183,18 @@ export default function FromOsu() {
 
          <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-12 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
-               <IconsSection />
-               <Settings
-                  className={tw(
-                     'size-[30px] hover:animate-spin hover:duration-2000 cursor-pointer',
-                     isSettingsVisible && 'animate-spin duration-2000',
-                  )}
-                  onClick={() => setIsSettingsVisible((p) => !p)}
-               />
+               <IconsSection>
+                  <Settings
+                     className={tw(
+                        'size-[30px] hover:animate-spin hover:duration-2000 cursor-pointer',
+                        isSettingsVisible && 'animate-spin duration-2000',
+                     )}
+                     onClick={() => setIsSettingsVisible((p) => !p)}
+                  />
+               </IconsSection>
                <CreatePlaylistButton
-                  data={combined
-                     .flatMap((item) => flatCombinedArray(item))
-                     .filter((item) => item.spotify !== null)
-                     .map((item) => item.spotify as Track[])}
-                  isDisabled={!isLoggedWithSpotify || isLoading}
-                  data-tooltip-id={!isLoggedWithSpotify || isLoading ? 'tooltip' : undefined}
-                  data-tooltip-content={
-                     isLoggedWithSpotify
-                        ? 'Wait for the Spotify data to load'
-                        : 'Log in to your Spotify account on a previous page to create a playlist'
-                  }
+                  data={combined.map((item) => item.spotify).filter((item) => item !== null)}
+                  dataTotal={songs.length}
                />
             </section>
             <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />
@@ -223,7 +202,7 @@ export default function FromOsu() {
                <Toggle
                   value={exactSpotify}
                   setValue={setExactSpotify}
-                  disabled={isLoading}
+                  disabled={isLoading} //FIXME?  || !combined.some((i) => i.osu !== null)
                   text={{ on: 'Exact Spotify match', off: 'Any Spotify match' }}
                   width={175}
                   className="max-[1075px]:!hidden"
@@ -250,6 +229,11 @@ export default function FromOsu() {
 
          {/* content */}
          <main className="max-h-[calc(100dvh-48px)] flex justify-center sm:justify-end">
+            {!virtualListItems.length && !isLoading && (
+               <div className="inset-0 absolute flex flex-col items-center gap-4 mt-20 text-white text-2xl font-semibold">
+                  No songs found
+               </div>
+            )}
             <div className="h-[calc(100dvh-48px)] absolute top-0 left-0 flex justify-center items-center z-1 mt-12">
                <AnimatePresence>
                   {current && (

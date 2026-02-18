@@ -1,6 +1,7 @@
 import { Track, TrackFull } from './Spotify'
 import { BeatmapSet } from './Osu'
 import { UseQueryResult } from '@tanstack/react-query'
+import { SpotifyTrack } from './graphql-spotify/searchDesktop'
 
 export type Song = {
    title: string
@@ -28,7 +29,7 @@ export type SongDataQueried = {
 }
 export type CombinedQueried = {
    local: Song[]
-   spotifyQuery: UseQueryResult<(Track[] | null)[], Error>
+   spotifyQuery: UseQueryResult<(SpotifyTrack[] | null)[], Error>
    osuQuery: UseQueryResult<BeatmapSet[] | null, Error>
 }
 export type Combined = {
@@ -48,7 +49,7 @@ export type CombinedSingle = { local: Song; error?: string } & WithLoading<Beatm
 // TODO fix types
 export type CombinedSingleSimple = {
    local: Song
-   spotify: Track[] | null
+   spotify: SpotifyTrack[] | null
    osu: BeatmapSet | null
    isSpotifyLoading: boolean
    isOsuLoading: boolean

@@ -18,9 +18,10 @@ export type ModalProps = {
    status: 'error' | 'success' | 'warning' | 'info' | 'loading'
    className?: string
    setIsOpen: () => void
+   blockClosing?: boolean
 }
 
-export default function Modal({ buttons, children, status, title, className, setIsOpen, isOpen }: ModalProps) {
+export default function Modal({ buttons, children, status, title, className, setIsOpen, isOpen, blockClosing }: ModalProps) {
    const dialogRef = useRef<HTMLDialogElement>(null)
 
    useLayoutEffect(() => {
@@ -45,14 +46,14 @@ export default function Modal({ buttons, children, status, title, className, set
                ref={dialogRef}
                onCancel={(e) => {
                   e.preventDefault()
-                  setIsOpen()
+                  if (!blockClosing) setIsOpen()
                }}
                className={twJoin(
                   'fixed inset-0 z-[9999] flex items-center justify-center',
                   // delete native backdrop
                   'bg-transparent w-full h-full max-w-none max-h-none backdrop:bg-transparent',
                )}
-               onClick={setIsOpen}
+               onClick={() => !blockClosing && setIsOpen()}
             >
                {/* custom backdrop */}
                <motion.div

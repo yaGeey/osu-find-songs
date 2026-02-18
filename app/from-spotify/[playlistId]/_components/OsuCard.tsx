@@ -108,8 +108,8 @@ export default function OsuCard({
                src={beatmapset.covers.card}
                alt="cover"
                width={286}
-               height={100}
-               className="z-10 w-max-[286px] h-full object-cover min-h-[104px]"
+               height={104}
+               className="z-10 object-cover"
                loading="lazy"
                fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
             />

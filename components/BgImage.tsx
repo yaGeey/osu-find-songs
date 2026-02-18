@@ -25,6 +25,7 @@ export default function BgImage({ image, className }: { image?: string; brightne
             onLoad={() => setIsLoaded(true)}
             suppressHydrationWarning
             priority
+            unoptimized
          />
          {!isLoaded && <div className="fixed top-0 left-0 w-full h-full bg-main-border"></div>}
       </div>
