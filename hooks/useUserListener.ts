@@ -1,12 +1,14 @@
+'use client'
 import { useEffect } from 'react'
 import Pusher from 'pusher-js'
 import { toast } from 'react-toastify'
-import useFoStore from '@/contexts/useFoStore'
+import useSessionId from './useSessionId'
 
 export default function useUserListener() {
-   const sessionId = useFoStore((state) => state.sessionId)
+   const sessionId = useSessionId()
    useEffect(() => {
       if (!sessionId) return
+      console.log(sessionId)
 
       const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
          cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,

@@ -3,7 +3,6 @@ import { SpotifyPlaylistMetadataResponse, SpotifyPlaylistContentResponse } from 
 import { customAxios } from '../axios'
 import { SpotifySearchQueryResponse, TrackResponseWrapper } from '@/types/graphql-spotify/searchDesktop'
 import { cookies } from 'next/headers'
-import { H } from '@highlight-run/next/server'
 import { getHash, updateHashes } from './hashes'
 import { AxiosError, isAxiosError } from 'axios'
 
@@ -163,8 +162,7 @@ export async function searchTopTracks(query: string) {
 
    // if track not found log error (changed type name)
    const types = items.map((i) => i.item.__typename).join(', ')
-   if (tracks.length === 0 && types.length)
-      H.consumeError(new Error(`Spotify innerAPI: ${query} track not found. Types: {${types}}`))
+   if (tracks.length === 0 && types.length) new Error(`Spotify innerAPI: ${query} track not found. Types: {${types}}`)
 
    return tracks.map((i) => i.item.data)
 }

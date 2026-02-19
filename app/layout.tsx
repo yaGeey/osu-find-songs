@@ -3,7 +3,6 @@ import { Inter, Inter_Tight } from 'next/font/google'
 import './globals.css'
 import Providers from './Providers'
 import { Analytics } from '@vercel/analytics/next'
-import { HighlightInit } from '@highlight-run/next/client'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import Script from 'next/script'
 
@@ -53,19 +52,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
          >
             {isDev && <Script src="https://unpkg.com/react-scan/dist/auto.global.js" strategy="beforeInteractive" />}
-            {!isDev && (
-               <HighlightInit
-                  excludedHostnames={['localhost']}
-                  projectId={process.env.HIGHLIGHT_PROJECT_ID!}
-                  serviceName={process.env.HIGHLIGHT_APP_NAME!}
-                  tracingOrigins
-                  networkRecording={{
-                     enabled: true,
-                     recordHeadersAndBody: true,
-                     urlBlocklist: [],
-                  }}
-               />
-            )}
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
                <Providers>
                   {/* <MobileDeviceCheck /> */}

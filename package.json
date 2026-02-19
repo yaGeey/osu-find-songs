@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "postbuild": "node upload-sourcemaps.js",
+    "postbuild": "ldcli sourcemaps upload --project $LD_PROJECT_KEY --app-version $VERCEL_GIT_COMMIT_SHA --path .next/static --base-path _next/static --access-token $LD_ACCESS_TOKEN ",
     "start": "next start",
     "lint": "eslint .",
     "test": "jest"
@@ -18,7 +18,10 @@
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@highlight-run/next": "^7.9.34",
+    "@launchdarkly/node-server-sdk": "^9.10.6",
+    "@launchdarkly/observability": "^1.0.1",
+    "@launchdarkly/observability-node": "^1.0.1",
+    "@launchdarkly/session-replay": "^1.0.1",
     "@mui/material": "^6.4.7",
     "@neondatabase/serverless": "^1.0.1",
     "@next/third-parties": "^16.0.5",
@@ -33,6 +36,7 @@
     "framer-motion": "^12.29.2",
     "js-cookie": "^3.0.5",
     "jszip": "^3.10.1",
+    "launchdarkly-react-client-sdk": "^3.9.0",
     "lucide-react": "^0.563.0",
     "motion": "^12.5.0",
     "next": "15.5.9",
@@ -58,6 +62,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@launchdarkly/ldcli": "^2.1.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@tanstack/eslint-plugin-query": "^5.91.3",
     "@types/file-saver": "^2.0.7",

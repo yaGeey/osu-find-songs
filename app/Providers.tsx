@@ -8,6 +8,9 @@ import { Tooltip } from 'react-tooltip'
 import { useEffect, useRef } from 'react'
 import { getInternalTokens } from '@/lib/spotify/innerApi'
 import useUserListener from '@/hooks/useUserListener'
+import { LDProvider } from 'launchdarkly-react-client-sdk'
+import Observability from '@launchdarkly/observability'
+import SessionReplay from '@launchdarkly/session-replay'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    const hasRunInitialFetch = useRef(false)
@@ -21,14 +24,48 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
    useUserListener()
 
+   const clientSideID =
+      process.env.NODE_ENV === 'production'
+         ? process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID!
+         : process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID_TEST!
+
    const content = (
       <QueryProvider>
-         <NuqsAdapter>
-            <SongContextProvider>
-               <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
-               {children}
-            </SongContextProvider>
-         </NuqsAdapter>
+         <LDProvider
+            clientSideID={clientSideID}
+            options={{
+               bootstrap: 'localStorage',
+               plugins: [
+                  new Observability({
+                     tracingOrigins: true,
+                     networkRecording: {
+                        enabled: true,
+                        recordHeadersAndBody: true,
+                     },
+                     environment: process.env.NODE_ENV,
+                     backendUrl: 'https://pub-ld.yageey.me',
+                     otel: { otlpEndpoint: 'https://otel-ld.yageey.me' },
+                     version: process.env.NEXT_PUBLIC_VERCEL_GITHUB_COMMIT_SHA!,
+                     serviceName: 'client',
+                  }),
+                  new SessionReplay({
+                     privacySetting: 'none',
+                     version: process.env.NEXT_PUBLIC_VERCEL_GITHUB_COMMIT_SHA!,
+                     serviceName: 'client',
+                     environment: process.env.NODE_ENV,
+                     backendUrl: 'https://pub-ld.yageey.me',
+                  }),
+               ],
+               // logger: basicLogger({level: 'warn'})
+            }}
+         >
+            <NuqsAdapter>
+               <SongContextProvider>
+                  <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
+                  {children}
+               </SongContextProvider>
+            </NuqsAdapter>
+         </LDProvider>
       </QueryProvider>
    )
 

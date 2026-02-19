@@ -1,9 +1,8 @@
 'use client'
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { v4 as uuidv4 } from 'uuid'
 import clientAxios from '@/lib/client-axios'
-import useFoStore from '@/contexts/useFoStore'
+import useSessionId from '@/hooks/useSessionId'
 const botRegex =
    /bot|crawler|vercel|spider|slurp|facebookexternalhit|bingpreview|embedly|quora|baidu|yandex|sogou|exabot|rogerbot|uptime/i
 
@@ -11,6 +10,7 @@ export default function Telemetry() {
    const pathname = usePathname()
    const startTimeRef = useRef<number>(new Date().getTime())
    const recordIfRef = useRef<number | null>(null)
+   const sessionId = useSessionId()
 
    // Update session duration in DB
    const sendDuration = (durationMs: number) => {
@@ -31,9 +31,7 @@ export default function Telemetry() {
 
    useEffect(() => {
       if (typeof window === 'undefined' || typeof localStorage === 'undefined' || typeof navigator === 'undefined') return
-      const sessionId = localStorage.getItem('sessionId') || uuidv4()
-      localStorage.setItem('sessionId', sessionId)
-      useFoStore.setState({ sessionId }) // set in global store for later use in app
+      if (!sessionId) return
 
       if (process.env.NODE_ENV === 'development') return
 
@@ -70,7 +68,7 @@ export default function Telemetry() {
          sendDuration(Date.now() - startTimeRef.current)
          document.removeEventListener('visibilitychange', handleVisibilityChange)
       }
-   }, [pathname])
+   }, [pathname, sessionId])
 
    return null
 }
