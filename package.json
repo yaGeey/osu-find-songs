@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "postbuild": "ldcli sourcemaps upload --project $LD_PROJECT_KEY --app-version $VERCEL_GIT_COMMIT_SHA --path .next/static --base-path _next/static --access-token $LD_ACCESS_TOKEN ",
+    "postbuild": "npx @launchdarkly/ldcli sourcemaps upload --project $LD_PROJECT_KEY --app-version $VERCEL_GIT_COMMIT_SHA --path .next/static --base-path _next/static --access-token $LD_ACCESS_TOKEN ",
     "start": "next start",
     "lint": "eslint .",
     "test": "jest"
@@ -62,7 +62,6 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@launchdarkly/ldcli": "^2.1.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@tanstack/eslint-plugin-query": "^5.91.3",
     "@types/file-saver": "^2.0.7",
