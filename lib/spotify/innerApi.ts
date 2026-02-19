@@ -99,7 +99,10 @@ async function getInnerGraphApi<T>(operationName: string, variables: Record<stri
       if (isAxiosError(err) && err.response?.data) {
          const errorData = err.response.data as SpotifyApiError
          // hash is outdated, update and retry
-         if (errorData.errors.every((e) => e.extensions.code === 'GRAPHQL_UNKNOWN_OPERATION_NAME') && retries > 0) {
+         if (
+            (errorData.errors.every((e) => e.extensions.code === 'GRAPHQL_UNKNOWN_OPERATION_NAME') || err.status === 412) &&
+            retries > 0
+         ) {
             await updateHashes([operationName])
             return getInnerGraphApi(operationName, variables, await getHash(operationName), retries - 1)
          }

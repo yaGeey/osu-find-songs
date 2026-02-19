@@ -7,19 +7,19 @@ import ErrorCallback from '@/components/ErrorFallback'
 import { Tooltip } from 'react-tooltip'
 import { useEffect, useRef } from 'react'
 import { getInternalTokens } from '@/lib/spotify/innerApi'
+import useUserListener from '@/hooks/useUserListener'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    const hasRunInitialFetch = useRef(false)
    useEffect(() => {
-      const fetch = async () => {
-         const tokens = await getInternalTokens()
-         console.log(tokens)
-      }
+      const fetch = async () => await getInternalTokens()
       if (!hasRunInitialFetch.current) {
          fetch() // let error throw app
          hasRunInitialFetch.current = true
       }
    }, [])
+
+   useUserListener()
 
    const content = (
       <QueryProvider>

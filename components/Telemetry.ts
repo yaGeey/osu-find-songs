@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import clientAxios from '@/lib/client-axios'
+import useFoStore from '@/contexts/useFoStore'
 const botRegex =
    /bot|crawler|vercel|spider|slurp|facebookexternalhit|bingpreview|embedly|quora|baidu|yandex|sogou|exabot|rogerbot|uptime/i
 
@@ -29,11 +30,12 @@ export default function Telemetry() {
    }
 
    useEffect(() => {
-      if (process.env.NODE_ENV === 'development') return
       if (typeof window === 'undefined' || typeof localStorage === 'undefined' || typeof navigator === 'undefined') return
-
       const sessionId = localStorage.getItem('sessionId') || uuidv4()
       localStorage.setItem('sessionId', sessionId)
+      useFoStore.setState({ sessionId }) // set in global store for later use in app
+
+      if (process.env.NODE_ENV === 'development') return
 
       // first req to db to log visit
       const logVisit = async () => {

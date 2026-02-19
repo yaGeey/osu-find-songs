@@ -37,9 +37,9 @@ const clientAxios = axios.create()
 clientAxios.interceptors.response.use(
    (response) => response,
    (err) => {
-      // Ignore rate limit
       if (axios.isAxiosError(err)) {
-         if (err.response?.status === 429 || err.status === 429) {
+         if (err.response?.status === 429 || err.status === 429 || err.status === 404) {
+            // Ignore rate limit and not found
             return Promise.reject(err)
          }
          console.error(`${err.response?.status} ${err.config?.method?.toUpperCase()} ${err.config?.url}`, {

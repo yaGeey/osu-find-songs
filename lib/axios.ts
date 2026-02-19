@@ -11,12 +11,8 @@ export const customAxios = axios.create({
 customAxios.interceptors.response.use(
    (response) => response,
    (err: AxiosError) => {
-      if (err.status === 404) {
-         // they're expected to happen
-         return Promise.reject(err)
-      }
-      else if (err.response?.status === 429 && err.status === 429) {
-         // Ignore rate limit
+      if (err.response?.status === 429 || err.status === 429 || err.status === 404) {
+         // Ignore rate limit and not found errors
          return Promise.reject(err)
       } else {
          if (axios.isAxiosError(err)) {

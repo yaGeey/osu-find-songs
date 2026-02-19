@@ -101,7 +101,9 @@ export default function PlaylistPage() {
                qs: chunk
                   .map((item) => {
                      if (!item) return
-                     return `artist=${item.artists.items[0].profile.name} title=${item.name} ${searchParams.get('q') || ''}}`
+                     const artistName = item.artists?.items?.[0]?.profile?.name
+                     if (!artistName) return //? sometimes no items in artists, idk why
+                     return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}}`
                   })
                   .filter(Boolean),
                m: searchParams.get('m'),

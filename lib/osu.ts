@@ -59,15 +59,19 @@ export async function getBeatmap(id: string): Promise<BeatmapSet> {
    })
 }
 
-export async function beatmapsSearch(queries: { [key: string]: string | null }) {
-   // TODO fix any
+type Queries = Record<string, string | null>
+function getQueryString(queries: Queries) {
+   return Object.entries(queries)
+      .flatMap(([key, value]) => {
+         if (!value) return []
+         return `${key}=${encodeURIComponent(value)}`
+      })
+      .join('&')
+}
+
+export async function beatmapsSearch(queries: Queries) {
    return fetchOsu(async (token) => {
-      const queryString = Object.entries(queries)
-         .flatMap(([key, value]) => {
-            if (!value) return []
-            return `${key}=${encodeURIComponent(value)}`
-         })
-         .join('&')
+      const queryString = getQueryString(queries)
 
       const res = await customAxios.get<{ beatmapsets: Array<BeatmapSet>; total: number }>(
          `https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`,
@@ -77,6 +81,12 @@ export async function beatmapsSearch(queries: { [key: string]: string | null }) 
       )
       return res.data
    })
+}
+
+export async function beatmapsSearchCatboy(queries: Queries) {
+   const queryString = getQueryString(queries)
+   const { data } = await customAxios.get<Array<BeatmapSet>>(`https://catboy.best/api/v2/search?${queryString}`)
+   return data
 }
 
 export async function revalidateOsuToken(): Promise<string> {

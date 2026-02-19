@@ -6,6 +6,7 @@ type FoStore = {
    selectedGroup: string | null
    showSpotifyEmbeds: boolean
    setSpotifyEmbeds: (value: boolean) => void
+   sessionId: string | null
 }
 function getLocalStorageBoolean(key: string, defaultValue: boolean): boolean {
    if (typeof window === 'undefined') return defaultValue
@@ -22,5 +23,6 @@ const useFoStore = create<FoStore>((set, get) => ({
       localStorage.setItem('showSpotifyEmbeds', value.toString())
       set({ showSpotifyEmbeds: value })
    },
+   sessionId: null,
 }))
 export default useFoStore
