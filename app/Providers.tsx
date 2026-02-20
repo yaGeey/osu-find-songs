@@ -31,6 +31,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
    const content = (
       <QueryProvider>
+         <NuqsAdapter>
+            <SongContextProvider>
+               <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
+               {children}
+            </SongContextProvider>
+         </NuqsAdapter>
+      </QueryProvider>
+   )
+
+   if (process.env.NODE_ENV === 'development') return content
+   return (
+      <ErrorBoundary FallbackComponent={ErrorCallback}>
          <LDProvider
             clientSideID={clientSideID}
             options={{
@@ -61,16 +73,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                // logger: basicLogger({level: 'warn'})
             }}
          >
-            <NuqsAdapter>
-               <SongContextProvider>
-                  <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
-                  {children}
-               </SongContextProvider>
-            </NuqsAdapter>
+            {content}
          </LDProvider>
-      </QueryProvider>
+      </ErrorBoundary>
    )
-
-   if (process.env.NODE_ENV === 'development') return content
-   return <ErrorBoundary FallbackComponent={ErrorCallback}>{content}</ErrorBoundary>
 }

@@ -38,7 +38,7 @@ export default function PlaylistPage() {
 
    // download progress
    const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
-   const { setProgressBlinkRef } = useMapDownloadStore()
+   const setProgressBlinkRef = useMapDownloadStore((state) => state.setProgressBlinkRef)
    useEffect(() => {
       setProgressBlinkRef(progressNotifyRef)
    }, [setProgressBlinkRef, progressNotifyRef])

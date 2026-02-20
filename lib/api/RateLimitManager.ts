@@ -16,14 +16,14 @@ export default class RateLimitManager extends BaseLimiter {
     * @param maxConcurrency ? Max concurency.
     * @param defaultDelayMs ? Default delay in milliseconds if no headers are present.
     */
-   public constructor(id: string, options: RateLimitManagerOptions) {
+   public constructor(id: string, options?: RateLimitManagerOptions) {
       super({
          id,
-         q: new PQueue({ concurrency: options.maxConcurrency || 3 }),
+         q: new PQueue({ concurrency: options?.maxConcurrency || 1 }),
          remainingThreshold: 1,
-         defaultDelayMs: options.defaultDelayMs || 500,
+         defaultDelayMs: options?.defaultDelayMs || 500,
       })
-      this.maxConcurrency = options.maxConcurrency || 3
+      this.maxConcurrency = options?.maxConcurrency || 1
    }
 
    public async executeBatch<T>(tasks: Array<() => Promise<T>>): Promise<(T | null)[]> {

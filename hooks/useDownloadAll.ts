@@ -1,6 +1,6 @@
 import { BeatmapSet } from '@/types/Osu'
 import { getWindowsFriendlyLocalTime } from '@/utils/dates'
-import { download } from '@/utils/osuDownload'
+import { download, fetchBeatmapWithFallback, useNoVideoAxios } from '@/utils/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -8,12 +8,13 @@ import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 import clientAxios from '@/lib/client-axios'
-
-const manager = RateLimitManager.getInstance('catboy', { maxConcurrency: 1 })
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
+   const manager = RateLimitManager.getInstance('downloadAllQueue')
+   const update = useMapDownloadStore((state) => state.update)
 
    // download maps
    async function handleDownloadAll() {
@@ -24,11 +25,9 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
       const valid = maps.filter((set) => set.length)
       const tasks = valid.map((set) => async () => {
          const b: BeatmapSet = [...set].sort(sortFn(sortQuery))[0]
+
          const filename = `${b.id} ${b.artist} - ${b.title}.osz`
-         const res = await clientAxios.get(`https://catboy.best/d/${b.id}`, {
-            responseType: 'blob',
-            timeout: 15000,
-         })
+         const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, updateFn: update })
 
          // telemetry
          sendMapDownloadTelemetry({
@@ -42,9 +41,9 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
          count++
          setText(`Downloading... (${count}/${valid.length})`)
          setProgress((count / valid.length) * 99)
-         console.log(`Downloaded ${filename}`)
+         console.log(`Downloaded ${filename}. Total progress ${progress}%`)
 
-         return { ...res, filename, blob: res.data }
+         return { filename, blob }
       })
       const result = await manager.executeBatch(tasks)
       const downloadedFiles = result.filter((r) => r) as Array<{ filename: string; blob: Blob }>

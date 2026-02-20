@@ -3,7 +3,7 @@ import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import { formatBytes } from '@/utils/numbers'
 
 export default function ProgressMapDownload() {
-   const { pending } = useMapDownloadStore()
+   const pending = useMapDownloadStore(s => s.pending)
    const bytesDownloaded = Object.values(pending).reduce((acc, cur) => acc + (cur.downloadedBytes || 0), 0)
    const bytesTotal = Object.values(pending).reduce((acc, cur) => acc + (cur.totalBytes || 0), 0)
    return (

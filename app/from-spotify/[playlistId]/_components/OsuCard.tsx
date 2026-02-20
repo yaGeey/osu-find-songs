@@ -25,9 +25,8 @@ export default function OsuCard({
    const mutationNoVideo = useNoVideoAxios({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video })
    const mutationVideo = useNoVideoAxios({ id: beatmapset.id, fileName, video: true })
 
-   const { add } = useMapDownloadStore()
    const ref = useRef<HTMLDivElement>(null)
-   const { currentUrl, play, stop } = useAudioStore()
+   const currentUrl = useAudioStore((state) => state.currentUrl)
 
    // Dates tooltip text
    const dates = {
@@ -41,7 +40,7 @@ export default function OsuCard({
       .join(' | ')
 
    function handleDownload(video: boolean) {
-      add(beatmapset.id, `${beatmapset.artist} - ${beatmapset.title}`)
+      useMapDownloadStore.getState().add(beatmapset.id, `${beatmapset.artist} - ${beatmapset.title}`)
       if (video) mutationVideo.mutate()
       else mutationNoVideo.mutate()
    }
@@ -60,8 +59,8 @@ export default function OsuCard({
          <button
             className="bg-main-border relative w-21 h-full overflow-hidden z-0 group/play"
             onClick={() => {
-               if (currentUrl === beatmapset.preview_url) stop()
-               else play(beatmapset.preview_url)
+               if (currentUrl === beatmapset.preview_url) useAudioStore.getState().stop()
+               else useAudioStore.getState().play(beatmapset.preview_url)
             }}
          >
             {currentUrl === beatmapset.preview_url ? (
