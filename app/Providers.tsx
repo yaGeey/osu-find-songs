@@ -54,6 +54,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                      serviceName: 'client',
                      environment: process.env.NODE_ENV,
                      backendUrl: 'https://pub-ld.yageey.me',
+                     tracingOrigins: true,
+                     inlineImages: false,
                   }),
                ],
                // logger: basicLogger({level: 'warn'})

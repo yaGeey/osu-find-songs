@@ -94,7 +94,7 @@ export default function PlaylistPage() {
    const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
    const beatmapsetQueries = useQueries({
       queries: chunked.map((chunk) => ({
-         queryKey: ['search-from-spotify', chunk?.[0]?.uri.split(':').at(-1) ?? 'err'],
+         queryKey: ['search-from-spotify', chunk?.[0]?.uri?.split(':').at(-1) ?? 'err'],
          queryFn: async ({ signal }: QueryFunctionContext) => {
             const t0 = performance.now()
             const body = {
