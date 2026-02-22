@@ -49,7 +49,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                bootstrap: 'localStorage',
                plugins: [
                   new Observability({
-                     tracingOrigins: true,
+                     tracingOrigins: [
+                        'https://osu.yageey.me/api',
+                        'https://osufindsongs.vercel.app/api',
+                        'http://localhost:3000/api',
+                     ],
                      networkRecording: {
                         enabled: true,
                         recordHeadersAndBody: true,
@@ -66,8 +70,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                      serviceName: 'client',
                      environment: process.env.NODE_ENV,
                      backendUrl: 'https://pub-ld.yageey.me',
-                     tracingOrigins: true,
-                     inlineImages: false,
+                     tracingOrigins: [
+                        'https://osu.yageey.me/api',
+                        'https://osufindsongs.vercel.app/api',
+                        'http://localhost:3000/api',
+                     ],
+                     // inlineImages: false,
                   }),
                ],
                // logger: basicLogger({level: 'warn'})
