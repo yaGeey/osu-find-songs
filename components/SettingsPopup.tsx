@@ -1,9 +1,9 @@
 'use client'
 import { twMerge as tw } from 'tailwind-merge'
-import useFoStore from '@/contexts/useFoStore'
+import useBaseStore from '@/contexts/useBaseStore'
 
 export default function SettingsPopup({ className }: { className?: string }) {
-   const showSpotifyEmbeds = useFoStore((state) => state.showSpotifyEmbeds)
+   const showSpotifyEmbeds = useBaseStore((state) => state.showSpotifyEmbeds)
 
    return (
       <div
@@ -19,7 +19,7 @@ export default function SettingsPopup({ className }: { className?: string }) {
                   type="checkbox"
                   id="performance-spotify"
                   checked={!showSpotifyEmbeds}
-                  onChange={(e) => useFoStore.getState().setSpotifyEmbeds(!e.target.checked)}
+                  onChange={(e) => useBaseStore.getState().setSpotifyEmbeds(!e.target.checked)}
                   className="w-4 h-4 accent-main-border"
                />
                <label htmlFor="performance-spotify" className="text-sm">

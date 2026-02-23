@@ -1,4 +1,3 @@
-import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { create } from 'zustand'
 
 type Pending = {
@@ -11,8 +10,6 @@ export const useMapDownloadStore = create<{
    add: (id: number, filename: string) => void
    remove: (id: number) => void
    update: (id: number, downloadedBytes: number, totalBytes: number) => void
-   progressBlinkRef?: React.RefObject<ProgressNotifyHandle | null>
-   setProgressBlinkRef: (ref: React.RefObject<ProgressNotifyHandle | null>) => void
 }>((set, get) => ({
    pending: {},
 
@@ -44,7 +41,4 @@ export const useMapDownloadStore = create<{
          },
       })
    },
-
-   progressBlinkRef: undefined,
-   setProgressBlinkRef: (ref) => set({ progressBlinkRef: ref }),
 }))

@@ -12,7 +12,6 @@ import { useRouter } from 'next/navigation'
 import CreatePlaylistButton from './_components/CreatePlaylistButton'
 import { filterFn, searchFilterFn, groupArray, chunkArray, flatCombinedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
-import Cookies from 'js-cookie'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import Dropdown from '@/components/selectors/Dropdown'
 import DropdownSort from '@/components/selectors/DropdownSort'
@@ -20,7 +19,7 @@ import Search from '@/components/Search'
 import Toggle from '@/components/Toggle'
 import { FO_CHUNK_SIZE } from '@/variables'
 import useFoTelemetry from '../../hooks/useFoTelemetry'
-import useFoStore from '@/contexts/useFoStore'
+import useBaseStore from '@/contexts/useBaseStore'
 import VirtuosoCardFO from './_components/VirtuosoCardFO'
 import { motion, AnimatePresence } from 'framer-motion'
 import BgImage from '@/components/BgImage'
@@ -28,10 +27,6 @@ import IconsSection from '@/components/IconsSection'
 import { Settings } from 'lucide-react'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
 import clientAxios from '@/lib/client-axios'
-import CreatePlaylistDialog from './_components/CreatePlaylistDialog'
-import { faSpotify } from '@fortawesome/free-brands-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Button } from '@/components/buttons/Buttons'
 
 export type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
 
@@ -43,9 +38,9 @@ export default function FromOsu() {
    }, [songs, setSongs, router])
    const chunkedLocal = useMemo(() => chunkArray(songs, FO_CHUNK_SIZE), [songs])
 
-   const sortFnName = useFoStore((state) => state.sortFnName)
-   const selectedGroup = useFoStore((state) => state.selectedGroup)
-   const current = useFoStore((state) => state.current)
+   const sortFnName = useBaseStore((state) => state.sortFnName)
+   const selectedGroup = useBaseStore((state) => state.selectedGroup)
+   const current = useBaseStore((state) => state.current)
 
    const [exactSpotify, setExactSpotify] = useState(false)
    const [groupFn, setGroupFn] = useState<string>('no')
@@ -54,7 +49,7 @@ export default function FromOsu() {
    const [search, setSearch] = useState('')
 
    useEffect(() => {
-      useFoStore.setState({ current: null })
+      useBaseStore.setState({ current: null })
    }, [exactSpotify, groupFn, sortFnName])
 
    // queries
@@ -151,7 +146,7 @@ export default function FromOsu() {
       songsLength: songs.length,
    })
 
-   const src = useFoStore((state) => (state.current ? state.current.local.image : undefined))
+   const src = useBaseStore((state) => (state.current ? state.current.local.image : undefined))
    return (
       <div className="overflow-hidden" translate="no">
          <AnimatePresence>
@@ -219,7 +214,7 @@ export default function FromOsu() {
                />
                <DropdownSort
                   onSelected={({ query, order }) => {
-                     useFoStore.setState({ sortFnName: query ?? 'sort-date' })
+                     useBaseStore.setState({ sortFnName: query ?? 'sort-date' })
                      setSortOrder(order)
                   }}
                />

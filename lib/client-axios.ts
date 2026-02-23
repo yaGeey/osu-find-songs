@@ -1,6 +1,10 @@
+import useBaseStore from '@/contexts/useBaseStore'
 import axios from 'axios'
 
 export const sendUnknownError = (err: unknown, context: string) => {
+   const blinkRef = useBaseStore.getState().progressNotifyRef
+   if (blinkRef?.current) blinkRef.current.blink('error')
+
    if (err instanceof Error) {
       err.message = `[${context}] ${err.message}`
    }

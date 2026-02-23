@@ -1,5 +1,7 @@
+import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { CombinedSingleSimple } from '@/types/types'
 import { create } from 'zustand'
+
 type FoStore = {
    current: CombinedSingleSimple | null
    sortFnName: string
@@ -7,14 +9,17 @@ type FoStore = {
    showSpotifyEmbeds: boolean
    setSpotifyEmbeds: (value: boolean) => void
    sessionId: string | null
+   progressNotifyRef: React.RefObject<ProgressNotifyHandle | null> | null
 }
+
 function getLocalStorageBoolean(key: string, defaultValue: boolean): boolean {
    if (typeof window === 'undefined') return defaultValue
    const item = localStorage.getItem(key)
    if (item === null) return defaultValue
    return item === 'true'
 }
-const useFoStore = create<FoStore>((set, get) => ({
+
+const useBaseStore = create<FoStore>((set, get) => ({
    current: null,
    sortFnName: 'sort-date',
    selectedGroup: null,
@@ -24,5 +29,7 @@ const useFoStore = create<FoStore>((set, get) => ({
       set({ showSpotifyEmbeds: value })
    },
    sessionId: null,
+
+   progressNotifyRef: null,
 }))
-export default useFoStore
+export default useBaseStore

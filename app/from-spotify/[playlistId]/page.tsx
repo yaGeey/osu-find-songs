@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
 import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query'
@@ -13,8 +13,7 @@ import useDownloadAll from '@/hooks/useDownloadAll'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
 import Loading from '@/components/state/Loading'
-import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
-import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+import ProgressNotify from '@/components/state/ProgressNotify'
 import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
 import { FS_CHUNK_SIZE, MAPS_AMOUNT_TO_SHOW_VIRTUALIZED } from '@/variables'
 import DevLoadingTime from '@/components/DevLoadingTime'
@@ -28,20 +27,13 @@ import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
 import IconsSection from '@/components/IconsSection'
 import { getPlaylistMetadata, getPlaylistPage } from '@/lib/spotify/innerApi'
 import clientAxios from '@/lib/client-axios'
+import useBaseStore from '@/contexts/useBaseStore'
 
 export default function PlaylistPage() {
    const params = useParams()
    const searchParams = useSearchParams()
    const { playlistId } = params
-   const [error, setError] = useState<string>('')
-   const notiryErrRef = useRef<ProgressNotifyHandle | null>(null)
-
-   // download progress
-   const progressNotifyRef = useRef<ProgressNotifyHandle | null>(null)
-   const setProgressBlinkRef = useMapDownloadStore((state) => state.setProgressBlinkRef)
-   useEffect(() => {
-      setProgressBlinkRef(progressNotifyRef)
-   }, [setProgressBlinkRef, progressNotifyRef])
+   const progressNotifyRef = useBaseStore((state) => state.progressNotifyRef)
 
    // remove scrollbar
    useEffect(() => {
@@ -117,7 +109,7 @@ export default function PlaylistPage() {
                return data
             } catch (err: any) {
                if (err?.code === 'ERR_CANCELED' || err?.name === 'CanceledError') throw new Error('canceled')
-               notiryErrRef.current?.blink(4000)
+               progressNotifyRef?.current?.blink('error', 4000)
                throw err
             }
          },
@@ -178,13 +170,12 @@ export default function PlaylistPage() {
    useEffect(() => {
       if (beatmapsetQueries.some((q) => q.isError)) {
          const errorMsg = beatmapsetQueries.find((q) => q.isError)?.error?.message || 'An error occurred while fetching beatmaps.'
-         setError(errorMsg)
-         notiryErrRef.current?.blink(4000)
+         progressNotifyRef?.current?.blink('error', 4000, errorMsg)
       }
    }, [beatmapsetQueries.map((q) => q.isError).join(',')])
 
    useEffect(() => {
-      if (progress === -1) setError('An error occurred during the download process.')
+      if (progress === -1) progressNotifyRef?.current?.blink('error', 4000, 'An error occurred during the download process.')
    }, [progress])
 
    // animation
@@ -235,11 +226,8 @@ export default function PlaylistPage() {
          <Progress isVisible={progress !== null} value={progress || 0} color="text-success">
             {text}
          </Progress>
-         <ProgressNotify ref={progressNotifyRef} color="text-success" />
+         <ProgressNotify ref={progressNotifyRef}  />
          <ProgressMapDownload />
-         <ProgressNotify ref={notiryErrRef} color="text-error" textBgColor="bg-error">
-            {error}
-         </ProgressNotify>
 
          <header
             className={tw(
@@ -268,7 +256,13 @@ export default function PlaylistPage() {
                )}
             </AnimatePresence>
             <div className="_invisible">
-               <DownloadAllBtn disabled={isLoading} maps={maps} progress={progress} handleDownloadAll={handleDownloadAll} />
+               <DownloadAllBtn
+                  disabled={isLoading}
+                  maps={maps}
+                  progress={progress}
+                  handleDownloadAll={handleDownloadAll}
+                  loadingText={text}
+               />
             </div>
          </header>
 

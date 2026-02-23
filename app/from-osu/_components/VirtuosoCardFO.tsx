@@ -2,7 +2,7 @@ import React from 'react'
 import { Virtuoso } from 'react-virtuoso'
 import GroupSeparator from './GroupSeparator'
 import { CombinedSingleSimple } from '@/types/types'
-import useFoStore from '@/contexts/useFoStore'
+import useBaseStore from '@/contexts/useBaseStore'
 import Card from './Card'
 import { ListItem } from '../page'
 
@@ -25,13 +25,13 @@ export default function VirtuosoCardFO({ data }: { data: ListItem[] }) {
 }
 
 function Row({ item }: { item: RowItem }) {
-   const current = useFoStore((state) => state.current)
-   const sortFnName = useFoStore((state) => state.sortFnName)
-   const selectedGroup = useFoStore((state) => state.selectedGroup)
+   const current = useBaseStore((state) => state.current)
+   const sortFnName = useBaseStore((state) => state.sortFnName)
+   const selectedGroup = useBaseStore((state) => state.selectedGroup)
 
    function handleCardClick(t: CombinedSingleSimple) {
-      if (current?.local.id === t.local.id) useFoStore.setState({ current: null })
-      else useFoStore.setState({ current: t })
+      if (current?.local.id === t.local.id) useBaseStore.setState({ current: null })
+      else useBaseStore.setState({ current: t })
    }
 
    return (
@@ -40,7 +40,7 @@ function Row({ item }: { item: RowItem }) {
             <GroupSeparator
                className="-mt-3"
                selected={item.key === selectedGroup}
-               onClick={() => useFoStore.setState({ selectedGroup: item.key === selectedGroup ? null : item.key })}
+               onClick={() => useBaseStore.setState({ selectedGroup: item.key === selectedGroup ? null : item.key })}
             >
                {item.key}
             </GroupSeparator>

@@ -11,6 +11,8 @@ import useUserListener from '@/hooks/useUserListener'
 import { LDProvider } from 'launchdarkly-react-client-sdk'
 import Observability from '@launchdarkly/observability'
 import SessionReplay from '@launchdarkly/session-replay'
+import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
+import useBaseStore from '@/contexts/useBaseStore'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    const hasRunInitialFetch = useRef(false)
@@ -29,11 +31,18 @@ export default function Providers({ children }: { children: React.ReactNode }) {
          ? process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID!
          : process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID_TEST!
 
+   const progressNotifyRef = useRef<ProgressNotifyHandle>(null)
+   useEffect(() => {
+      if (typeof window === 'undefined') return
+      if (progressNotifyRef.current) useBaseStore.setState({ progressNotifyRef })
+   }, [progressNotifyRef])
+
    const content = (
       <QueryProvider>
          <NuqsAdapter>
             <SongContextProvider>
                <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
+               <ProgressNotify ref={progressNotifyRef} />
                {children}
             </SongContextProvider>
          </NuqsAdapter>

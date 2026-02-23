@@ -12,22 +12,18 @@ export default function DownloadAllBtn({
    maps,
    progress,
    handleDownloadAll,
+   loadingText,
 }: {
    disabled?: boolean
    maps: BeatmapSet[][]
    progress: number | null
    handleDownloadAll: () => void
+   loadingText?: string | null
 }) {
    const [isOpen, setIsOpen] = useState(false)
    const [step, setStep] = useState<ModalStep>('confirm')
 
-   const openModal = () => {
-      setStep('confirm')
-      setIsOpen(true)
-   }
-   const closeModal = () => {
-      setIsOpen(false)
-   }
+   const closeModal = () => setIsOpen(false)
    const handleStartDownload = () => {
       setStep('downloading')
       handleDownloadAll()
@@ -41,30 +37,36 @@ export default function DownloadAllBtn({
                status: 'info' as const,
                children: (
                   <p>
-                     If there is more than one beatmap set for a song, the first one based on your search{' '}
-                     <span className="underline">filters</span> will be downloaded
+                     The estimated total size of the maps is <span className="font-medium">{maps.length * 11} MB</span>.
+                     {maps.length > 100 && <span className="font-medium"> This may take a very long time.</span>} Are you sure you
+                     want to proceed downloading? No videos will be included. If multiple beatmap sets exist for a song, the first
+                     one matching your search <span className="underline">filters</span> will be downloaded
                   </p>
                ),
                buttons: [
-                  { onClick: closeModal, children: 'Cancel', className: 'bg-error w-30' },
-                  { onClick: handleStartDownload, children: 'Download', className: 'bg-success w-30' },
+                  { onClick: handleStartDownload, children: 'Download', className: 'bg-success w-31' },
+                  { onClick: closeModal, children: 'Later', className: 'w-31' },
                ],
             }
-
          case 'downloading':
             if (progress !== null) {
                return {
                   title: 'Download All Beatmaps',
                   status: 'info' as const,
-                  children: "Please wait, this may take some time. Don't close this page",
-                  buttons: [{ onClick: closeModal, children: 'Okay' }],
+                  children: (
+                     <p>
+                        <span>Please wait, this may take some time. Don&apos;t close this page</span>
+                        <span>{loadingText}</span>
+                     </p>
+                  ),
+                  buttons: [{ onClick: closeModal, children: 'Okay', className: 'w-31' }],
                }
             } else
                return {
                   title: 'Download All Beatmaps',
                   status: 'success' as const,
                   children: 'Downloaded successfully',
-                  buttons: [{ onClick: closeModal, children: 'Okay' }],
+                  buttons: [{ onClick: closeModal, children: 'Okay', className: 'w-31' }],
                }
 
          default:
@@ -81,7 +83,7 @@ export default function DownloadAllBtn({
    return (
       <>
          <Button
-            onClick={openModal}
+            onClick={() => setIsOpen(true)}
             className="text-white py-0.5 px-5 bg-main-dark _invisible"
             textClassName="font-outline-sm"
             disabled={disabled}
@@ -96,7 +98,7 @@ export default function DownloadAllBtn({
             title={content.title}
             status={content.status}
             buttons={content.buttons}
-            className="w-150 h-50"
+            className="w-150"
          >
             {content.children}
          </Modal>

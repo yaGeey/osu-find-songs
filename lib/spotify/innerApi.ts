@@ -19,6 +19,9 @@ const headers = {
    'Sec-Ch-Ua-Mobile': '?0',
    'Sec-Ch-Ua-Platform': '"Windows"',
    'App-Platform': 'WebPlayer',
+   Accept: 'application/json',
+   'Content-Type': 'application/json;charset=UTF-8',
+   'accept-language': 'en',
 }
 
 const buildHeaders = async () => {
@@ -63,14 +66,17 @@ async function getInternalTokenFromServer() {
    const storage = await cookies()
    storage.set('spotify_internal_token', data.access.accessToken, {
       path: '/',
+      httpOnly: true,
       expires: new Date(data.access.accessTokenExpirationTimestampMs - 5 * 60 * 1000),
    })
    storage.set('spotify_client_token', data.client.token, {
       path: '/',
+      httpOnly: true,
       expires: new Date(data.client.expires_at - 5 * 60 * 1000),
    })
    storage.set('spotify_app_version', data.client.version, {
       path: '/',
+      httpOnly: true,
       maxAge: 10 * 365 * 24 * 60 * 60, // no expiration
    })
 

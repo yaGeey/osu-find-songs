@@ -6,12 +6,12 @@ import { useEffect, useRef } from 'react'
 import AuthorString from './AuthorString'
 import SpotifyEmbed from '../../../components/embeds/Spotify'
 import { twMerge as tw } from 'tailwind-merge'
-import useFoStore from '@/contexts/useFoStore'
+import useBaseStore from '@/contexts/useBaseStore'
 import CloseBtn from '@/components/buttons/CloseBtn'
 import CustomLink from '@/components/CustomLink'
 
 export default function Info({ data }: { data: CombinedSingleSimple }) {
-   const showSpotifyEmbeds = useFoStore((state) => state.showSpotifyEmbeds)
+   const showSpotifyEmbeds = useBaseStore((state) => state.showSpotifyEmbeds)
    const { local, spotify, osu } = data
    const container = useRef<HTMLDivElement>(null)
 
@@ -30,7 +30,7 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
          )}
       >
          <CloseBtn
-            onClick={() => useFoStore.setState({ current: null })}
+            onClick={() => useBaseStore.setState({ current: null })}
             className="absolute right-2 top-2 visible lgx:invisible z-2 bg-main-dark-vivid"
          />
          <div className="relative flex gap-4 border-b-4 border-main-border p-4">
