@@ -9,6 +9,7 @@ import RateLimitWithWindowManager from '@/lib/api/RateLimitWithWindowManager'
 import { BaseLimiter } from '@/lib/api/Base'
 import useBaseStore from '@/contexts/useBaseStore'
 import { SOURCES_COOLDOWN_MS, SOURCES_MAX_FAILURES } from '@/variables'
+import useSessionId from '@/hooks/useSessionId'
 
 const sourceTracker = new Map<string, { failures: number; cooldownUntil: number }>()
 
@@ -22,14 +23,6 @@ export function download(blob: Blob, filename: string) {
    a.click()
    document.body.removeChild(a)
    window.URL.revokeObjectURL(url)
-}
-
-const sendTemeletry = async (mapId: number) => {
-   try {
-      const sessionId = localStorage.getItem('sessionId')
-      if (!sessionId) return
-      await sendMapDownloadTelemetry({ sessionId, mapId, playlistId: window.location.pathname.split('/')[2]! })
-   } catch (err) {}
 }
 
 const getBeatmap = async <T extends BaseLimiter>(
@@ -129,10 +122,13 @@ export const useNoVideoAxios = ({ id, fileName, video, onlyNoVideo }: UseNoVideo
    const remove = useMapDownloadStore((s) => s.remove)
    const update = useMapDownloadStore((s) => s.update)
    const progressBlinkRef = useBaseStore((s) => s.progressNotifyRef)
+   const sessionId = useSessionId()
 
    return useMutation({
       mutationFn: async () => {
-         await sendTemeletry(id)
+         await sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(
+            () => {},
+         )
          return video
             ? await fetchBeatmapWithFallback({ id, video: true, updateFn: update, priority: 1 })
             : await fetchBeatmapWithFallback({ id, video: false, onlyNoVideo, updateFn: update, priority: 1 })

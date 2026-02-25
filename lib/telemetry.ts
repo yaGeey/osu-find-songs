@@ -8,7 +8,7 @@ export async function sendMapDownloadTelemetry({
    playlistId,
    all,
 }: {
-   sessionId: string
+   sessionId?: string
    mapId: number
    playlistId: string
    all?: boolean
@@ -16,7 +16,7 @@ export async function sendMapDownloadTelemetry({
    const all_value = all ?? false
    await sql`
       INSERT INTO downloads (session_id, map_id, playlist_id, download_all)
-      VALUES (${sessionId}, ${mapId}, ${playlistId}, ${all_value})
+      VALUES (${sessionId ?? null}, ${mapId}, ${playlistId}, ${all_value})
    `
 }
 
@@ -25,7 +25,7 @@ export async function sendMapDownloadTelemetry({
 export async function foTelemetryStart(mapsAmount: number, sessionId?: string) {
    const result = await sql`
       INSERT INTO fo_loading (session_id, maps_amount)
-      VALUES (${sessionId}, ${mapsAmount})
+      VALUES (${sessionId ?? null}, ${mapsAmount})
       RETURNING id
    `
    return result[0].id as number

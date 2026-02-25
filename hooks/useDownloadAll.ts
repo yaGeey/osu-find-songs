@@ -1,20 +1,21 @@
 import { BeatmapSet } from '@/types/Osu'
 import { getWindowsFriendlyLocalTime } from '@/utils/dates'
-import { download, fetchBeatmapWithFallback, useNoVideoAxios } from '@/utils/osuDownload'
+import { download, fetchBeatmapWithFallback } from '@/utils/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
-import clientAxios from '@/lib/client-axios'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+import useSessionId from './useSessionId'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
    const manager = RateLimitManager.getInstance('downloadAllQueue')
    const update = useMapDownloadStore((state) => state.update)
+   const sessionId = useSessionId()
 
    // download maps
    async function handleDownloadAll() {
@@ -31,7 +32,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
 
          // telemetry
          sendMapDownloadTelemetry({
-            sessionId: localStorage.getItem('sessionId')!,
+            sessionId,
             mapId: b.id,
             playlistId: window.location.pathname.split('/')[2]!,
             all: true,

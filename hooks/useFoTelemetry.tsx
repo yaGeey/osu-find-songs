@@ -1,6 +1,7 @@
 import { UseQueryResult } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef } from 'react'
+import { use, useEffect, useMemo, useRef } from 'react'
 import { foTelemetryStart, foTelemetryError, foTelemetryFinishedSpotify, foTelemetryFinishedOsu } from '@/lib/telemetry'
+import useSessionId from './useSessionId'
 
 export default function useFoTelemetry({
    spotifyQueries,
@@ -15,10 +16,7 @@ export default function useFoTelemetry({
    const isSpotifyFetching = spotifyQueries.some((q) => q.isFetching)
    const hasInitialized = useRef(false)
 
-   const sessionId = useMemo(() => {
-      if (typeof window === 'undefined') return null
-      return localStorage.getItem('sessionId')
-   }, [])
+   const sessionId = useSessionId()
    const telemetryIdRef = useRef<number | null>(null)
 
    useEffect(() => {
@@ -26,7 +24,7 @@ export default function useFoTelemetry({
       if (hasInitialized.current) return
       hasInitialized.current = true
 
-      foTelemetryStart(songsLength, sessionId ?? 'empty')
+      foTelemetryStart(songsLength, sessionId)
          .then((id) => {
             telemetryIdRef.current = id
          })

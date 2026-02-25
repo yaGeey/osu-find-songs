@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 export default function useSessionId() {
-   const [id, setId] = useState<string | null>(null)
+   const [id, setId] = useState<string | undefined>(undefined)
    useEffect(() => {
       if (typeof window === 'undefined' || typeof localStorage === 'undefined') return
-      
+
       // first try if already initialized
       const sessionId = localStorage.getItem('highlightIdentifier')
       if (sessionId) {
