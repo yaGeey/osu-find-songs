@@ -1,5 +1,5 @@
 'use server'
-import { customAxios } from '../axios';
+import { customAxios } from '../axios'
 
 type Response = { requested: Record<string, string>; all: Record<string, string> }
 
@@ -20,9 +20,13 @@ export async function getHash(opName: string) {
 }
 
 export async function updateHashes(opNames: string[]) {
-   const { data } = await customAxios.put<Response>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/hashes?names=` + opNames.join(','), {
-      headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
-   })
+   const { data } = await customAxios.put<Response>(
+      `${process.env.SPOTIFY_TOKEN_SERVER_URL}/hashes?names=` + opNames.join(','),
+      null,
+      {
+         headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
+      },
+   )
    Object.entries(data.all).forEach(([name, hash]) => (hashes[name] = hash))
    return opNames.length ? data.requested : data.all
 }
