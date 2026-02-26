@@ -10,7 +10,7 @@ export async function getHash(opName: string) {
       const { data } = await customAxios.get<Response>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/hashes?names=` + opName, {
          headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
       })
-      if (data.all) Object.assign(hashes, data.all)
+      if (Object.keys(data.all).length) Object.assign(hashes, data.all)
       else await updateHashes([opName])
    }
    if (!hashes[opName]) {
