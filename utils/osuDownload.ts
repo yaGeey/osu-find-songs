@@ -8,7 +8,7 @@ import RateLimitManager from '@/lib/api/RateLimitManager'
 import RateLimitWithWindowManager from '@/lib/api/RateLimitWithWindowManager'
 import { BaseLimiter } from '@/lib/api/Base'
 import useBaseStore from '@/contexts/useBaseStore'
-import { SOURCES_COOLDOWN_MS, SOURCES_MAX_FAILURES } from '@/variables'
+import { DOWNLOAD_PROGRESS_TIMEOUT_MS, SOURCES_COOLDOWN_MS, SOURCES_MAX_FAILURES } from '@/variables'
 import useSessionId from '@/hooks/useSessionId'
 
 const sourceTracker = new Map<string, { failures: number; cooldownUntil: number }>()
@@ -43,13 +43,12 @@ const getBeatmap = async <T extends BaseLimiter>(
                clearTimeout(progressTimer)
                progressTimer = setTimeout(() => {
                   controller.abort()
-               }, 5000)
+               }, DOWNLOAD_PROGRESS_TIMEOUT_MS)
                if (progressEvent.total && id) {
                   update?.(id, progressEvent.loaded, progressEvent.total)
                }
             },
             signal: controller.signal,
-            timeout: 5000,
          }),
       priority,
    )
@@ -66,24 +65,39 @@ export async function fetchBeatmapWithFallback({
    | { video: true; onlyNoVideo?: never }
    | { video: false; onlyNoVideo?: boolean }
 )) {
-   const managerCatboy = RateLimitManager.getInstance('catboy')
-   const managerAkatsuki = RateLimitManager.getInstance('akatsuki')
-   const managerGatari = RateLimitManager.getInstance('gatari')
-   const managerBeatconnect = RateLimitManager.getInstance('beatconnect')
-   // const managerSayobot = RateLimitManager.getInstance('sayobot')
-   const managerNerinyan = RateLimitWithWindowManager.getInstance('nerinyan', { avg: 25, burst: 100, durationMs: 60000 })
+   const managerCatboy = RateLimitManager.getInstance('catboy', { showErrors: false })
+   const managerAkatsuki = RateLimitManager.getInstance('akatsuki', { showErrors: false })
+   const managerGatari = RateLimitManager.getInstance('gatari', { showErrors: false })
+   const managerBeatconnect = RateLimitManager.getInstance('beatconnect', { showErrors: false })
+   const managerSayobot = RateLimitManager.getInstance('sayobot', { showErrors: false })
+   const managerNerinyan = RateLimitWithWindowManager.getInstance('nerinyan', {
+      avg: 25,
+      burst: 100,
+      durationMs: 60000,
+      showErrors: false,
+   })
 
    const sourceConfigs =
       video || onlyNoVideo
          ? [
-              { name: 'catboy', manager: managerCatboy, url: `https://catboy.best/d/${id}` },
-              { name: 'akatsuki', manager: managerAkatsuki, url: `https://akatsuki.gg/d/${id}` },
-              { name: 'nerinyan', manager: managerNerinyan, url: `https://api.nerinyan.moe/d/${id}?nv=0` },
-              { name: 'beatconnect', manager: managerBeatconnect, url: `https://beatconnect.io/b/${id}/` },
+              { name: 'catboy', manager: managerCatboy, url: `https://catboy.best/d/${id}` }, // DEAD
+              { name: 'akatsuki', manager: managerAkatsuki, url: `https://beatmaps.akatsuki.gg/d/${id}` }, // MOVED -> NOT FOUND
+              { name: 'beatconnect', manager: managerBeatconnect, url: `/api/proxy?url=https://beatconnect.io/b/${id}/` }, // CORS (use proxy)
+              {
+                 name: 'sayobot',
+                 manager: managerSayobot,
+                 url: `https://dl.sayobot.cn/beatmaps/download/full/${id}`,
+              },
+              { name: 'nerinyan', manager: managerNerinyan, url: `https://api.nerinyan.moe/d/${id}?nv=0` }, // DEAD
            ]
          : [
               { name: 'gatari (nv)', manager: managerGatari, url: `/api/proxy?url=https://osu.gatari.pw/d/${id}` },
-              { name: 'nerinyan (nv)', manager: managerNerinyan, url: `https://api.nerinyan.moe/d/${id}?nv=1` },
+              {
+                 name: 'sayobot (nv)',
+                 manager: managerSayobot,
+                 url: `https://dl.sayobot.cn/beatmaps/download/novideo/${id}`,
+              },
+              { name: 'nerinyan (nv)', manager: managerNerinyan, url: `https://api.nerinyan.moe/d/${id}?nv=1` }, // DEAD
            ]
 
    const sources = sourceConfigs.map((src) => ({

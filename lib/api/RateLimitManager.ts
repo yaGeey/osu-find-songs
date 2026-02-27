@@ -1,11 +1,10 @@
 import PQueue from 'p-queue'
-import { BaseLimiter } from './Base'
+import { BaseLimiter, BaseLimiterParameters } from './Base'
 import { AxiosResponse } from 'axios'
 
 type RateLimitManagerOptions = {
    maxConcurrency?: number
-   defaultDelayMs?: number
-}
+} & Partial<BaseLimiterParameters>
 
 export default class RateLimitManager extends BaseLimiter {
    private maxConcurrency: number
@@ -15,13 +14,15 @@ export default class RateLimitManager extends BaseLimiter {
     * @param id Unique identifier for the limiter instance.
     * @param maxConcurrency ? Max concurency.
     * @param defaultDelayMs ? Default delay in milliseconds if no headers are present.
+    * @param showErrors ? Whether to log errors.
     */
    public constructor(id: string, options?: RateLimitManagerOptions) {
       super({
          id,
          q: new PQueue({ concurrency: options?.maxConcurrency || 1 }),
-         remainingThreshold: 1,
+         remainingThreshold: options?.remainingThreshold || 1,
          defaultDelayMs: options?.defaultDelayMs || 500,
+         showErrors: options?.showErrors || true,
       })
       this.maxConcurrency = options?.maxConcurrency || 1
    }

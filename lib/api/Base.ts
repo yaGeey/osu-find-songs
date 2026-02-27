@@ -20,11 +20,14 @@ export class SingletonInstance<T> {
    }
 }
 
-type BaseLimiterOptions = {
+type BaseLimiterInternal = {
    id: string
    q: PQueue
+}
+export type BaseLimiterParameters = {
    defaultDelayMs?: number
    remainingThreshold: number
+   showErrors?: boolean
 }
 
 export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
@@ -34,18 +37,27 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
    }
    protected defaultDelayMs: number
    protected remainingThreshold: number
+   protected showErrors: boolean
 
    /**
     * @param id Unique identifier for the limiter instance.
     * @param q PQueue instance to manage rate limiting.
     * @param defaultDelayMs Default delay in milliseconds if no headers are present.
     * @param remainingThreshold Remaining requests to trigger a pause (strictly less than).
+    * @param showErrors Whether to log errors.
     */
-   protected constructor({ id, q, defaultDelayMs = 500, remainingThreshold }: BaseLimiterOptions) {
+   protected constructor({
+      id,
+      q,
+      defaultDelayMs = 500,
+      remainingThreshold,
+      showErrors,
+   }: BaseLimiterParameters & BaseLimiterInternal) {
       super(id)
       this.q = q
       this.defaultDelayMs = defaultDelayMs
       this.remainingThreshold = remainingThreshold
+      this.showErrors = showErrors || false
    }
    abstract executeBatch<T>(tasks: Array<() => Promise<T>>): Promise<(T | null)[]>
 
@@ -100,6 +112,7 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                   // Retry with higher priority
                   return this.execute(task, 1)
                }
+               if (!this.showErrors) throw err
                sendUnknownError(err, `${this.id}_LIMITER`)
                console.error(`[${this.id}] ❌ Task failed:`, err)
                throw err || new Error('Task failed with undefined error')
