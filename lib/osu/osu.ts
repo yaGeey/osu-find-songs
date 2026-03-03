@@ -1,7 +1,7 @@
 'use server'
 import { BeatmapSet } from '@/types/Osu'
 import axios from 'axios'
-import { customAxios } from './axios'
+import { customAxios } from '../axios'
 import { cookies } from 'next/headers'
 
 let tokenRefreshPromise: Promise<string> | null = null

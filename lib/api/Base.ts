@@ -26,7 +26,7 @@ type BaseLimiterInternal = {
 }
 export type BaseLimiterParameters = {
    defaultDelayMs?: number
-   remainingThreshold: number
+   remainingThreshold?: number
    showErrors?: boolean
 }
 
@@ -50,14 +50,14 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
       id,
       q,
       defaultDelayMs = 500,
-      remainingThreshold,
-      showErrors,
+      remainingThreshold = 5,
+      showErrors = true,
    }: BaseLimiterParameters & BaseLimiterInternal) {
       super(id)
       this.q = q
       this.defaultDelayMs = defaultDelayMs
       this.remainingThreshold = remainingThreshold
-      this.showErrors = showErrors || false
+      this.showErrors = showErrors
    }
    abstract executeBatch<T>(tasks: Array<() => Promise<T>>): Promise<(T | null)[]>
 
@@ -112,9 +112,7 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                   // Retry with higher priority
                   return this.execute(task, 1)
                }
-               if (!this.showErrors) throw err
-               sendUnknownError(err, `${this.id}_LIMITER`)
-               console.error(`[${this.id}] ❌ Task failed:`, err)
+               sendUnknownError(err, `${this.id}_LIMITER`, this.showErrors)
                throw err || new Error('Task failed with undefined error')
             }
          },

@@ -1,6 +1,6 @@
 import { BeatmapSet } from '@/types/Osu'
 import { getWindowsFriendlyLocalTime } from '@/utils/dates'
-import { download, fetchBeatmapWithFallback } from '@/utils/osuDownload'
+import { download, fetchBeatmapWithFallback } from '@/lib/osu/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -8,7 +8,7 @@ import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import useSessionId from './useSessionId'
+import useSessionId from '../../hooks/useSessionId'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)

@@ -1,14 +1,14 @@
 import useBaseStore from '@/contexts/useBaseStore'
 import axios from 'axios'
 
-export const sendUnknownError = (err: unknown, context: string) => {
+export const sendUnknownError = (err: unknown, context: string, throwErr: boolean = true) => {
    const blinkRef = useBaseStore.getState().progressNotifyRef
    if (blinkRef?.current) blinkRef.current.blink('error')
 
    if (err instanceof Error) {
       err.message = `[${context}] ${err.message}`
    }
-   if (typeof window !== 'undefined' && typeof window.reportError === 'function') {
+   if (throwErr && typeof window !== 'undefined' && typeof window.reportError === 'function') {
       window.reportError(err)
    }
 }

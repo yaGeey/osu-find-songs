@@ -1,4 +1,4 @@
-import { beatmapsSearch } from '@/lib/osu'
+import { beatmapsSearch } from '@/lib/osu/osu'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { BeatmapSet } from '@/types/Osu'
 export const revalidate = 0

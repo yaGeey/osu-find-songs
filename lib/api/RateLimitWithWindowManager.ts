@@ -1,11 +1,11 @@
 import PQueue from 'p-queue'
-import { BaseLimiter } from './Base'
+import { BaseLimiter, BaseLimiterParameters } from './Base'
 
 type RateLimitWithWindowOptions = {
    avg: number
    burst: number
    durationMs: number
-}
+} & Omit<Partial<BaseLimiterParameters>, 'remainingThreshold' | 'defaultDelayMs'>
 
 export default class RateLimitWithWindowManager extends BaseLimiter {
    /**
@@ -14,6 +14,7 @@ export default class RateLimitWithWindowManager extends BaseLimiter {
     * @param avg Average number of requests allowed in the time window.
     * @param burst Maximum number of concurrent requests.
     * @param durationMs Duration of the time window in milliseconds.
+    * @param showErrors ? Whether to log errors.
     */
    public constructor(id: string, options: RateLimitWithWindowOptions) {
       super({
@@ -24,6 +25,7 @@ export default class RateLimitWithWindowManager extends BaseLimiter {
             intervalCap: options.avg,
          }),
          remainingThreshold: options.avg,
+         showErrors: options.showErrors,
       })
    }
 

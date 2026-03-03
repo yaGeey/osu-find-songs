@@ -20,9 +20,9 @@ export default class RateLimitManager extends BaseLimiter {
       super({
          id,
          q: new PQueue({ concurrency: options?.maxConcurrency || 1 }),
-         remainingThreshold: options?.remainingThreshold || 1,
-         defaultDelayMs: options?.defaultDelayMs || 500,
-         showErrors: options?.showErrors || true,
+         remainingThreshold: options?.remainingThreshold,
+         defaultDelayMs: options?.defaultDelayMs,
+         showErrors: options?.showErrors,
       })
       this.maxConcurrency = options?.maxConcurrency || 1
    }
@@ -40,7 +40,7 @@ export default class RateLimitManager extends BaseLimiter {
       }
 
       // Dynamically adjust concurrency based on first request headers
-      if (firstResult) {
+      if (firstResult !== null && firstResult !== false) {
          const res = firstResult as unknown as AxiosResponse
          const calculatedConcurrency = this.calculateConcurrency(res)
          if (this.getQ().concurrency !== calculatedConcurrency) {

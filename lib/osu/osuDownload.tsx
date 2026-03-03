@@ -1,4 +1,3 @@
-// https://github.com/eligrey/FileSaver.js/issues/796 - xhr download progress
 import axios, { AxiosResponse, isAxiosError } from 'axios'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
@@ -8,10 +7,11 @@ import RateLimitManager from '@/lib/api/RateLimitManager'
 import RateLimitWithWindowManager from '@/lib/api/RateLimitWithWindowManager'
 import { BaseLimiter } from '@/lib/api/Base'
 import useBaseStore from '@/contexts/useBaseStore'
-import { DOWNLOAD_PROGRESS_TIMEOUT_MS, SOURCES_COOLDOWN_MS, SOURCES_MAX_FAILURES } from '@/variables'
 import useSessionId from '@/hooks/useSessionId'
+import { getSourcesHealth, reportAllSourcesDown, reportSourceStatus } from '@/lib/osu/osu-source-tracker'
+import { sendUnknownError } from '@/lib/client-axios'
 
-const sourceTracker = new Map<string, { failures: number; cooldownUntil: number }>()
+const DOWNLOAD_PROGRESS_TIMEOUT_MS = 7000
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -80,14 +80,14 @@ export async function fetchBeatmapWithFallback({
    const sourceConfigs =
       video || onlyNoVideo
          ? [
-              { name: 'catboy', manager: managerCatboy, url: `https://catboy.best/d/${id}` }, // DEAD
-              { name: 'akatsuki', manager: managerAkatsuki, url: `https://beatmaps.akatsuki.gg/d/${id}` }, // MOVED -> NOT FOUND
+              { name: 'catboy', manager: managerCatboy, url: `https://catboy.best/d/${id}` },
               { name: 'beatconnect', manager: managerBeatconnect, url: `/api/proxy?url=https://beatconnect.io/b/${id}/` }, // CORS (use proxy)
               {
                  name: 'sayobot',
                  manager: managerSayobot,
                  url: `https://dl.sayobot.cn/beatmaps/download/full/${id}`,
               },
+              { name: 'akatsuki', manager: managerAkatsuki, url: `https://beatmaps.akatsuki.gg/d/${id}` }, // MOVED -> NOT FOUND
               { name: 'nerinyan', manager: managerNerinyan, url: `https://api.nerinyan.moe/d/${id}?nv=0` }, // DEAD
            ]
          : [
@@ -105,27 +105,39 @@ export async function fetchBeatmapWithFallback({
       fn: () => getBeatmap(src.manager, src.url, id, updateFn, priority),
    }))
 
+   // get sources state from server
+   const serverTrackerState =
+      (await getSourcesHealth().catch((err) =>
+         console.warn('Failed to fetch sources health from server action, proceeding without it', err),
+      )) ?? {}
+
+   let hasAttemptedDownload = false // Flag to track if we've attempted at least one download
+
    for (const source of sources) {
-      const state = sourceTracker.get(source.name) || { failures: 0, cooldownUntil: 0 }
+      const state = serverTrackerState[source.name] || { failures: 0, cooldownUntil: 0 }
       if (Date.now() < state.cooldownUntil) {
          console.warn(`Skipping ${source.name} due to cooldown`)
          continue
       }
 
+      hasAttemptedDownload = true
+
       try {
          const res = await source.fn()
-         if (state.failures > 0) sourceTracker.set(source.name, { failures: 0, cooldownUntil: 0 })
+         if (state.failures > 0) reportSourceStatus(source.name, 'success').catch(() => {}) // reset state on success
          return res
       } catch (err) {
          console.warn(`${source.name} failed:`, err)
          if (isAxiosError(err) && (!err.response || err.response.status >= 500)) {
-            state.failures++
-            if (state.failures >= SOURCES_MAX_FAILURES) state.cooldownUntil = Date.now() + SOURCES_COOLDOWN_MS
-            sourceTracker.set(source.name, state)
+            await reportSourceStatus(source.name, 'failure').catch(() => {}) // await to ensure state is updated before next attempt
          }
       }
    }
-   throw new Error('All download sources failed')
+
+   if (hasAttemptedDownload) {
+      reportAllSourcesDown().catch(() => {}) // reduce waiting time
+      throw new Error('All download sources failed')
+   } else throw new Error('No available download sources at the moment')
 }
 
 type UseNoVideoAxiosOptions = {
@@ -140,17 +152,32 @@ export const useNoVideoAxios = ({ id, fileName, video, onlyNoVideo }: UseNoVideo
 
    return useMutation({
       mutationFn: async () => {
-         await sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(
-            () => {},
-         )
+         sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(() => {})
          return video
             ? await fetchBeatmapWithFallback({ id, video: true, updateFn: update, priority: 1 })
             : await fetchBeatmapWithFallback({ id, video: false, onlyNoVideo, updateFn: update, priority: 1 })
       },
-      onError: (error: any) => {
+      onError: (error) => {
          remove(id)
-         console.error('Error downloading file:', error)
-         toast.error(`Can't download map, please download it directly from osu! website. \nhttps://osu.ppy.sh/beatmapsets/${id}`)
+
+         toast.error(
+            <div>
+               <p>All mirrors are down 😔</p>
+               <a
+                  href={`https://osu.ppy.sh/beatmapsets/${id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontWeight: 'bold', textDecoration: 'underline', color: 'inherit' }}
+               >
+                  download directly from osu! website
+               </a>
+            </div>,
+            {
+               autoClose: 15000,
+               closeOnClick: false,
+            },
+         )
+         sendUnknownError(error, 'MAP_DOWNLOAD')
          progressBlinkRef?.current?.blink('error', 4000, 'Download failed')
       },
       onSuccess: (data: Blob) => {

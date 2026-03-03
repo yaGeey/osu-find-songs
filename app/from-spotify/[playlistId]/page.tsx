@@ -9,7 +9,7 @@ import Filters from './_components/Filters'
 import Progress from '@/components/state/Progress'
 import { sortBeatmapsMatrix } from './_utils/sortBeatmapsMatrix'
 import { chunkArray, uniqueBeatmapsetMatrix } from '@/utils/arrayManaging'
-import useDownloadAll from '@/hooks/useDownloadAll'
+import useDownloadAll from '@/lib/osu/useDownloadAll'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
 import Loading from '@/components/state/Loading'
@@ -226,7 +226,7 @@ export default function PlaylistPage() {
          <Progress isVisible={progress !== null} value={progress || 0} color="text-success">
             {text}
          </Progress>
-         <ProgressNotify ref={progressNotifyRef}  />
+         <ProgressNotify ref={progressNotifyRef} />
          <ProgressMapDownload />
 
          <header
