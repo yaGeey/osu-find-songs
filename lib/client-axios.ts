@@ -5,11 +5,16 @@ export const sendUnknownError = (err: unknown, context: string, throwErr: boolea
    const blinkRef = useBaseStore.getState().progressNotifyRef
    if (blinkRef?.current) blinkRef.current.blink('error')
 
+   let errToReport = err
    if (err instanceof Error) {
-      err.message = `[${context}] ${err.message}`
+      errToReport = new Error(`[${context}] ${err.message}`, { cause: err })
+      if (err.stack) {
+         ;(errToReport as Error).stack = err.stack
+      }
+      ;(errToReport as Error).name = err.name
    }
    if (throwErr && typeof window !== 'undefined' && typeof window.reportError === 'function') {
-      window.reportError(err)
+      window.reportError(errToReport)
    }
 }
 
