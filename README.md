@@ -49,3 +49,8 @@ Thanks for checking it out — and even bigger thanks if you decide to give it a
 And even bigger thanks if you consider to star the repo!
 
 ThunderBirdo featured my app in [his video](https://www.youtube.com/watch?v=0uZ4RehxDO4&t=300s&ab_channel=ThunderBirdo)! Just note: the map background issue on cards is already fixed, and the video only covers the `from-osu` page.
+
+### Technical stuff
+The core application logic orchestrates via Next.js on Vercel while offloading resource-intensive scraping to a dedicated Digital Ocean VPS. This specialized microservice employs Playwright to emulate authentic user sessions, retrieving headers, tokens and dynamic query hashes.
+System observability and data integrity are maintained through a telemetry stack featuring NeonDB for serverless SQL analytics and LaunchDarkly for live sessions recordings and error logging.
+![c4 diagram](docs/c4.png) 
