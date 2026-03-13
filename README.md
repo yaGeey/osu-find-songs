@@ -45,10 +45,12 @@ _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or 
 ### Try it out!
 
 I hope you find this tool useful and fun to use. I really put soul in it.
-Thanks for checking it out — and even bigger thanks if you decide to give it a try!💗
+Thanks for checking it out - and even bigger thanks if you decide to give it a try!💗
 And even bigger thanks if you consider to star the repo!
 
 ThunderBirdo featured my app in [his video](https://www.youtube.com/watch?v=0uZ4RehxDO4&t=300s&ab_channel=ThunderBirdo)! Just note: the map background issue on cards is already fixed, and the video only covers the `from-osu` page.
+
+---
 
 ### Technical stuff
 The core application logic orchestrates via Next.js on Vercel while offloading resource-intensive scraping to a dedicated Digital Ocean VPS. This specialized microservice employs Playwright to emulate authentic user sessions, retrieving headers, tokens and dynamic query hashes.

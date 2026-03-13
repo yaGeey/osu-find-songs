@@ -103,15 +103,9 @@ export default function PlaylistPage() {
                s: 'any',
             }
 
-            try {
-               const { data } = await clientAxios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, { signal })
-               addTimeLeft(performance.now() - t0)
-               return data
-            } catch (err: any) {
-               if (err?.code === 'ERR_CANCELED' || err?.name === 'CanceledError') throw new Error('canceled')
-               progressNotifyRef?.current?.blink('error', 4000)
-               throw err
-            }
+            const { data } = await clientAxios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, { signal })
+            addTimeLeft(performance.now() - t0)
+            return data
          },
          enabled: !!tracks,
       })),

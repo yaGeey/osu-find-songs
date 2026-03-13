@@ -48,6 +48,10 @@ export async function GET(req: Request) {
       }
    })
 
+   if (simplified.every((s) => s === null)) {
+      return new Response('No beatmaps found', { status: 404 })
+   }
+
    return new Response(JSON.stringify(simplified), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

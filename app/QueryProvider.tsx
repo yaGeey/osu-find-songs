@@ -1,11 +1,22 @@
 'use client'
 
 // Since QueryClientProvider relies on useContext under the hood, we have to put 'use client' on top
-import { isServer, QueryCache, QueryClient } from '@tanstack/react-query'
+import { isServer, MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { toast } from 'react-toastify'
+import useBaseStore from '@/contexts/useBaseStore'
+
+const displayError = (err: unknown, errMsg: string) => {
+   console.error(err)
+   toast.error(errMsg, { autoClose: 8000 })
+   useBaseStore.getState().progressNotifyRef?.current?.blink('error', 4000)
+}
+
+const persister = createSyncStoragePersister({
+   storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+})
 
 function makeQueryClient() {
    return new QueryClient({
@@ -19,8 +30,18 @@ function makeQueryClient() {
       },
       queryCache: new QueryCache({
          onError: (error, query) => {
-            toast.error(`Something went wrong ${error instanceof Error ? `: ${error.message}` : ''}`)
-            console.error(`Error in query ${query.queryKey}:`, error)
+            displayError(
+               error,
+               (query.meta?.errMsg as string) ?? 'An error occurred while fetching data. Open console for details.',
+            )
+         },
+      }),
+      mutationCache: new MutationCache({
+         onError: (error, _variables, _context, mutation) => {
+            displayError(
+               error,
+               (mutation.meta?.errMsg as string) ?? 'An error occurred while performing the action. Open console for details.',
+            )
          },
       }),
    })
@@ -48,24 +69,9 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
    //       suspend because React will throw away the client on the initial
    //       render if it suspends and there is no boundary
    const queryClient = getQueryClient()
-   const persister = createSyncStoragePersister({
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-   })
-
    return (
       <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-         {/* <ErrorBoundary
-            onError={(error, info) => { sendTgMessage(error + (info.componentStack || '') + info.digest); }}
-            fallbackRender={({ error, resetErrorBoundary }) => (
-               <div>
-                  <p>Something went wrong!</p>
-                  <pre>{error.message}</pre>
-                  <button onClick={resetErrorBoundary}>Try again</button>
-               </div>
-            )}
-         > */}
          {children}
-         {/* </ErrorBoundary> */}
          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
       </PersistQueryClientProvider>
    )

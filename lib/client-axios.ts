@@ -7,12 +7,15 @@ export const sendUnknownError = (err: unknown, context: string, throwErr: boolea
 
    let errToReport = err
    if (err instanceof Error) {
-      errToReport = new Error(`[${context}] ${err.message}`, { cause: err })
+      errToReport = new Error(`[${context.toUpperCase()}] ${err.message}`, { cause: err })
       if (err.stack) {
          ;(errToReport as Error).stack = err.stack
       }
       ;(errToReport as Error).name = err.name
+   } else {
+      errToReport = new Error(`[${context.toUpperCase()}] Unknown error: ${JSON.stringify(err)}`)
    }
+
    if (throwErr && typeof window !== 'undefined' && typeof window.reportError === 'function') {
       window.reportError(errToReport)
    }
@@ -28,8 +31,7 @@ clientAxios.interceptors.response.use(
             return Promise.reject(err)
          }
       }
-
-      sendUnknownError(err, 'AXIOS')
+      sendUnknownError(err, 'CLIENT')
       return Promise.reject(err)
    },
 )

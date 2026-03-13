@@ -39,7 +39,7 @@ export default function LandingPage() {
                      {!details &&
                         'osu! find songs is the tool that links osu! with Spotify: scan your beatmaps to build playlists and find songs, or find beatmaps from playlists and download them.'}
                      {details === 'from-spotify' &&
-                        "Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can filter, sort and search results with all the options provided by osu search queries and even custom one. Once you're happy with the results, you can download each beatmap individually — or grab them all in a single zip archive."}
+                        "Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can filter, sort and search results with all the options provided by osu search queries and even custom one. Once you're happy with the results, you can download each beatmap individually - or grab them all in a single zip archive."}
                      {details === 'from-osu' &&
                         "The app will scan all your .osu files to extract track metadata. It then automatically searches for those songs on Spotify and YouTube. You can view, listen or watch videos in the app, and instantly generate a Spotify playlist. Similarly to the native osu! client, you can organize your songs exactly the way you're used to."}
                   </h2>
@@ -47,7 +47,7 @@ export default function LandingPage() {
                      <section>
                         Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can
                         filter, sort and search results with all the options provided by osu search queries and even custom one.
-                        Once you&apos;re happy with the results, you can download each beatmap individually — or grab them all in
+                        Once you&apos;re happy with the results, you can download each beatmap individually - or grab them all in
                         a single zip archive.
                      </section>
                      <section>

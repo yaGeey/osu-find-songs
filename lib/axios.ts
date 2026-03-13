@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import https from 'https'
 import http from 'http'
+import { LDObserve } from '@launchdarkly/observability-node'
 
 export const customAxios = axios.create({
    httpAgent: new http.Agent({ keepAlive: true }),
@@ -13,16 +14,8 @@ customAxios.interceptors.response.use(
       if (err.response?.status === 429 || err.status === 429 || err.status === 404) {
          // Ignore rate limit and not found errors
          return Promise.reject(err)
-      } else {
-         if (axios.isAxiosError(err)) {
-            console.error(`${err.response?.status} ${err.config?.method?.toUpperCase()} ${err.config?.url}`, {
-               message: err.message,
-               data: err.response?.data,
-            })
-         } else {
-            console.error('Unexpected error:', err)
-         }
       }
+      LDObserve.recordError(err, undefined, undefined)
       return Promise.reject(err)
    },
 )

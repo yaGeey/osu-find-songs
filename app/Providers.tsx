@@ -5,21 +5,27 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorCallback from '@/components/ErrorFallback'
 import { Tooltip } from 'react-tooltip'
-import { useEffect, useRef } from 'react'
-import { getInternalTokens } from '@/lib/spotify/innerApi'
+import { useEffect, useRef, useState } from 'react'
 import useUserListener from '@/hooks/useUserListener'
 import { LDProvider } from 'launchdarkly-react-client-sdk'
 import Observability from '@launchdarkly/observability'
 import SessionReplay from '@launchdarkly/session-replay'
 import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import useBaseStore from '@/contexts/useBaseStore'
+import { getInternalTokens } from '@/lib/spotify/innerApi'
+
+function InitialErrorThrower({ error }: { error: unknown }) {
+   if (error) throw error
+   return null
+}
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    const hasRunInitialFetch = useRef(false)
+   const [error, setError] = useState<unknown>(null)
    useEffect(() => {
       const fetch = async () => await getInternalTokens()
       if (!hasRunInitialFetch.current) {
-         fetch() // let error throw app
+         fetch().catch(setError) // let error throw app
          hasRunInitialFetch.current = true
       }
    }, [])
@@ -52,6 +58,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
    if (process.env.NODE_ENV === 'development') return content
    return (
       <ErrorBoundary FallbackComponent={ErrorCallback}>
+         <InitialErrorThrower error={error} />
          <LDProvider
             clientSideID={clientSideID}
             options={{
