@@ -54,10 +54,10 @@ export default function DownloadAllBtn({
                   title: 'Download All Beatmaps',
                   status: 'info' as const,
                   children: (
-                     <p>
-                        <span>Please wait, this may take some time. Don&apos;t close this page</span>
-                        <span>{loadingText}</span>
-                     </p>
+                     <div>
+                        <p>Please wait, this may take some time. Don&apos;t close this page</p>
+                        <p>{loadingText}</p>
+                     </div>
                   ),
                   buttons: [{ onClick: closeModal, children: 'Okay', className: 'w-31' }],
                }

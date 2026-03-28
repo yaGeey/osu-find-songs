@@ -33,23 +33,23 @@ export default class RateLimitManager extends BaseLimiter {
       // PROBING for limits with the first request
       let firstResult: T | null = null
       try {
-         firstResult = await this.execute(tasks[0])
+         firstResult = await this.execute(tasks[0], 0)
       } catch (e) {
          console.error(`[${this.id}] ⚠️ Probe task failed`, e)
          firstResult = null
       }
 
       // Dynamically adjust concurrency based on first request headers
-      if (firstResult !== null && firstResult !== false) {
+      if (firstResult !== null && typeof firstResult === 'object' && 'headers' in firstResult) {
          const res = firstResult as unknown as AxiosResponse
          const calculatedConcurrency = this.calculateConcurrency(res)
-         if (this.getQ().concurrency !== calculatedConcurrency) {
+         if (this.q.concurrency !== calculatedConcurrency) {
             console.log(`[${this.id}] 📊 Adjusting Concurrency to ${calculatedConcurrency}`)
-            this.getQ().concurrency = calculatedConcurrency
+            this.q.concurrency = calculatedConcurrency
          }
       }
 
-      const mainBatch = await this.processBatch(tasks.slice(1))
+      const mainBatch = await this.processBatch(tasks.slice(1), 1)
       return [firstResult, ...mainBatch]
    }
 

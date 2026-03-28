@@ -79,6 +79,8 @@ export async function beatmapsSearch(queries: Queries) {
             headers: buildHeaders(token),
          },
       )
+      if (res.data.beatmapsets?.find((b) => b.id === 22156) && res.data.beatmapsets.length === 50)
+         return { beatmapsets: [], total: 0 }
       return res.data
    })
 }

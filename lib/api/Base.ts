@@ -31,10 +31,7 @@ export type BaseLimiterParameters = {
 }
 
 export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
-   private q: PQueue
-   getQ(): PQueue {
-      return this.q
-   }
+   protected q: PQueue
    protected defaultDelayMs: number
    protected remainingThreshold: number
    protected showErrors: boolean
@@ -61,13 +58,13 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
    }
    abstract executeBatch<T>(tasks: Array<() => Promise<T>>): Promise<(T | null)[]>
 
-   protected async pauseQueue(ms: number) {
+   protected pauseQueue(ms: number) {
       this.q.pause()
       setTimeout(() => this.q.start(), ms)
    }
 
-   protected async processBatch<T>(tasks: Array<() => Promise<T>>): Promise<(T | null)[]> {
-      const promises = tasks.map((task) => this.execute(task))
+   protected async processBatch<T>(tasks: Array<() => Promise<T>>, priorityOffset: number = 0): Promise<(T | null)[]> {
+      const promises = tasks.map((task, i) => this.execute(task, -(priorityOffset + i)))
       const results = await Promise.allSettled(promises)
 
       return results.map((result, i) => {
