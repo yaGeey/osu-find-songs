@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import clientAxios from '@/lib/client-axios'
+import clientAxios, { sendUnknownError } from '@/lib/client-axios'
 import useSessionId from '@/hooks/useSessionId'
 const botRegex =
    /bot|crawler|vercel|spider|slurp|facebookexternalhit|bingpreview|embedly|quora|baidu|yandex|sogou|exabot|rogerbot|uptime/i
@@ -46,7 +46,9 @@ export default function Telemetry() {
                is_bot: botRegex.test(navigator.userAgent),
             })
             recordIfRef.current = res.data.id
-         } catch (e) {}
+         } catch (e) {
+            sendUnknownError(e, 'TELEMETRY_VISIT')
+         }
       }
 
       recordIfRef.current = null // Dropping previous record id on path change

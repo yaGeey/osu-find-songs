@@ -44,6 +44,13 @@ export async function foTelemetryFinishedOsu(id: number) {
       WHERE id = ${id}
    `
 }
+export async function foTelemetryAttachSession(id: number, sessionId: string) {
+   await sql`
+      UPDATE fo_loading
+      SET session_id = COALESCE(session_id, ${sessionId})
+      WHERE id = ${id}
+   `
+}
 export async function foTelemetryError(id: number, errorMessage: string) {
    await sql`
       UPDATE fo_loading
