@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo, faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
 import { twMerge as tw, twJoin } from 'tailwind-merge'
-import { useNoVideoAxios } from '@/lib/osu/osuDownload'
+import { useMapDownload } from '@/lib/osu/hooks/useMapDownload'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef } from 'react'
 import ImageFallback from '@/components/ImageFallback'
@@ -22,8 +22,8 @@ export default function OsuCard({
    className?: string
 }) {
    const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
-   const mutationNoVideo = useNoVideoAxios({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video })
-   const mutationVideo = useNoVideoAxios({ id: beatmapset.id, fileName, video: true })
+   const mutationNoVideo = useMapDownload({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video })
+   const mutationVideo = useMapDownload({ id: beatmapset.id, fileName, video: true })
 
    const ref = useRef<HTMLDivElement>(null)
    const currentUrl = useAudioStore((state) => state.currentUrl)

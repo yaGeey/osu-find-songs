@@ -1,21 +1,21 @@
 import { BeatmapSet } from '@/types/Osu'
 import { getWindowsFriendlyLocalTime } from '@/utils/dates'
-import { download, fetchBeatmapWithFallback } from '@/lib/osu/osuDownload'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/telemetry'
-import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import useSessionId from '../../hooks/useSessionId'
+import useSessionId from '../../../hooks/useSessionId'
+import { useQueryClient } from '@tanstack/react-query'
+import { fetchBeatmapWithFallback, download } from '../osuDownload'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
    const manager = RateLimitManager.getInstance('downloadAllQueue')
-   const update = useMapDownloadStore((state) => state.update)
    const sessionId = useSessionId()
+   const queryClient = useQueryClient()
 
    // download maps
    async function handleDownloadAll() {
@@ -28,7 +28,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
          const b: BeatmapSet = [...set].sort(sortFn(sortQuery))[0]
 
          const filename = `${b.id} ${b.artist} - ${b.title}.osz`
-         const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, updateFn: update })
+         const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, sessionId, queryClient })
 
          // telemetry
          sendMapDownloadTelemetry({
