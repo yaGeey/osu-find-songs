@@ -1,4 +1,5 @@
 import useBaseStore from '@/contexts/useBaseStore'
+import { isAxiosError } from 'axios'
 
 export const sendUnknownError = (err: unknown, context: string, throwErr: boolean = true) => {
    const blinkRef = useBaseStore.getState().progressNotifyRef
@@ -12,15 +13,33 @@ export const sendUnknownError = (err: unknown, context: string, throwErr: boolea
 
 export const modifyErrorMessage = (err: unknown, context: string) => {
    const contextFormatted = context.split(' ').join('_').toUpperCase()
-   let errToReport: Error
    if (err instanceof Error) {
-      errToReport = new Error(`[${contextFormatted}] ${err.message}`, { cause: err })
-      if (err.stack) {
-         ;(errToReport as Error).stack = err.stack
+      try {
+         err.message = `[${contextFormatted}] ${err.message}`
+      } catch {
+         Object.defineProperty(err, 'message', {
+            value: `[${contextFormatted}] ${err.message}`,
+            writable: true,
+            configurable: true,
+            enumerable: false,
+         })
       }
-      ;(errToReport as Error).name = err.name
-   } else {
-      errToReport = new Error(`[${contextFormatted}] Unknown error: ${JSON.stringify(err)}`)
+      return err
    }
-   return errToReport
+   return new Error(`[${contextFormatted}] Unknown error: ${JSON.stringify(err)}`)
+}
+
+const ignoredErrorStatuses = [429, 404]
+export const getErrorHandlingMeta = (err: unknown, context: string) => {
+   if (isAxiosError(err)) {
+      const ignoredErrors = (err.config?.ignoredErrors || []).concat(ignoredErrorStatuses)
+      const status = err.response?.status || err.status
+      if (status && ignoredErrors?.includes(status)) {
+         return { skip: true, context }
+      }
+      if (err.config && err.config.context) {
+         context = err.config.context
+      }
+   }
+   return { skip: false, context }
 }

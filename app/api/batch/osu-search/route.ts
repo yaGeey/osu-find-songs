@@ -3,6 +3,7 @@ import RateLimitManager from '@/lib/api/RateLimitManager'
 import { BeatmapSet } from '@/types/Osu'
 export const revalidate = 0
 
+// TODO we already use simple rate limit in all fn in osu.ts, remove it and leave RateLimitManager
 const manager = RateLimitManager.getInstance('osu', { maxConcurrency: 3 })
 export async function POST(req: Request) {
    const { qs, m, s } = await req.json()

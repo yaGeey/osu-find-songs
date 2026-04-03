@@ -98,7 +98,11 @@ async function getInnerGraphApi<T>(operationName: string, variables: Record<stri
                },
             },
          },
-         { headers: await buildHeaders(), context: `spotify innerapi` },
+         {
+            headers: await buildHeaders(),
+            context: `spotify innerapi`,
+            ignoredErrors: [400],
+         },
       )
       return data
    } catch (err) {
