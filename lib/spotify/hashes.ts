@@ -9,9 +9,10 @@ export async function getHash(opName: string) {
    if (!hashes[opName]) {
       const { data } = await customAxios.get<Response>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/hashes?names=` + opName, {
          headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
+         context: 'get hash',
       })
       if (Object.keys(data.all).length) Object.assign(hashes, data.all)
-      else await updateHashes([opName])
+      if (!hashes[opName]) await updateHashes([opName])
    }
    if (!hashes[opName]) {
       throw new Error(`Hash for operation "${opName}" could not be found even after update.`)
@@ -25,6 +26,7 @@ export async function updateHashes(opNames: string[]) {
       null,
       {
          headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
+         context: 'update hashes',
       },
    )
    Object.entries(data.all).forEach(([name, hash]) => (hashes[name] = hash))

@@ -9,7 +9,7 @@ import Footer from '@/components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { twJoin } from 'tailwind-merge'
-import { sendUnknownError } from '@/lib/client-axios'
+import { sendUnknownError } from '@/lib/errorHandling'
 
 export default function SelectPage() {
    const { setSongs } = useSongContext()

@@ -1,6 +1,6 @@
 import { AxiosResponse, isAxiosError } from 'axios'
 import PQueue from 'p-queue'
-import { sendUnknownError } from '../client-axios'
+import { sendUnknownError } from '@/lib/errorHandling'
 // TODO розрібратись з тайпскриптом
 export class SingletonInstance<T> {
    protected id: string

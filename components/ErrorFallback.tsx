@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Button } from './buttons/Buttons'
 import Image from 'next/image'
-import { sendUnknownError } from '@/lib/client-axios'
+import { sendUnknownError } from '@/lib/errorHandling'
 import ExternalLink from './ExternalLink'
 
 export default function ErrorCallback({ error, resetErrorBoundary }: { error: unknown; resetErrorBoundary: () => void }) {

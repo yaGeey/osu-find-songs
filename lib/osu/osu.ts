@@ -54,6 +54,7 @@ export async function getBeatmap(id: string): Promise<BeatmapSet> {
    return fetchOsu(async (token) => {
       const res = await customAxios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
          headers: buildHeaders(token),
+         context: 'fetch beatmap details',
       })
       return res.data
    })
@@ -77,18 +78,13 @@ export async function beatmapsSearch(queries: Queries) {
          `https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`,
          {
             headers: buildHeaders(token),
+            context: 'search beatmaps',
          },
       )
       if (res.data.beatmapsets?.find((b) => b.id === 22156) && res.data.beatmapsets.length === 50)
          return { beatmapsets: [], total: 0 }
       return res.data
    })
-}
-
-export async function beatmapsSearchCatboy(queries: Queries) {
-   const queryString = getQueryString(queries)
-   const { data } = await customAxios.get<Array<BeatmapSet>>(`https://catboy.best/api/v2/search?${queryString}`)
-   return data
 }
 
 export async function revalidateOsuToken(): Promise<string> {
@@ -108,6 +104,7 @@ export async function revalidateOsuToken(): Promise<string> {
          Accept: 'application/json',
          'Content-Type': 'application/x-www-form-urlencoded',
       },
+      context: 'revalidate osu token',
    })
 
    const storage = await cookies()

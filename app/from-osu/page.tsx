@@ -58,7 +58,9 @@ export default function FromOsu() {
          queryKey: ['spotifyChunk', localChunk.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', localChunk)
+            const res = await clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', localChunk, {
+               context: 'spotify search',
+            })
             addTimeSpotify(performance.now() - t0)
             return res.data
          },
@@ -76,6 +78,7 @@ export default function FromOsu() {
                   id: localChunk.map((s) => s.id),
                },
                paramsSerializer: { indexes: null },
+               context: 'osu search',
             })
             addTimeOsu(performance.now() - t0)
             return res.data

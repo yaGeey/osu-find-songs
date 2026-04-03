@@ -5,7 +5,7 @@ import { sendMapDownloadTelemetry } from '@/lib/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import useBaseStore from '@/contexts/useBaseStore'
 import useSessionId from '@/hooks/useSessionId'
-import { sendUnknownError } from '@/lib/client-axios'
+import { sendUnknownError } from '@/lib/errorHandling'
 import { fetchBeatmapWithFallback, download } from '../osuDownload'
 
 type UseMapDownloadOptions = {

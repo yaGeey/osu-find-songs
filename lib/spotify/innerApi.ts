@@ -60,6 +60,7 @@ type SpotifyApiError = {
 async function getInternalTokenFromServer() {
    const { data } = await customAxios.get<TokenResponse>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/token`, {
       headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
+      context: 'get internal token',
    })
 
    // set cookies
@@ -97,7 +98,7 @@ async function getInnerGraphApi<T>(operationName: string, variables: Record<stri
                },
             },
          },
-         { headers: await buildHeaders() },
+         { headers: await buildHeaders(), context: `spotify innerapi` },
       )
       return data
    } catch (err) {
@@ -224,7 +225,7 @@ export async function createPlaylist({ name, description }: { name: string; desc
             },
          ],
       },
-      { headers: customHeaders },
+      { headers: customHeaders, context: 'create playlist' },
    )
 
    // TODO handle dynamic user id (get it from server)
@@ -251,7 +252,7 @@ export async function createPlaylist({ name, description }: { name: string; desc
             },
          ],
       },
-      { headers: customHeaders },
+      { headers: customHeaders, context: 'add playlist to rootlist' },
    )
    return data
 }

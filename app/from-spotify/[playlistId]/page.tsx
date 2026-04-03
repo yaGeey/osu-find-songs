@@ -103,7 +103,10 @@ export default function PlaylistPage() {
                s: 'any',
             }
 
-            const { data } = await clientAxios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, { signal })
+            const { data } = await clientAxios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, {
+               signal,
+               context: 'search from spotify',
+            })
             addTimeLeft(performance.now() - t0)
             return data
          },
