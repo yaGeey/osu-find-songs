@@ -3,21 +3,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { CombinedSingleSimple } from '@/types/types'
 import Info from './_components/Info'
 import { twMerge as tw } from 'tailwind-merge'
-import { useQueries } from '@tanstack/react-query'
-import { BeatmapSet } from '@/types/Osu'
-import { groupOptions } from '@/utils/selectOptions'
+import { groupOptions, GroupOptionValue } from '@/utils/selectOptions'
 import { useSongContext } from '@/contexts/SongContext'
 import SettingsPopup from '@/components/SettingsPopup'
 import { useRouter } from 'next/navigation'
 import CreatePlaylistButton from './_components/CreatePlaylistButton'
-import { filterFn, searchFilterFn, groupArray, chunkArray, flatCombinedArray } from '@/utils/arrayManaging'
+import { filterFn, searchFilterFn, chunkArray, flatCombinedArray, getGroupedArray, sortGroupedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
-import useTimeLeft from '@/hooks/useTimeLeft'
 import Dropdown from '@/components/selectors/Dropdown'
 import DropdownSort from '@/components/selectors/DropdownSort'
 import Search from '@/components/Search'
 import Toggle from '@/components/Toggle'
-import { FO_CHUNK_SIZE } from '@/variables'
 import useFoTelemetry from '../../hooks/useFoTelemetry'
 import useBaseStore from '@/contexts/useBaseStore'
 import VirtuosoCardFO from './_components/VirtuosoCardFO'
@@ -25,25 +21,37 @@ import { motion, AnimatePresence } from 'framer-motion'
 import BgImage from '@/components/BgImage'
 import IconsSection from '@/components/IconsSection'
 import { Settings } from 'lucide-react'
-import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
-import clientAxios from '@/lib/client-axios'
+import useOsuSearch from '@/lib/osu/hooks/useOsuSearch'
+import useSpotifySearch from '@/lib/spotify/hooks/useSpotifySearch'
+
+const MAX_PARALLEL_QUERIES = 100
+const ABSOLUTE_MIN_CHUNK_SIZE = 25
 
 export type ListItem = { type: 'group'; key: string } | { type: 'card'; data: CombinedSingleSimple }
 
 export default function FromOsu() {
    const router = useRouter()
-   const { songs, setSongs } = useSongContext()
+   const { songs } = useSongContext()
    useEffect(() => {
       if (!songs.length) router.replace('/from-osu/select')
-   }, [songs, setSongs, router])
-   const chunkedLocal = useMemo(() => chunkArray(songs, FO_CHUNK_SIZE), [songs])
+   }, [songs, router])
+
+   // chunk songs
+   const chunkedLocal = useMemo(() => {
+      const chunkSize =
+         songs.length <= MAX_PARALLEL_QUERIES * ABSOLUTE_MIN_CHUNK_SIZE
+            ? ABSOLUTE_MIN_CHUNK_SIZE
+            : Math.ceil(songs.length / MAX_PARALLEL_QUERIES)
+      console.log(`Using chunk size of ${chunkSize} for ${songs.length} songs.`)
+      return chunkArray(songs, chunkSize)
+   }, [songs])
 
    const sortFnName = useBaseStore((state) => state.sortFnName)
    const selectedGroup = useBaseStore((state) => state.selectedGroup)
    const current = useBaseStore((state) => state.current)
 
    const [exactSpotify, setExactSpotify] = useState(false)
-   const [groupFn, setGroupFn] = useState<string>('no')
+   const [groupFn, setGroupFn] = useState<GroupOptionValue | null>(null)
    const [isSettingsVisible, setIsSettingsVisible] = useState(false)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
@@ -53,85 +61,34 @@ export default function FromOsu() {
    }, [exactSpotify, groupFn, sortFnName])
 
    // queries
-   const spotifyQueries = useQueries({
-      queries: chunkedLocal.map((localChunk) => ({
-         queryKey: ['spotifyChunk', localChunk.map((s) => s.id)],
-         queryFn: async () => {
-            const t0 = performance.now()
-            const res = await clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', localChunk, {
-               context: 'spotify search',
-            })
-            addTimeSpotify(performance.now() - t0)
-            return res.data
-         },
-      })),
-   })
-   const isSpotifyFetching = spotifyQueries.some((q) => q.isFetching)
-
-   const osuQueries = useQueries({
-      queries: chunkedLocal.map((localChunk) => ({
-         queryKey: ['osuChunk', localChunk.map((s) => s.id)],
-         queryFn: async () => {
-            const t0 = performance.now()
-            const res = await clientAxios.get<BeatmapSet[] | null>(`/api/batch/osu`, {
-               params: {
-                  id: localChunk.map((s) => s.id),
-               },
-               paramsSerializer: { indexes: null },
-               context: 'osu search',
-            })
-            addTimeOsu(performance.now() - t0)
-            return res.data
-         },
-      })),
-   })
-   const isOsuFetching = osuQueries.some((q) => q.isFetching)
-
-   const isLoading = isOsuFetching || isSpotifyFetching
-
-   // Approximate loading time left
-   const {
-      addTimeLeft: addTimeSpotify,
-      timeLeft: timeLeftSpotify,
-      msLeft: msLeftSpotify,
-   } = useTimeLeft(spotifyQueries.filter((q) => !q.isFetched).length)
-   const {
-      addTimeLeft: addTimeOsu,
-      timeLeft: timeLeftOsu,
-      msLeft: msLeftOsu,
-   } = useTimeLeft(osuQueries.filter((q) => !q.isFetched).length)
+   const sp = useSpotifySearch({ chunks: chunkedLocal })
+   const osu = useOsuSearch({ chunks: chunkedLocal })
+   const isFetching = osu.isFetching || sp.isFetching
 
    // Combine the arrays
-   const combined = useMemo(() => {
-      return chunkedLocal
-         .map((localChunk, i) => ({
-            local: localChunk,
-            spotifyQuery: spotifyQueries[i],
-            osuQuery: osuQueries[i],
-         }))
-         .flatMap((item) => flatCombinedArray(item))
-   }, [
-      songs,
-      osuQueries.filter((q) => q.isLoading).length,
-      spotifyQueries.filter((q) => q.isLoading).length,
-      osuQueries.map((q) => q.dataUpdatedAt).join(','),
-      spotifyQueries.map((q) => q.dataUpdatedAt).join(','),
-   ])
+   const combined = chunkedLocal
+      .map((localChunk, i) => ({
+         local: localChunk,
+         spotifyQuery: sp.queries[i],
+         osuQuery: osu.queries[i],
+      }))
+      .flatMap((item) => flatCombinedArray(item))
 
    const groupedDict = useMemo(() => {
       const extractedData = combined.filter((item) => item.spotify !== null)
-      if (isLoading) return { '': extractedData }
-      return groupArray(groupFn, sortOrder, sortFnName, extractedData)
-   }, [groupFn, sortFnName, sortOrder, combined, isLoading])
+      if (isFetching) return { '': extractedData }
+      const grouped = getGroupedArray(groupFn, combined)
+      return sortGroupedArray(sortFnName, sortOrder, grouped)
+   }, [groupFn, sortFnName, sortOrder, combined, isFetching])
 
    // prepara data for virtuoso
    const virtualListItems = useMemo(() => {
       const items: ListItem[] = []
 
       for (const group of Object.keys(groupedDict || {})) {
-         if (group !== '') items.push({ type: 'group', key: group })
+         if (group) items.push({ type: 'group', key: group })
 
-         if (group === '' || group === selectedGroup) {
+         if (!group || group === selectedGroup) {
             const filtered = groupedDict[group].filter(filterFn(exactSpotify)).filter(searchFilterFn(search))
             filtered.forEach((data) => {
                items.push({ type: 'card', data })
@@ -144,8 +101,8 @@ export default function FromOsu() {
 
    // Telemetry
    useFoTelemetry({
-      spotifyQueries,
-      osuQueries,
+      spotifyQueries: sp.queries,
+      osuQueries: osu.queries,
       songsLength: songs.length,
    })
 
@@ -168,15 +125,15 @@ export default function FromOsu() {
          </AnimatePresence>
 
          <Progress
-            isVisible={isLoading}
+            isVisible={isFetching}
             value={
                ((combined.filter((q) => !q.isOsuLoading).length + combined.filter((q) => !q.isSpotifyLoading).length) * 100) /
                (combined.length * 2)
             }
          >
-            {msLeftOsu > msLeftSpotify
-               ? `${osuQueries.filter((q) => !q.isLoading).length}/${songs.length} | ${timeLeftOsu} left`
-               : `${spotifyQueries.filter((q) => !q.isLoading).length}/${songs.length} | ${timeLeftSpotify} left`}
+            {osu.msLeft > sp.msLeft
+               ? `${osu.queries.filter((q) => !q.isLoading).length}/${songs.length} | ${osu.timeLeft} left`
+               : `${sp.queries.filter((q) => !q.isLoading).length}/${songs.length} | ${sp.timeLeft} left`}
          </Progress>
 
          <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-12 flex justify-between items-center px-4 gap-3">
@@ -200,34 +157,33 @@ export default function FromOsu() {
                <Toggle
                   value={exactSpotify}
                   setValue={setExactSpotify}
-                  disabled={isLoading} //FIXME?  || !combined.some((i) => i.osu !== null)
+                  disabled={isFetching} //FIXME?  || !combined.some((i) => i.osu !== null)
                   text={{ on: 'Exact Spotify match', off: 'Any Spotify match' }}
                   width={175}
                   className="max-[1075px]:!hidden"
                />
                <Dropdown
                   onSelected={(option) => {
-                     console.log(option.value)
-                     setGroupFn(option.value ?? 'no')
+                     setGroupFn((option?.value as GroupOptionValue) ?? null)
                   }}
                   placeholder="Group by"
                   options={groupOptions}
-                  disabled={isLoading}
+                  disabled={isFetching}
                   width={100}
                />
                <DropdownSort
                   onSelected={({ query, order }) => {
-                     useBaseStore.setState({ sortFnName: query ?? 'sort-date' })
+                     useBaseStore.setState({ sortFnName: query })
                      setSortOrder(order)
                   }}
                />
-               <Search value={search} setValue={setSearch} placeholder="Search songs" width={200} disabled={isLoading} />
+               <Search value={search} setValue={setSearch} placeholder="Search songs" width={200} disabled={isFetching} />
             </section>
          </header>
 
          {/* content */}
          <main className="max-h-[calc(100dvh-48px)] flex justify-center sm:justify-end">
-            {!virtualListItems.length && !isLoading && (
+            {!virtualListItems.length && !isFetching && (
                <div className="inset-0 absolute flex flex-col items-center gap-4 mt-20 text-white text-2xl font-semibold">
                   No songs found
                </div>

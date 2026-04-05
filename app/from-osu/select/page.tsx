@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify'
 import Footer from '@/components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy, faUpload } from '@fortawesome/free-solid-svg-icons'
-import { twJoin } from 'tailwind-merge'
+import { twJoin, twMerge } from 'tailwind-merge'
 import { sendUnknownError } from '@/lib/errorHandling'
 
 export default function SelectPage() {
@@ -92,7 +92,7 @@ export default function SelectPage() {
    }
 
    const [message, setMessage] = useState('Click to select folder')
-   const [state, setState] = useState<'idle' | 'success' | 'error'>('idle')
+   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
    return (
       <div className="flex flex-col justify-center items-center min-h-screen text-white">
@@ -114,7 +114,7 @@ export default function SelectPage() {
             <div
                className={twJoin(
                   'border-2 border-dashed w-full rounded-lg mt-7 p-8 text-center relative hover:brightness-125 transition-all',
-                  state === 'idle' && 'border-main text-main',
+                  (state === 'idle' || state === 'loading') && 'border-main text-main',
                   state === 'success' && 'border-success text-success',
                   state === 'error' && 'border-error text-error',
                )}
@@ -127,7 +127,7 @@ export default function SelectPage() {
                   type="file"
                   {...({ directory: '', webkitdirectory: '' } as any)}
                   onChange={async (e) => {
-                     setState('idle')
+                     setState('loading')
                      setMessage('Loading...')
                      handleFileChange(e)
                         .then(() => {
@@ -141,7 +141,10 @@ export default function SelectPage() {
                            sendUnknownError(e, 'FILE_SELECT')
                         })
                   }}
-                  className="absolute opacity-0 top-0 left-0 w-full h-full"
+                  className={twMerge(
+                     'absolute opacity-0 top-0 left-0 w-full h-full',
+                     state === 'loading' && 'cursor-not-allowed pointer-events-none',
+                  )}
                />
             </div>
          </div>

@@ -205,7 +205,7 @@ export default function PlaylistPage() {
    }, [maps, sortQuery])
 
    return (
-      <div className="min-w-[710px] font-inter overflow-hidden" translate="no">
+      <div className="min-w-[710px] overflow-hidden" translate="no">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
          <style>{`
          body {

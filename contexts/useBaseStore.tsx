@@ -1,10 +1,11 @@
 import { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import { CombinedSingleSimple } from '@/types/types'
+import { SortOptionValue } from '@/utils/selectOptions'
 import { create } from 'zustand'
 
 type FoStore = {
    current: CombinedSingleSimple | null
-   sortFnName: string
+   sortFnName: SortOptionValue | null
    selectedGroup: string | null
    showSpotifyEmbeds: boolean
    setSpotifyEmbeds: (value: boolean) => void
@@ -21,7 +22,7 @@ function getLocalStorageBoolean(key: string, defaultValue: boolean): boolean {
 
 const useBaseStore = create<FoStore>((set, get) => ({
    current: null,
-   sortFnName: 'sort-date',
+   sortFnName: null,
    selectedGroup: null,
    showSpotifyEmbeds: getLocalStorageBoolean('showSpotifyEmbeds', true),
    setSpotifyEmbeds: (value: boolean) => {

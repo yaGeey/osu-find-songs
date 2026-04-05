@@ -1,6 +1,6 @@
-export type FilterOption = {
+export type FilterOption<T = string> = {
    label: string[]
-   value: string
+   value: T
    isNested?: boolean
    isDate?: boolean
 }

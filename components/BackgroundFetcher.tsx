@@ -1,6 +1,4 @@
-import { getDeadMirrors } from '@/lib/osu/actions/osuMirrorsTracker'
 import usePrepareMirrors from '@/lib/osu/hooks/usePrepareMirrors'
-import { getPrioritizedMirrorsFilteredByDead } from '@/lib/osu/osuMirrors'
 import { getInternalTokens } from '@/lib/spotify/innerApi'
 import { useQuery } from '@tanstack/react-query'
 

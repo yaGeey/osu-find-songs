@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import DropdownInput from './bricks/DropdownInput'
-import DropdownFilterSelect from './bricks/DropdownFilterSelect'
-import DropdownValueInput from './bricks/DropdownValueInput'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowDownWideShort, faArrowUpShortWide } from '@fortawesome/free-solid-svg-icons'
-import { sortOptions as options } from '@/utils/selectOptions'
+import { sortOptions as options, SortOptionValue } from '@/utils/selectOptions'
 
 export default function DropdownSort({
    onSelected,
    disabled,
 }: {
-   onSelected: ({ query, order }: { query: string; order: 'asc' | 'desc' }) => void
+   onSelected: ({ query, order }: { query: SortOptionValue | null; order: 'asc' | 'desc' }) => void
    disabled?: boolean
 }) {
    const [query, setQuery] = useState('')
@@ -22,7 +20,7 @@ export default function DropdownSort({
    const selectedOption = options.find((opt) => opt.label.some((label) => label.toLowerCase() === query.toLowerCase()))
 
    useEffect(() => {
-      if (query === '') onSelected({ query: 'no', order })
+      if (query === '') onSelected({ query: null, order })
       else if (selectedOption) onSelected({ query: selectedOption.value, order })
    }, [query, selectedOption, order])
 

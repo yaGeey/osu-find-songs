@@ -27,7 +27,7 @@ export default function Filters({
          {/* Main filters */}
          <div className="flex justify-between ">
             <div className="flex items-center gap-6.5">
-               <h4>Mode</h4>
+               <h4 className="font-outline-sm">Mode</h4>
                <SwitchFullDict
                   className="font-inter"
                   required
@@ -46,7 +46,7 @@ export default function Filters({
             <Search onSearch={onSearch} disabled={disabled} />
          </div>
          <section className="flex items-center gap-7.5">
-            <h4>State</h4>
+            <h4 className="font-outline-sm">State</h4>
             <SwitchFullDict
                className="font-inter"
                required
@@ -64,11 +64,11 @@ export default function Filters({
             />
          </section>
          <section className="flex items-center gap-5.5">
-            <h4>Filters</h4>
+            <h4 className="font-outline-sm">Filters</h4>
             <DropdownFilterMulti onSelected={(opt) => onFilterChange(opt)} disabled={disabled} />
          </section>
          <section className="flex items-center gap-4">
-            <h4>Sort by</h4>
+            <h4 className="font-outline-sm">Sort by</h4>
             <SwitchSort
                options={['title', 'artist', 'difficulty', 'date submitted', 'rating', 'plays', 'favorites', 'date in playlist']}
                onChange={(val, sort) => {

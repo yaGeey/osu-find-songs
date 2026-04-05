@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query"
-import { getDeadMirrors } from "../actions/osuMirrorsTracker"
-import { getPrioritizedMirrorsFilteredByDead } from "../osuMirrors"
+import { useQuery } from '@tanstack/react-query'
+import { getDeadMirrors } from '../actions/osuMirrorsTracker'
+import { getPrioritizedMirrorsFilteredByDead } from '../osuMirrors'
 
 export default function usePrepareMirrors() {
    useQuery({
@@ -21,6 +21,7 @@ export default function usePrepareMirrors() {
       retry: false,
       refetchInterval: 60 * 60 * 1000,
       refetchOnWindowFocus: false,
+      enabled: process.env.NODE_ENV === 'production',
    })
    return null
 }

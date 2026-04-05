@@ -1,6 +1,6 @@
 import { BeatmapSet } from '@/types/Osu'
-import { Track } from '@/types/Spotify'
-import { Combined, CombinedQueried, CombinedSingle, CombinedSingleSimple, Song, SongDataQueried } from '@/types/types'
+import { CombinedQueried, CombinedSingleSimple } from '@/types/types'
+import { GroupOptionValue, SortOptionValue } from './selectOptions'
 
 // filters
 export const filterFn = (exactSpotify: boolean) => (a: CombinedSingleSimple) => {
@@ -77,82 +77,76 @@ export function flatCombinedArray(arr: CombinedQueried): CombinedSingleSimple[] 
    }))
 }
 
-// group
-export function groupArray(groupFn: string, sortOrder: string, sortFn: string, combinedArray: CombinedSingleSimple[]) {
-   let groupedArray
-
-   // Grouping
-   // TODO sort grouping titles UI
-   if (groupFn === 'year') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.osu?.submitted_date?.split('-')[0] ?? 'Unknown')
-   } else if (groupFn === 'genre') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.osu?.genre.name ?? 'Unknown')
-   } else if (groupFn === 'length') {
-      groupedArray = Object.groupBy(combinedArray, (q) => {
-         if (!q.osu) return 'Unknown'
-         const length = q.osu.beatmaps[0].total_length
-         if (length < 60) return '< 1 minute'
-         if (length < 120) return '1 - 2 minutes'
-         if (length < 300) return '2 - 5 minutes'
-         if (length < 600) return '5 - 10 minutes'
-         return '> 10 minutes'
-      })
-   } else if (groupFn === 'artist') {
-      groupedArray = Object.groupBy(combinedArray, (q) => q.osu?.artist ?? 'Unknown')
-   } else if (groupFn === 'bpm') {
-      groupedArray = Object.groupBy(combinedArray, (q) => {
-         if (!q.osu) return 'Unknown'
-         const bpm = q.osu.bpm
-         if (bpm < 100) return '< 100 bpm'
-         if (bpm < 200) return '100 - 200 bpm'
-         if (bpm < 300) return '200 - 300 bpm'
-         return '> 300 bpm'
-      })
-   } else if (groupFn === 'no') {
-      groupedArray = { '': combinedArray }
-   } else {
-      groupedArray = { '': combinedArray }
-   }
-
-   // Sort each group
-   // TODO розберись, перепиши мб
-   const sortedGroupedArray = Object.entries(groupedArray).reduce(
-      (acc, [key, value]) => {
-         const sortedArray = value.sort((a, b) => {
-            const aData = sortOrder == 'asc' ? a.osu : b.osu
-            const bData = sortOrder == 'asc' ? b.osu : a.osu
-            if (!aData || !bData) return 0
-
-            switch (sortFn) {
-               case 'sort-artist':
-                  return aData.artist.localeCompare(bData.artist)
-               case 'sort-bpm':
-                  return aData.bpm - bData.bpm
-               case 'sort-creator':
-                  return aData.creator.localeCompare(bData.creator)
-               case 'sort-date':
-                  return 0
-               case 'sort-date-mapped':
-                  return new Date(aData.submitted_date).getTime() - new Date(bData.submitted_date).getTime()
-               case 'sort-date-updated':
-                  return new Date(aData.last_updated).getTime() - new Date(bData.last_updated).getTime()
-               // case 'sort-dif': return aData.difficulty - bData.difficulty;
-               case 'sort-length':
-                  return aData.beatmaps[0].total_length - bData.beatmaps[0].total_length
-               case 'sort-title':
-                  return aData.title.localeCompare(bData.title)
-               default:
-                  return 0
-            }
+export const getGroupedArray = (groupFn: GroupOptionValue | null, combinedArray: CombinedSingleSimple[]) => {
+   switch (groupFn) {
+      case 'year':
+         return Object.groupBy(combinedArray, (q) => q.osu?.submitted_date?.split('-')[0] ?? 'Unknown')
+      case 'genre':
+         return Object.groupBy(combinedArray, (q) => q.osu?.genre.name ?? 'Unknown')
+      case 'length':
+         return Object.groupBy(combinedArray, (q) => {
+            if (!q.osu) return 'Unknown'
+            const length = q.osu.beatmaps[0].total_length
+            if (length < 60) return '< 1 minute'
+            if (length < 120) return '1 - 2 minutes'
+            if (length < 300) return '2 - 5 minutes'
+            if (length < 600) return '5 - 10 minutes'
+            return '> 10 minutes'
          })
+      case 'bpm':
+         return Object.groupBy(combinedArray, (q) => {
+            if (!q.osu) return 'Unknown'
+            const bpm = q.osu.bpm
+            if (bpm < 100) return '< 100 bpm'
+            if (bpm < 200) return '100 - 200 bpm'
+            if (bpm < 300) return '200 - 300 bpm'
+            return '> 300 bpm'
+         })
+      // case 'artist':
+      //    return Object.groupBy(combinedArray, (q) => q.osu?.artist ?? 'Unknown')
+      case null:
+         return { '': combinedArray }
+      default:
+         throw new Error(`Unknown group function: ${groupFn satisfies never}`)
+   }
+}
 
-         acc[key] = sortedArray
-         return acc
-      },
-      {} as Record<string, typeof combinedArray>,
+const sortBeatmaps = (sortFn: SortOptionValue | null, a: BeatmapSet | null, b: BeatmapSet | null) => {
+   if (!a || !b) return 0
+   switch (sortFn) {
+      case 'artist':
+         return a.artist.localeCompare(b.artist)
+      case 'bpm':
+         return a.bpm - b.bpm
+      case 'creator':
+         return a.creator.localeCompare(b.creator)
+      case 'date-updated':
+         return new Date(a.last_updated).getTime() - new Date(b.last_updated).getTime()
+      case 'length':
+         return a.beatmaps[0].total_length - b.beatmaps[0].total_length
+      case 'title':
+         return a.title.localeCompare(b.title)
+      case null:
+         return 0
+      default:
+         throw new Error(`Unknown sort function: ${sortFn satisfies never}`)
+   }
+}
+
+export function sortGroupedArray(
+   sortFn: SortOptionValue | null,
+   sortOrder: 'asc' | 'desc',
+   groupedArray: ReturnType<typeof getGroupedArray>,
+) {
+   return Object.fromEntries(
+      Object.entries(groupedArray).map(([key, value]) => {
+         const sortedArray = value.toSorted((a, b) => {
+            const comparison = sortBeatmaps(sortFn, a.osu, b.osu)
+            return comparison * (sortOrder === 'asc' ? 1 : -1)
+         })
+         return [key, sortedArray]
+      }),
    )
-
-   return sortedGroupedArray
 }
 
 // TODO розберись, це чат гпт
@@ -160,9 +154,6 @@ export function mergeGroupedArrays<T>(grouped: Record<string, any[]>[]) {
    return grouped.reduce(
       (acc, obj) => {
          for (const [key, value] of Object.entries(obj)) {
-            // ❌ НЕБЕЗПЕЧНО: Spread operator на великих масивах
-            // acc[key] = [...(acc[key] || []), ...(value || [])]
-            // ✅ БЕЗПЕЧНО: Використання concat (створює новий масив, не використовуючи стек)
             acc[key] = (acc[key] || []).concat(value || [])
          }
          return acc

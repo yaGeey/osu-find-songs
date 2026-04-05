@@ -6,6 +6,8 @@ import { cookies } from 'next/headers'
 import { getHash, updateHashes } from './hashes'
 import { AxiosError, isAxiosError } from 'axios'
 
+// TODO for graph handle error when hash is wrong - returns an json error
+
 const playlistHash = await getHash('fetchPlaylist')
 
 const headers = {

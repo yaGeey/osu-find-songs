@@ -3,26 +3,26 @@ import { type FilterOption } from './FilterOptions'
 import DropdownInput from './bricks/DropdownInput'
 import { twMerge as tw } from 'tailwind-merge'
 
-export default function Dropdown({
+export default function Dropdown<T>({
    onSelected,
    placeholder,
    options,
    disabled,
    width = 130,
 }: {
-   onSelected: (option: FilterOption) => void
+   onSelected: (option: FilterOption | null) => void
    placeholder: string
    options: FilterOption[]
    disabled?: boolean
    width?: number
 }) {
-   const [query, setQuery] = useState('')
+   const [query, setQuery] = useState<string>('')
    const [isOpen, setIsOpen] = useState(false)
    const filtered = options.filter((opt) => [opt.label].flat().join(' ').toLowerCase().includes(query.toLowerCase()))
    const selectedOption = options.find((opt) => opt.label.some((label) => label.toLowerCase() === query.toLowerCase()))
 
    useEffect(() => {
-      if (query === '') onSelected({ value: 'no', label: [''] })
+      if (!query) onSelected(null)
       else if (selectedOption) onSelected(selectedOption)
    }, [query, selectedOption])
 

@@ -126,12 +126,14 @@ export default function OsuCard({
             className="no-jump select-none absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white hover:w-[calc(100%-5.25rem-1.75rem)] hover:rounded-r-[14px]"
          >
             {/* INFORMATION */}
-            <div className="truncate drop-shadow-xs/30">
+            <div className="truncate font-outline">
                <h2 className="font-semibold text-[17px]">{beatmapset.title}</h2>
                <h3 className="font-medium text-sm -mt-1">from {beatmapset.artist}</h3>
             </div>
-            <h4 className="font-inter-tight text-xs">
-               <span className="drop-shadow-xs/20">created by</span> <span className="selected">{beatmapset.creator}</span>
+            <h4 className="text-xs">
+               <span className="font-outline-sm">
+                  mapped by <span className="text-accent-light">{beatmapset.creator}</span>
+               </span>
             </h4>
             <div className="flex gap-2.5 text-main-gray text-[11px] items-center ">
                <FontAwesomeIcon icon={faHeart} />

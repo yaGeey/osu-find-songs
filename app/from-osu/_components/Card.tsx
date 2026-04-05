@@ -5,26 +5,25 @@ import { twMerge as tw } from 'tailwind-merge'
 import React from 'react'
 import Spinner from 'react-spinner-material'
 import ErrorBackdrop from '../../../components/state/ErrorBackdrop'
+import { SortOptionValue } from '@/utils/selectOptions'
 
-const getSortValue = (sortFn: string, c: CombinedSingleSimple) => {
+const getSortValue = (sortFn: SortOptionValue, c: CombinedSingleSimple) => {
    if (!c.osu || !c.spotify) return null
    switch (sortFn) {
-      case 'sort-title':
-         return null
-      case 'sort-artist':
-         return null
-      case 'sort-bpm':
+      case 'title':
+      case 'artist':
+      case 'bpm':
          return Math.round(c.osu.bpm!)
-      case 'sort-creator':
+      case 'creator':
          return c.osu.creator
-      case 'sort-date':
-         return null
-      case 'sort-date-updated':
+      case 'date-updated':
          return c.osu.last_updated ? new Date(c.osu.last_updated).toLocaleDateString() : null
-      case 'sort-length':
+      case 'length':
          return c.osu.beatmaps[0].total_length
             ? new Date(c.osu.beatmaps[0].total_length * 1000).toISOString().slice(14, 19)
             : null
+      default:
+         throw new Error(`Unknown sort function: ${sortFn satisfies never}`)
    }
 }
 
@@ -36,7 +35,7 @@ function Card({
    className,
 }: {
    data: CombinedSingleSimple
-   sortFn?: string
+   sortFn: SortOptionValue | null
    selected: boolean
    onClick?: ({ osu, spotify, local }: CombinedSingleSimple) => void
    className?: string

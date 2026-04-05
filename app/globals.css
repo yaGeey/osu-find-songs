@@ -19,7 +19,7 @@ body {
    --color-main-subtle: oklch(0.55 0.06 20); /* 3 */
    --color-main-dark: oklch(0.6 0.1 20);
    --color-main-dark-vivid: oklch(0.55 0.1 20);
-   --color-main-darker: oklch(0.5 0.07 20);
+   --color-main-darker: oklch(0.485 0.075 20);
    --color-main-border: oklch(0.43 0.075 20);
    --color-main-gray: oklch(0.3 0 0); /* 1 */
 
@@ -52,6 +52,7 @@ body {
 
    --font-inter: 'Inter', sans-serif;
    --font-inter-tight: 'Inter Tight', sans-serif;
+   --font-nunito: 'Nunito Sans', sans-serif;
 
    --text-xs: 0.75rem;
 }
@@ -98,12 +99,18 @@ body {
       @apply text-accent text-shadow-2xs/20;
    }
 
-   /* text-shadow-2xs/30*/
    .font-outline {
-      @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)];
+      /* @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.55)]; */
+      /* text-shadow: 0 1px 3px rgba(0, 0, 0, .75) */
+      text-shadow:
+         0 1px 2px rgba(0, 0, 0, 0.4),
+         0 0 5px rgba(0, 0, 0, 0.2);
    }
    .font-outline-sm {
-      @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)];
+      /* @apply drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.3)]; */
+      text-shadow:
+         0 1px 2px rgba(0, 0, 0, 0.3),
+         0 0 5px rgba(0, 0, 0, 0.15);
    }
    .input-parent {
       @apply border-2 border-main-border bg-gray-200 rounded-full flex items-center gap-1 px-1.5 w-fit h-[26px] transition-all text-sm;

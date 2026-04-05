@@ -1,7 +1,6 @@
 'use server'
 import { BeatmapSet } from '@/types/Osu'
-import axios from 'axios'
-import { customAxios } from '../axios'
+import { customAxios } from '../../axios'
 import { cookies } from 'next/headers'
 
 let tokenRefreshPromise: Promise<string> | null = null
@@ -33,21 +32,8 @@ async function getToken(): Promise<string> {
 }
 
 async function fetchOsu<T>(func: (token: string) => Promise<T>, retries = 3): Promise<T> {
-   try {
-      const token = await getToken()
-      return await func(token)
-   } catch (err) {
-      if (axios.isAxiosError<{ error: string }>(err)) {
-         if (err.response?.status === 429 || (err.response?.data.error === 'Too Many Attempts' && retries > 0)) {
-            const jitter = Math.random() * 400
-            const delay = 300 + jitter
-            console.warn(`OSU 429. Retry in ${Math.floor(delay)}ms`)
-            await new Promise((resolve) => setTimeout(resolve, delay))
-            return fetchOsu(func, retries - 1)
-         }
-      }
-      throw err
-   }
+   const token = await getToken()
+   return await func(token)
 }
 
 export async function getBeatmap(id: string): Promise<BeatmapSet> {
