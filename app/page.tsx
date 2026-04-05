@@ -127,9 +127,8 @@ function NavigationButtons({ details }: { details: string }) {
                      'scale-105 animate-border-from-osu [box-shadow:0_0_60px_1px_var(--color-animated-border)]',
                   details !== 'from-osu' && 'border-from-osu',
                )}
-               disabled
             >
-               Currently unavailable
+               Beatmaps to Spotify
             </Button>
          </Link>
          <Link href="/from-spotify/select">

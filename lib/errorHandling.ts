@@ -34,7 +34,7 @@ export const getErrorHandlingMeta = (err: unknown, context: string) => {
    if (isAxiosError(err)) {
       const ignoredErrors = (err.config?.ignoredErrors || []).concat(ignoredErrorStatuses)
       const status = err.response?.status || err.status
-      if (status && ignoredErrors?.includes(status)) {
+      if ((status && ignoredErrors?.includes(status)) || err.code === 'ERR_NETWORK') {
          return { skip: true, context }
       }
       if (err.config && err.config.context) {

@@ -1,10 +1,12 @@
 import useTimeLeft from '@/hooks/useTimeLeft'
 import clientAxios from '@/lib/client-axios'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
-import { BeatmapSet } from '@/types/Osu'
 import { Song } from '@/types/types'
+import { MAX_SPOTIFY_SEARCH_CONCURRENCY } from '@/variables'
 import { useQueries } from '@tanstack/react-query'
+import pLimit from 'p-limit'
 import { useEffect, useRef } from 'react'
+const limit = pLimit(MAX_SPOTIFY_SEARCH_CONCURRENCY)
 
 export default function useSpotifySearch({ chunks }: { chunks: Song[][] }) {
    const addTimeLeftRef = useRef<(time: number) => void>(() => {})
@@ -14,9 +16,12 @@ export default function useSpotifySearch({ chunks }: { chunks: Song[][] }) {
          queryKey: ['spotifyChunk', c.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', c, {
-               context: 'spotify search',
-            })
+            const res = await limit(() =>
+               clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', c, {
+                  context: 'spotify search',
+                  ignoredErrors: [504],
+               }),
+            )
             addTimeLeftRef.current(performance.now() - t0)
             return res.data
          },
@@ -30,7 +35,6 @@ export default function useSpotifySearch({ chunks }: { chunks: Song[][] }) {
    }, [addTimeLeft])
 
    const isFetching = queries.some((q) => q.isFetching)
-   // const data = queries.map((q) => q.data).filter((d): d is BeatmapSet[] => !!d)
 
    return { isFetching, queries, timeLeft, msLeft }
 }

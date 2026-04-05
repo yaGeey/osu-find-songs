@@ -1,8 +1,9 @@
 import { searchSongWithConditions } from '@/lib/spotify/helpers'
 import { Song } from '@/types/types'
-import { OSU_BATCH_SIZE } from '@/variables'
+import { MAX_SPOTIFY_SEARCH_CONCURRENCY, OSU_BATCH_SIZE } from '@/variables'
 import pLimit from 'p-limit'
-const limit = pLimit(3)
+// TODO maybe remove pLimit or make it conccurent to emulate user? 
+const limit = pLimit(MAX_SPOTIFY_SEARCH_CONCURRENCY)
 
 export async function POST(req: Request) {
    const songs: Song[] = await req.json()

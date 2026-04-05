@@ -2,8 +2,11 @@ import useTimeLeft from '@/hooks/useTimeLeft'
 import clientAxios from '@/lib/client-axios'
 import { BeatmapSet } from '@/types/Osu'
 import { Song } from '@/types/types'
+import { MAX_OSU_SEARCH_CONCURRENCY } from '@/variables'
 import { useQueries } from '@tanstack/react-query'
+import pLimit from 'p-limit'
 import { useEffect, useRef } from 'react'
+const limit = pLimit(MAX_OSU_SEARCH_CONCURRENCY)
 
 export default function useOsuSearch({ chunks }: { chunks: Song[][] }) {
    const addTimeLeftRef = useRef<(time: number) => void>(() => {})
@@ -13,13 +16,15 @@ export default function useOsuSearch({ chunks }: { chunks: Song[][] }) {
          queryKey: ['osuChunk', c.map((s) => s.id)],
          queryFn: async () => {
             const t0 = performance.now()
-            const res = await clientAxios.get<BeatmapSet[] | null>(`/api/batch/osu`, {
-               params: {
-                  id: c.map((s) => s.id),
-               },
-               paramsSerializer: { indexes: null },
-               context: 'osu search',
-            })
+            const res = await limit(() =>
+               clientAxios.get<BeatmapSet[] | null>(`/api/batch/osu`, {
+                  params: {
+                     id: c.map((s) => s.id),
+                  },
+                  paramsSerializer: { indexes: null },
+                  context: 'osu search',
+               }),
+            )
 
             addTimeLeftRef.current(performance.now() - t0)
             return res.data

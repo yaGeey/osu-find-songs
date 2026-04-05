@@ -37,20 +37,17 @@ export default function FromOsu() {
    }, [songs, router])
 
    // chunk songs
-   const chunkedLocal = useMemo(() => {
-      const chunkSize =
-         songs.length <= MAX_PARALLEL_QUERIES * ABSOLUTE_MIN_CHUNK_SIZE
-            ? ABSOLUTE_MIN_CHUNK_SIZE
-            : Math.ceil(songs.length / MAX_PARALLEL_QUERIES)
-      console.log(`Using chunk size of ${chunkSize} for ${songs.length} songs.`)
-      return chunkArray(songs, chunkSize)
-   }, [songs])
+   const chunkSize = useMemo(() => {
+      if (songs.length <= MAX_PARALLEL_QUERIES * ABSOLUTE_MIN_CHUNK_SIZE) return ABSOLUTE_MIN_CHUNK_SIZE
+      return Math.ceil(songs.length / MAX_PARALLEL_QUERIES)
+   }, [songs.length])
+
+   const chunkedLocal = useMemo(() => chunkArray(songs, chunkSize), [songs, chunkSize])
 
    const sortFnName = useBaseStore((state) => state.sortFnName)
    const selectedGroup = useBaseStore((state) => state.selectedGroup)
    const current = useBaseStore((state) => state.current)
 
-   const [exactSpotify, setExactSpotify] = useState(false)
    const [groupFn, setGroupFn] = useState<GroupOptionValue | null>(null)
    const [isSettingsVisible, setIsSettingsVisible] = useState(false)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
@@ -58,7 +55,7 @@ export default function FromOsu() {
 
    useEffect(() => {
       useBaseStore.setState({ current: null })
-   }, [exactSpotify, groupFn, sortFnName])
+   }, [groupFn, sortFnName])
 
    // queries
    const sp = useSpotifySearch({ chunks: chunkedLocal })
@@ -89,7 +86,7 @@ export default function FromOsu() {
          if (group) items.push({ type: 'group', key: group })
 
          if (!group || group === selectedGroup) {
-            const filtered = groupedDict[group].filter(filterFn(exactSpotify)).filter(searchFilterFn(search))
+            const filtered = groupedDict[group].filter(searchFilterFn(search))
             filtered.forEach((data) => {
                items.push({ type: 'card', data })
             })
@@ -97,7 +94,7 @@ export default function FromOsu() {
       }
 
       return items
-   }, [groupedDict, selectedGroup, exactSpotify, search])
+   }, [groupedDict, selectedGroup, search])
 
    // Telemetry
    useFoTelemetry({
@@ -124,16 +121,8 @@ export default function FromOsu() {
             )}
          </AnimatePresence>
 
-         <Progress
-            isVisible={isFetching}
-            value={
-               ((combined.filter((q) => !q.isOsuLoading).length + combined.filter((q) => !q.isSpotifyLoading).length) * 100) /
-               (combined.length * 2)
-            }
-         >
-            {osu.msLeft > sp.msLeft
-               ? `${osu.queries.filter((q) => !q.isLoading).length}/${songs.length} | ${osu.timeLeft} left`
-               : `${sp.queries.filter((q) => !q.isLoading).length}/${songs.length} | ${sp.timeLeft} left`}
+         <Progress isVisible={isFetching} value={(combined.filter((q) => !q.isSpotifyLoading).length * 100) / combined.length}>
+            {`${sp.queries.filter((q) => !q.isLoading).length * chunkSize}/${songs.length} | ${sp.timeLeft} left`}
          </Progress>
 
          <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-12 flex justify-between items-center px-4 gap-3">
@@ -154,14 +143,6 @@ export default function FromOsu() {
             </section>
             <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />
             <section className="flex gap-2">
-               <Toggle
-                  value={exactSpotify}
-                  setValue={setExactSpotify}
-                  disabled={isFetching} //FIXME?  || !combined.some((i) => i.osu !== null)
-                  text={{ on: 'Exact Spotify match', off: 'Any Spotify match' }}
-                  width={175}
-                  className="max-[1075px]:!hidden"
-               />
                <Dropdown
                   onSelected={(option) => {
                      setGroupFn((option?.value as GroupOptionValue) ?? null)

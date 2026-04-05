@@ -1,10 +1,9 @@
-import { CombinedSingle, CombinedSingleSimple } from '@/types/types'
+import { CombinedSingleSimple } from '@/types/types'
 import Image from 'next/image'
 import Loading from '../../../components/state/Loading'
 import { twMerge as tw } from 'tailwind-merge'
 import React from 'react'
 import Spinner from 'react-spinner-material'
-import ErrorBackdrop from '../../../components/state/ErrorBackdrop'
 import { SortOptionValue } from '@/utils/selectOptions'
 
 const getSortValue = (sortFn: SortOptionValue, c: CombinedSingleSimple) => {
@@ -12,6 +11,7 @@ const getSortValue = (sortFn: SortOptionValue, c: CombinedSingleSimple) => {
    switch (sortFn) {
       case 'title':
       case 'artist':
+         return null
       case 'bpm':
          return Math.round(c.osu.bpm!)
       case 'creator':
@@ -51,21 +51,21 @@ function Card({
    return (
       <div
          className={tw(
-            'last:rounded-b-lg hover:py-2 hover:px-3 transition-all duration-300 ease-in-out',
+            'last:rounded-b-lg hover:px-3 transition-all duration-300 ease-in-out',
             selected && 'py-2 hover:px-0',
             (isSpotifyLoading || error || spotify === null) && 'pointer-events-none',
          )}
       >
          <div
             className={tw(
-               'bg-triangles-faded-right [--color-dialog:var(--color-main-dark)] select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out hover:opacity-85',
-               selected && 'opacity-85 sm:mr-20 rounded-lg hover:sm:mr-17',
+               'bg-triangles-faded-right [--color-dialog:var(--color-main-dark)] select-none relative justify-center items-center text-white flex w-[500px] min-h-[95px] overflow-hidden border-[5px] border-main-border rounded-l-lg transition-all duration-300 ease-in-out',
+               selected && 'opacity-85 sm:mr-10 rounded-lg hover:sm:mr-5',
                className,
             )}
             onClick={handleClick}
          >
             {isOsuLoading && isSpotifyLoading && <Loading />}
-            {error && spotify === null && <ErrorBackdrop msg={error} />}
+            {error && spotify === null && <ErrorMessage msg={error} />}
             {(local.image || osu?.covers.card) && (
                <div className="relative w-[150px] h-[86px]">
                   <Image
@@ -73,7 +73,6 @@ function Card({
                      alt={local.title || 'alt'}
                      fill
                      style={{ objectFit: 'cover' }}
-                     unoptimized
                   />
                </div>
             )}
@@ -105,14 +104,7 @@ function Card({
                   )}
                   {spotify && spotify.length == 1 && (
                      <a className="hover:brightness-120 transition-all" href={'https://open.spotify.com/track/' + spotify[0].id}>
-                        <Image
-                           src="/icons/Spotify.svg"
-                           width={30}
-                           height={30}
-                           alt="Spotify"
-                           unoptimized
-                           className="animation-in fade-in w-[30px] h-[30px] shrink-0"
-                        />
+                        <SpotifyIcon />
                      </a>
                   )}
                   {spotify && spotify.length > 1 && spotify.length !== 20 && (
@@ -120,14 +112,7 @@ function Card({
                         <span className="text-white bg-red-400 rounded-full absolute text-xs left-5 -top-1 font-bold w-4 h-4 flex items-center justify-center select-none">
                            {spotify.length}
                         </span>
-                        <Image
-                           src="/icons/Spotify.svg"
-                           width={30}
-                           height={30}
-                           alt="Spotify"
-                           unoptimized
-                           className="w-[30px] h-[30px] min-w-[30px] shrink-0"
-                        />
+                        <SpotifyIcon />
                      </div>
                   )}
                </div>
@@ -137,3 +122,22 @@ function Card({
    )
 }
 export default React.memo(Card)
+
+function SpotifyIcon() {
+   return (
+      <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className="w-[30px] h-[30px] min-w-[30px] shrink-0" />
+   )
+}
+
+function ErrorMessage({ msg }: { msg: string }) {
+   return (
+      <div
+         className={`absolute top-0 left-0 w-full h-full flex justify-center items-center z-50 brightness-75 [backdrop-filter:blur(1.5px)]`}
+      >
+         <p className="text-error flex items-center justify-center gap-2">
+            <span className=" text-6xl mb-1.5">&times;</span>
+            <span>{msg}</span>
+         </p>
+      </div>
+   )
+}

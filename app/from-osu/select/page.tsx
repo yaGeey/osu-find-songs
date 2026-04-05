@@ -40,6 +40,7 @@ export default function SelectPage() {
       const folders = new Map<string, File[]>()
       for (const file of fileList) {
          const parts = file.webkitRelativePath.split('/')
+         if (parts.length <= 1) continue
          const folderName = parts[1]
          if (!folders.has(folderName)) {
             folders.set(folderName, [])
@@ -49,43 +50,50 @@ export default function SelectPage() {
 
       // getting data
       for (const [folderName, files] of folders) {
-         const songParts = folderName.split(' ')
+         try {
+            const mapParts = folderName.split(' ')
 
-         // check if folder is map folder
-         const id = songParts.length > 0 && !isNaN(parseInt(songParts[0])) ? songParts.shift() : null
-         if (!id) continue
+            // check if folder is map folder
+            const id = mapParts.length > 0 && !isNaN(parseInt(mapParts[0])) ? mapParts.shift() : null
+            if (!id) continue
 
-         const osuFile = files.find((f) => f.name.endsWith('.osu'))
-         if (!osuFile) continue
+            const osuFile = files.find((f) => f.name.endsWith('.osu'))
+            if (!osuFile) continue
 
-         // getting file content -> bg filename
-         const content = await readFileAsText(osuFile)
-         const lines = content.split('\n')
-         let bgFileName: null | string = null
+            // getting file content -> bg filename
+            const content = await readFileAsText(osuFile)
+            const lines = content.split('\n')
 
-         lines.forEach((line, i) => {
-            if (!bgFileName && line.trim().startsWith('//Background and Video events')) {
-               const bgLine = lines[i + 1]
-               const match = bgLine.match(/"(.*?)"/)
-               if (match) bgFileName = match[1]
+            let bgFileName: null | string = null
+
+            for (let i = 0; i < lines.length; i++) {
+               const line = lines[i]
+
+               if (!bgFileName && line.trim().startsWith('//Background and Video events')) {
+                  const bgLine = lines[i + 1]
+                  const match = bgLine.match(/"(.*?)"/)
+                  if (match) bgFileName = match[1]
+               }
             }
-         })
-         if (!bgFileName) continue
+            if (!bgFileName) continue // TODO we can live without bg
 
-         // searching bg file
-         const imageFile = files.find((f) => f.name === bgFileName)
-         if (!imageFile) continue
-         const image = URL.createObjectURL(imageFile)
+            // searching bg file
+            const imageFile = files.find((f) => f.name === bgFileName)
+            if (!imageFile) continue
+            const image = URL.createObjectURL(imageFile)
 
-         const songName = songParts.join(' ').split(' - ')
-         const songKey = `${songName[0]} - ${songName[1]}`
-         songs.push({
-            author: songName[0],
-            title: songName[1],
-            text: songKey,
-            image,
-            id,
-         })
+            const mapName = mapParts.join(' ').split(' - ')
+            const title = mapName[1].replace('[no video]', '').trim()
+            songs.push({
+               author: mapName[0],
+               title,
+               text: `${mapName[0]} - ${title}`,
+               image,
+               id,
+            })
+         } catch (err) {
+            console.warn(`Skipping folder "${folderName}" due to read/parse error`, err)
+         }
       }
       setSongs(songs)
       router.push('/from-osu')

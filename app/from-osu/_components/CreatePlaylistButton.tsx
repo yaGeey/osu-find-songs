@@ -138,7 +138,7 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Spotif
                               </CustomLink>
                            </span>
                            <p className="text-sm">
-                              {data.length === dataTotal
+                              {data.length !== dataTotal
                                  ? 'You can save it while tracks are being added'
                                  : 'Thanks for using the app'}
                            </p>

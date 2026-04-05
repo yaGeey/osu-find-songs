@@ -102,8 +102,8 @@ export const getGroupedArray = (groupFn: GroupOptionValue | null, combinedArray:
             if (bpm < 300) return '200 - 300 bpm'
             return '> 300 bpm'
          })
-      // case 'artist':
-      //    return Object.groupBy(combinedArray, (q) => q.osu?.artist ?? 'Unknown')
+      case 'artist':
+         return Object.groupBy(combinedArray, (q) => q.osu?.artist ?? 'Unknown')
       case null:
          return { '': combinedArray }
       default:

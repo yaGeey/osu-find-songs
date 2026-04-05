@@ -1,9 +1,10 @@
 import { beatmapsSearch } from '@/lib/osu/actions/osu'
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { BeatmapSet } from '@/types/Osu'
+import { MAX_OSU_SEARCH_CONCURRENCY } from '@/variables'
 export const revalidate = 0
 
-const manager = RateLimitManager.getInstance('osu', { maxConcurrency: 3 })
+const manager = RateLimitManager.getInstance('osu', { maxConcurrency: MAX_OSU_SEARCH_CONCURRENCY })
 export async function POST(req: Request) {
    const { qs, m, s } = await req.json()
 

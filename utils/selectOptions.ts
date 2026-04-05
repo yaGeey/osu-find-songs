@@ -9,13 +9,14 @@ export const sortOptions: { value: SortOptionValue; label: string[] }[] = [
    { value: 'title', label: ['title'] },
 ]
 
-const groupOptionValues = ['bpm', 'genre', 'length', 'year'] as const
+const groupOptionValues = ['artist', 'bpm', 'genre', 'length', 'year'] as const
 export type GroupOptionValue = (typeof groupOptionValues)[number]
 export const groupOptions: { value: GroupOptionValue; label: string[] }[] = [
-   { value: 'bpm', label: ['bpm'] },
+   { value: 'artist', label: ['artist'] },
    { value: 'genre', label: ['genre'] },
-   { value: 'length', label: ['length'] },
    { value: 'year', label: ['year'] },
+   { value: 'bpm', label: ['bpm', 'beats per minute'] },
+   { value: 'length', label: ['length'] },
 ]
 
 export const filterOptions = [{ value: 'exact-spotify', label: 'Exact Spotify match' }]

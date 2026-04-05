@@ -65,7 +65,7 @@ export default function DropdownInput({
                   <li
                      key={opt.value}
                      onClick={() => handleSelect(opt)}
-                     className="px-2 py-0.5 hover:bg-gray-200 cursor-pointer text-sm text-main-gray"
+                     className="px-2 py-0.5 hover:bg-gray-100 rounded-md cursor-pointer text-sm text-main-gray"
                      onMouseDown={(e) => e.preventDefault()}
                   >
                      {opt.label[0]}

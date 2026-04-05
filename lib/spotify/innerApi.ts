@@ -274,6 +274,8 @@ export async function addToPlaylist(playlistUri: string, tracksUris: string[]) {
          playlistItemUris: tracksUris,
          playlistUri,
       },
-      await getHash('addToPlaylist'),
+      // FIXME critical hash
+      // await getHash('addToPlaylist'),
+      '47b2a1234b17748d332dd0431534f22450e9ecbb3d5ddcdacbd83368636a0990',
    )
 }
