@@ -19,7 +19,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       if (audio) audio.pause()
 
       const newAudio = new Audio(url)
-      newAudio.volume = 0.5
+      newAudio.volume = 0.8
       newAudio.play().catch((error) => {
          toast.error('Playback failed:', error)
          set({ currentUrl: null, audio: null })

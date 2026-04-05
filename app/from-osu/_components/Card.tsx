@@ -92,13 +92,27 @@ function Card({
                   )}
                   {!osu && !isSpotifyLoading && (
                      <div className="relative w-[30px] h-[30px] flex justify-center items-center">
-                        <Image src="icons/osu.svg" width={30} height={30} alt="osu" className="animation-in fade-in blur-[1px]" />
+                        <Image
+                           src="/icons/osu.svg"
+                           width={30}
+                           height={30}
+                           alt="osu"
+                           unoptimized
+                           className="animation-in fade-in blur-[1px] w-[30px] h-[30px] shrink-0"
+                        />
                         {isOsuLoading && <Spinner radius={33} color="#ff87c6" stroke={3} visible={true} className="absolute" />}
                      </div>
                   )}
                   {spotify && spotify.length == 1 && (
                      <a className="hover:brightness-120 transition-all" href={'https://open.spotify.com/track/' + spotify[0].id}>
-                        <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className="animation-in fade-in" />
+                        <Image
+                           src="/icons/Spotify.svg"
+                           width={30}
+                           height={30}
+                           alt="Spotify"
+                           unoptimized
+                           className="animation-in fade-in w-[30px] h-[30px] shrink-0"
+                        />
                      </a>
                   )}
                   {spotify && spotify.length > 1 && spotify.length !== 20 && (
@@ -106,7 +120,14 @@ function Card({
                         <span className="text-white bg-red-400 rounded-full absolute text-xs left-5 -top-1 font-bold w-4 h-4 flex items-center justify-center select-none">
                            {spotify.length}
                         </span>
-                        <Image src="/icons/Spotify.svg" width={30} height={30} alt="Spotify" className="min-w-[30px] w-[30px]" />
+                        <Image
+                           src="/icons/Spotify.svg"
+                           width={30}
+                           height={30}
+                           alt="Spotify"
+                           unoptimized
+                           className="w-[30px] h-[30px] min-w-[30px] shrink-0"
+                        />
                      </div>
                   )}
                </div>

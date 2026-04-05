@@ -31,7 +31,7 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
       >
          <CloseBtn
             onClick={() => useBaseStore.setState({ current: null })}
-            className="absolute right-2 top-2 visible lgx:invisible z-2 bg-main-dark-vivid"
+            className="absolute right-2 top-2 visible lgx:invisible z-100 bg-main-dark-vivid"
          />
          <div className="relative flex gap-4 border-b-4 border-main-border p-4">
             <Image

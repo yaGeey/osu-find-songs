@@ -122,19 +122,20 @@ function NavigationButtons({ details }: { details: string }) {
          <Link href="/from-osu/select">
             <Button
                className={tw(
-                  'w-70 py-2 text-black max-sm:w-fit',
+                  'w-70 py-2 text-black max-sm:w-fit disabled:brightness-50',
                   details === 'from-osu' &&
                      'scale-105 animate-border-from-osu [box-shadow:0_0_60px_1px_var(--color-animated-border)]',
                   details !== 'from-osu' && 'border-from-osu',
                )}
+               disabled
             >
-               Beatmaps to Spotify
+               Currently unavailable
             </Button>
          </Link>
          <Link href="/from-spotify/select">
             <Button
                className={tw(
-                  'w-70 py-2 text-black max-sm:w-fit',
+                  'w-70 py-2 text-black max-sm:w-fit disabled:brightness-50',
                   details === 'from-spotify' &&
                      'scale-105 animate-border-from-spotify [box-shadow:0_0_60px_1px_var(--color-animated-border)]',
                   details !== 'from-spotify' && 'border-from-spotify',
