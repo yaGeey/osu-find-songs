@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
    },
    experimental: {
       reactCompiler: true,
+      viewTransition: true,
    },
    productionBrowserSourceMaps: true,
 }

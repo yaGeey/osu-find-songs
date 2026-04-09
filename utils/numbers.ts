@@ -9,3 +9,11 @@ export function formatBytes(bytes: number, decimals = 1, si = false) {
    const i = Math.floor(Math.log(bytes) / Math.log(k))
    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + (si ? sizes[i] : '')
 }
+
+export function roundDownAndSaveDigits(num: number) {
+   const intNum = Math.floor(num)
+   if (intNum < 10) return 0
+   if (intNum < 100) return intNum - (intNum % 10)
+   if (intNum < 1000) return intNum - (intNum % 100)
+   return intNum - (intNum % 1000)
+}

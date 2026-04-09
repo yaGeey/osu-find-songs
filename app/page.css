@@ -93,3 +93,104 @@
 .go-front {
    animation: move-to-front 0.7s ease-in-out forwards;
 }
+
+/* ---------- TEXT SHINE ---------- */
+@keyframes text-shine {
+   0% {
+      background-position:
+         130% 50%,
+         0% 50%;
+   }
+   100% {
+      background-position:
+         -30% 50%,
+         0% 50%;
+   }
+}
+
+@keyframes text-shine-group {
+   0% {
+      background-position:
+         130% 50%,
+         0% 50%;
+   }
+   100% {
+      background-position:
+         -30% 50%,
+         0% 50%;
+   }
+}
+
+@keyframes text-shine-link {
+   0% {
+      background-position:
+         130% 50%,
+         0% 50%;
+   }
+   100% {
+      background-position:
+         -30% 50%,
+         0% 50%;
+   }
+}
+
+.text-shine-hover {
+   /* --shine-base: var(--color-brand-osu); */
+   --shine-color: color-mix(in oklch, var(--shine-base), white 30%);
+   background-image:
+      linear-gradient(110deg, transparent 40%, var(--shine-color) 50%, transparent 60%),
+      linear-gradient(to right, var(--shine-color), var(--shine-base));
+   background-size:
+      220% 100%,
+      100% 100%;
+   background-position:
+      130% 50%,
+      0% 50%;
+   background-repeat: no-repeat;
+   will-change: background-position;
+}
+
+.text-shine-once {
+   animation: text-shine 1.1s ease-out 1;
+}
+
+.group:hover .text-shine-hover:not(:hover) {
+   animation: text-shine-group 1.1s ease-out 1;
+}
+
+.text-shine-hover:hover {
+   animation: text-shine-link 1.1s ease-out 1;
+   /* text-shadow: 0 0 10px #0D7CFF, 0 0 20px #0D7CFF, 0 0 30px #0D7CFF, 0 0 40px #0D7CFF; */
+}
+
+/* ---------- BROKEN LIGHT TITLE ---------- */
+@keyframes broken-light-blink {
+   0% {
+      opacity: 1;
+      filter: drop-shadow(0 1px 5px var(--color-main-light));
+   }
+   15% {
+      opacity: 0.5;
+      filter: drop-shadow(0 0 1px color-mix(in oklch, var(--color-main-light), transparent 75%));
+   }
+   30% {
+      opacity: 1;
+      filter: drop-shadow(0 1px 6px var(--color-main-light));
+   }
+   55% {
+      opacity: 0.7;
+      filter: drop-shadow(0 0 2px color-mix(in oklch, var(--color-main-light), transparent 65%));
+   }
+   100% {
+      opacity: 1;
+      filter: drop-shadow(0 1px 5px var(--color-main-light));
+   }
+}
+
+.broken-light-title {
+   filter: drop-shadow(0 1px 5px var(--color-main-light));
+}
+
+.group:hover .broken-light-title {
+   animation: broken-light-blink 0.65s steps(1, end) 1;
+}

@@ -20,6 +20,18 @@ export async function sendMapDownloadTelemetry({
    `
 }
 
+//* Stats *//
+export async function getMapsDownloadedCount() {
+   const result = await sql`
+      SELECT COUNT(*) AS count
+      FROM downloads
+   `
+   return parseInt(result[0].count, 10)
+}
+export async function getPlaylistsCreatedCount() {
+   
+}
+
 //* Fo Telemetry *//
 
 export async function foTelemetryStart(mapsAmount: number, sessionId?: string) {
