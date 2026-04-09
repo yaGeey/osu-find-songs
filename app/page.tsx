@@ -1,26 +1,27 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import Footer from '@/components/Footer'
 import './page.css'
-import icon from '@/public/icon.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { Suspense } from 'react'
 import { MapsDownloaded, PlaylistsCreated } from '@/components/AnimatedNumers'
 import Overlay from '@/components/Overlay'
-import { ViewTransition } from 'react'
 
 export default async function LandingPage() {
    return (
       <main className="relative grid grid-cols-2 max-sm:grid-cols-1 h-screen w-screen text-white">
          <Overlay />
-         <Link href="/from-osu/select" className="relative overflow-hidden flex items-center justify-center group">
+         <Link
+            href="/from-osu/select"
+            className="relative overflow-hidden flex items-center justify-center group"
+            transitionTypes={['nav-forward']}
+         >
             <Image
-               src="/fo.webp"
+               src="/fo2.webp"
                alt="fo"
                fill
                priority
-               className="object-cover blur-[2px] brightness-25 group-hover:scale-105 transition-[scale] ease-in"
+               className="object-cover object-right blur-[2px] brightness-25 group-hover:scale-102 transition-[scale] ease-in"
             />
             <div className="absolute grid items-center text-center gap-7 font-medium group">
                <div className="grid gap-2">
@@ -41,20 +42,27 @@ export default async function LandingPage() {
                   Select an osu folder
                </span>
                <h4 className="text-base font-normal text-main-white">
-                  <Suspense fallback="...">
+                  <Suspense fallback={<span className='opacity-0'>...</span>}>
                      <PlaylistsCreated />
                   </Suspense>
                </h4>
             </div>
          </Link>
 
-         <Link href="/from-spotify/select" className="relative overflow-hidden flex items-center justify-center group">
+         <div className="absolute top-0 bottom-0 bg-main w-5 brightness-25 mx-auto inset-0 blur-sm z-1 sm:visible invisible"/>
+         <div className="absolute left-0 right-0 bg-main h-5 brightness-25 my-auto inset-0 blur-sm z-1 visible sm:invisible"/>
+
+         <Link
+            href="/from-spotify/select"
+            className="relative overflow-hidden flex items-center justify-center group"
+            transitionTypes={['nav-forward']}
+         >
             <Image
-               src="/fs.webp"
+               src="/fs2.webp"
                alt="fs"
                fill
                priority
-               className="object-cover blur-[2px] brightness-25 group-hover:scale-105 transition-[scale] ease-in"
+               className="object-cover object-left blur-[2px] brightness-25 group-hover:scale-102 transition-[scale] ease-in"
             />
             <div className="absolute grid items-center text-center gap-7 font-medium group">
                <div className="grid gap-2">
@@ -69,18 +77,12 @@ export default async function LandingPage() {
                   Select a playlist
                </span>
                <h4 className="text-base font-normal text-main-white">
-                  <Suspense fallback="...">
+                  <Suspense fallback={<span className='opacity-0'>...</span>}>
                      <MapsDownloaded />
                   </Suspense>
                </h4>
             </div>
          </Link>
-         <div className="absolute top-0 w-full h-[70px] bg-main-dark-vivid/30 backdrop-blur-xs flex items-center justify-center">
-            <div className="flex gap-3 items-center">
-               <Image src={icon} alt="osufindsongs - tool for osu and spotify" className="size-10" placeholder="blur" />
-               <h1 className="text-3xl font-medium tracking-tight">osufindsongs</h1>
-            </div>
-         </div>
 
          <div className="sr-only">
             <section>

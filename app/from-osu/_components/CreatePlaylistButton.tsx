@@ -1,25 +1,21 @@
 import { Button } from '@/components/buttons/Buttons'
 import CustomLink from '@/components/CustomLink'
 import Modal, { ModalProps } from '@/components/Modal'
+import useSessionId from '@/hooks/useSessionId'
 import { createPlaylist, addToPlaylist } from '@/lib/spotify/innerApi'
+import { playlistCreated } from '@/lib/telemetry'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LinearProgress } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
-export default function CreatePlaylistButton({ data, dataTotal }: { data: SpotifyTrack[][]; dataTotal: number }) {
+export default function CreatePlaylistButton({ data, dataTotal }: { data: (SpotifyTrack[] | null)[]; dataTotal: number }) {
    const [isOpen, setOpen] = useState(true)
    const [textState, setTextState] = useState<'error' | 'ready' | 'creating'>('ready')
    const [step, setStep] = useState<'confirm' | 'playlistCreation' | 'allowNotifications'>('confirm')
    const isTracksLoadingFinished = data.length === dataTotal && dataTotal > 0
-
-   const trackUris = useMemo(() => {
-      const filteredErrors = data.filter(Boolean)
-      const strictSearchRes = filteredErrors.filter((track) => track.length !== 20)
-      return strictSearchRes.map((tracks) => tracks[0].uri)
-   }, [data])
 
    const createPlaylistMutation = useMutation({
       mutationFn: ({ name, description }: { name: string; description: string }) => createPlaylist({ name, description }),
@@ -28,10 +24,11 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Spotif
          setTextState('error')
       },
    })
+   const playlistId = createPlaylistMutation.data?.uri.split(':').pop()
 
    const addItemsMutation = useMutation({
       mutationFn: async ({ playlistUri, tracksUris }: { playlistUri: string; tracksUris: string[] }) => {
-         if (trackUris.length === 0) throw new Error('No tracks found to add to playlist')
+         if (tracksUris.length === 0) throw new Error('No tracks found to add to playlist')
          return await addToPlaylist(playlistUri, tracksUris)
       },
       onError: (err) => {
@@ -54,24 +51,28 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Spotif
    // add items to playlist
    useEffect(() => {
       if (createPlaylistMutation.data && step === 'playlistCreation' && addItemsMutation.isIdle && isTracksLoadingFinished) {
-         const filteredErrors = data.filter(Boolean)
-         const strictSearchRes = filteredErrors.filter((track) => track.length !== 20)
-         const tracks = strictSearchRes.map((tracks) => tracks[0])
-
          addItemsMutation.mutate({
             playlistUri: createPlaylistMutation.data.uri,
-            tracksUris: tracks.map((track) => track.uri),
+            tracksUris: data.filter(Boolean).map((tracks) => tracks![0].uri),
          })
       }
    }, [step, createPlaylistMutation.data, isTracksLoadingFinished])
 
-   // notification
+   // notification and telemetry
+   const sessionId = useSessionId()
    const isNotifiedRef = useRef(false)
    useEffect(() => {
-      if (!isNotifiedRef.current && isTracksLoadingFinished && createPlaylistMutation.isSuccess && addItemsMutation.isSuccess) {
+      if (
+         !isNotifiedRef.current &&
+         isTracksLoadingFinished &&
+         createPlaylistMutation.isSuccess &&
+         addItemsMutation.isSuccess &&
+         playlistId
+      ) {
          new Notification('Your playlist is ready')
          isNotifiedRef.current = true
          setTextState('ready')
+         if (sessionId) playlistCreated(playlistId, sessionId)
       }
    }, [data, dataTotal, addItemsMutation.isSuccess, createPlaylistMutation.isSuccess])
 
@@ -119,9 +120,7 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Spotif
                ],
             }
          case 'playlistCreation': {
-            const plUrl = createPlaylistMutation.data
-               ? `https://open.spotify.com/playlist/${createPlaylistMutation.data.uri.split(':').pop()}`
-               : null
+            const plUrl = playlistId ? `https://open.spotify.com/playlist/${playlistId}` : null
             const isError = createPlaylistMutation.isError || addItemsMutation.isError
             const status = isError ? 'error' : !plUrl || addItemsMutation.isPending ? 'loading' : 'success'
             return {
@@ -157,7 +156,7 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Spotif
                                  <LinearProgress color="inherit" />
                               </div>
                            </>
-                        ) : data.length === dataTotal ? (
+                        ) : data.length === dataTotal && data.length !== 0 ? (
                            <>
                               <span>All tracks added &#10004;</span>
                               <div className="text-success">

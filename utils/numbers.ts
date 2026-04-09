@@ -13,7 +13,7 @@ export function formatBytes(bytes: number, decimals = 1, si = false) {
 export function roundDownAndSaveDigits(num: number) {
    const intNum = Math.floor(num)
    if (intNum < 10) return 0
-   if (intNum < 100) return intNum - (intNum % 10)
+   if (intNum < 100) return intNum / 2 - (intNum / 2 % 10)
    if (intNum < 1000) return intNum - (intNum % 100)
    return intNum - (intNum % 1000)
 }

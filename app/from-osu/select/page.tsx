@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 import { ToastContainer } from 'react-toastify'
-import Footer from '@/components/Footer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { twJoin, twMerge } from 'tailwind-merge'
@@ -157,7 +156,6 @@ export default function SelectPage() {
             </div>
          </div>
          <ToastContainer />
-         <Footer />
       </div>
    )
 }

@@ -1,21 +1,12 @@
-import { getMapsDownloadedCount } from '@/lib/telemetry'
+import { getMapsDownloadedCount, getPlaylistsCreatedCount } from '@/lib/telemetry'
 import AnimatedNumber from './AnimatedNumber'
 
 export async function MapsDownloaded() {
    const mapsDownloadedCount = await getMapsDownloadedCount()
-   return (
-      <span>
-         <AnimatedNumber value={mapsDownloadedCount} /> maps downloaded
-      </span>
-   )
+   return <AnimatedNumber value={mapsDownloadedCount} label="maps downloaded" />
 }
 
 export async function PlaylistsCreated() {
-   // const playlistsCreatedCount = await getPlaylistsCreatedCount()
-   const playlistsCreatedCount = 223
-   return (
-      <span>
-         <AnimatedNumber value={playlistsCreatedCount} /> playlists created
-      </span>
-   )
+   const playlistsCreatedCount = await getPlaylistsCreatedCount()
+   return <AnimatedNumber value={playlistsCreatedCount} label="playlists created" />
 }

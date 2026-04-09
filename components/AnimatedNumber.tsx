@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useSpring } from 'framer-motion'
+import { useSpring, motion } from 'framer-motion'
 import { roundDownAndSaveDigits } from '@/utils/numbers'
 
-export default function AnimatedNumber({ value: target, duration = 1000 }: { value: number; duration?: number }) {
+export default function AnimatedNumber({ value: target, duration = 1000, label }: { value: number; duration?: number, label?: string }) {
    const rounded = roundDownAndSaveDigits(target)
    const [displayValue, setDisplayValue] = useState(rounded)
 
@@ -17,5 +17,9 @@ export default function AnimatedNumber({ value: target, duration = 1000 }: { val
       spring.set(target)
    }, [target, spring])
 
-   return displayValue
+   return (
+      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+         {displayValue} {label}
+      </motion.span>
+   )
 }

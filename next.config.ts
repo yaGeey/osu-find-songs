@@ -5,13 +5,10 @@ const nextConfig: NextConfig = {
       domains: ['assets.ppy.sh', 'i.scdn.co', 'i.ytimg.com', 'i.imgur.com', 'lh3.googleusercontent.com'],
       // unoptimized: true,
    },
-   eslint: {
-      ignoreDuringBuilds: true,
-   },
    experimental: {
-      reactCompiler: true,
       viewTransition: true,
    },
+   cacheComponents: true,
    productionBrowserSourceMaps: true,
 }
 

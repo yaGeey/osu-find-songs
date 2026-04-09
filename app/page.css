@@ -136,7 +136,7 @@
 
 .text-shine-hover {
    /* --shine-base: var(--color-brand-osu); */
-   --shine-color: color-mix(in oklch, var(--shine-base), white 30%);
+   --shine-color: color-mix(in oklch, var(--shine-base), white 50%);
    background-image:
       linear-gradient(110deg, transparent 40%, var(--shine-color) 50%, transparent 60%),
       linear-gradient(to right, var(--shine-color), var(--shine-base));

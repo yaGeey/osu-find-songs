@@ -1,22 +1,10 @@
-'use client'
 import { faArrowUpRightFromSquare, faStar } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useQuery } from '@tanstack/react-query'
 import { getGitHubRepoLastUpdate, getGitHubRepoStarCount } from '@/lib/github'
 
-export default function Footer() {
-   const isBot = typeof navigator !== 'undefined' && /bot|crawler|spider|crawling/i.test(navigator.userAgent)
-
-   const { data: lastUpdated } = useQuery({
-      queryKey: ['lastUpdated'],
-      queryFn: () => getGitHubRepoLastUpdate(),
-      enabled: !isBot,
-   })
-   const { data: stargazeCount } = useQuery({
-      queryKey: ['stargazeCount'],
-      queryFn: () => getGitHubRepoStarCount(),
-      enabled: !isBot,
-   })
+export default async function Footer() {
+   const lastUpdated = await getGitHubRepoLastUpdate()
+   const stargazeCount = await getGitHubRepoStarCount()
    return (
       <footer className="mt-auto pb-3">
          <p className="text-base max-sm:text-[13px] px-1 text-center">Consider staring ⭐ a GitHub repo if you like this app!</p>

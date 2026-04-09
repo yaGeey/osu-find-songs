@@ -8,12 +8,11 @@ import { useSongContext } from '@/contexts/SongContext'
 import SettingsPopup from '@/components/SettingsPopup'
 import { useRouter } from 'next/navigation'
 import CreatePlaylistButton from './_components/CreatePlaylistButton'
-import { filterFn, searchFilterFn, chunkArray, flatCombinedArray, getGroupedArray, sortGroupedArray } from '@/utils/arrayManaging'
+import { searchFilterFn, chunkArray, flatCombinedArray, getGroupedArray, sortGroupedArray } from '@/utils/arrayManaging'
 import Progress from '@/components/state/Progress'
 import Dropdown from '@/components/selectors/Dropdown'
 import DropdownSort from '@/components/selectors/DropdownSort'
 import Search from '@/components/Search'
-import Toggle from '@/components/Toggle'
 import useFoTelemetry from '../../hooks/useFoTelemetry'
 import useBaseStore from '@/contexts/useBaseStore'
 import VirtuosoCardFO from './_components/VirtuosoCardFO'
@@ -74,7 +73,7 @@ export default function FromOsu() {
    const groupedDict = useMemo(() => {
       const extractedData = combined.filter((item) => item.spotify !== null)
       if (isFetching) return { '': extractedData }
-      const grouped = getGroupedArray(groupFn, combined)
+      const grouped = getGroupedArray(groupFn, extractedData)
       return sortGroupedArray(sortFnName, sortOrder, grouped)
    }, [groupFn, sortFnName, sortOrder, combined, isFetching])
 
@@ -103,6 +102,8 @@ export default function FromOsu() {
       songsLength: songs.length,
    })
 
+   const spNotNullCount = combined.filter((q) => q.spotify !== null).length
+   const totalTracks = sp.isFetching && spNotNullCount === 0 ? songs.length : spNotNullCount
    const src = useBaseStore((state) => (state.current ? state.current.local.image : undefined))
    return (
       <div className="overflow-hidden" translate="no">
@@ -138,7 +139,7 @@ export default function FromOsu() {
                </IconsSection>
                <CreatePlaylistButton
                   data={combined.map((item) => item.spotify).filter((item) => item !== null)}
-                  dataTotal={songs.length}
+                  dataTotal={totalTracks}
                />
             </section>
             <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />

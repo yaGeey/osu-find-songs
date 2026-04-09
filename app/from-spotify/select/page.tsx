@@ -1,14 +1,11 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
-import Footer from '@/components/Footer'
 import { twMerge as tw, twMerge } from 'tailwind-merge'
 import { getPlaylist } from '@/lib/spotify/officialApi'
 import { useMutation } from '@tanstack/react-query'
-import { getHash } from '@/lib/spotify/hashes'
-import Overlay from '@/components/Overlay'
 
 export default function SelectPage() {
    const [isLoading, setIsLoading] = useState(false)
@@ -75,7 +72,6 @@ export default function SelectPage() {
                )}
             </div>
          </div>
-         <Overlay />
       </div>
    )
 }
