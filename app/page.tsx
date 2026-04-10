@@ -7,7 +7,7 @@ import { Suspense } from 'react'
 import { MapsDownloaded, PlaylistsCreated } from '@/components/AnimatedNumers'
 import Overlay from '@/components/Overlay'
 
-export default async function LandingPage() {
+export default function LandingPage() {
    return (
       <main className="relative grid grid-cols-2 max-sm:grid-cols-1 h-screen w-screen text-white">
          <Overlay />
@@ -21,6 +21,7 @@ export default async function LandingPage() {
                alt="fo"
                fill
                priority
+               sizes="(max-width: 640px) 100vw, 50vw"
                className="object-cover object-right blur-[2px] brightness-25 group-hover:scale-102 transition-[scale] ease-in"
             />
             <div className="absolute grid items-center text-center gap-7 font-medium group">
@@ -42,15 +43,15 @@ export default async function LandingPage() {
                   Select an osu folder
                </span>
                <h4 className="text-base font-normal text-main-white">
-                  <Suspense fallback={<span className='opacity-0'>...</span>}>
+                  <Suspense fallback={<span className="opacity-0">...</span>}>
                      <PlaylistsCreated />
                   </Suspense>
                </h4>
             </div>
          </Link>
 
-         <div className="absolute top-0 bottom-0 bg-main w-5 brightness-25 mx-auto inset-0 blur-sm z-1 sm:visible invisible"/>
-         <div className="absolute left-0 right-0 bg-main h-5 brightness-25 my-auto inset-0 blur-sm z-1 visible sm:invisible"/>
+         <div className="absolute top-0 bottom-0 bg-main w-5 brightness-25 mx-auto inset-0 blur-sm z-1 sm:visible invisible" />
+         <div className="absolute left-0 right-0 bg-main h-5 brightness-25 my-auto inset-0 blur-sm z-1 visible sm:invisible" />
 
          <Link
             href="/from-spotify/select"
@@ -62,6 +63,7 @@ export default async function LandingPage() {
                alt="fs"
                fill
                priority
+               sizes="(max-width: 640px) 100vw, 50vw"
                className="object-cover object-left blur-[2px] brightness-25 group-hover:scale-102 transition-[scale] ease-in"
             />
             <div className="absolute grid items-center text-center gap-7 font-medium group">
@@ -77,7 +79,7 @@ export default async function LandingPage() {
                   Select a playlist
                </span>
                <h4 className="text-base font-normal text-main-white">
-                  <Suspense fallback={<span className='opacity-0'>...</span>}>
+                  <Suspense fallback={<span className="opacity-0">...</span>}>
                      <MapsDownloaded />
                   </Suspense>
                </h4>

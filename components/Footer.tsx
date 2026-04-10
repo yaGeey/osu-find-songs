@@ -7,7 +7,9 @@ export default async function Footer() {
    const stargazeCount = await getGitHubRepoStarCount()
    return (
       <footer className="mt-auto pb-3">
-         <p className="text-base max-sm:text-[13px] px-1 text-center">Consider staring ⭐ a GitHub repo if you like this app!</p>
+         <p className="text-base max-sm:text-[13px] px-1 text-center">
+            Consider starring ⭐ this GitHub repo if you like this app!
+         </p>
          <a
             href="https://github.com/yaGeey/osu-find-songs"
             target="_blank"
@@ -15,7 +17,7 @@ export default async function Footer() {
          >
             GitHub
             <FontAwesomeIcon icon={faStar} className="text-[10px] mx-1" />
-            {stargazeCount || 'xx'} · Last update: {lastUpdated ? lastUpdated.date.split(', ')[0] : 'x/xx/xx'}{' '}
+            {stargazeCount || 'xx'} · Last update: {lastUpdated ? new Date(lastUpdated.date).toLocaleDateString() : 'x/xx/xx'}{' '}
             <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px] ml-1" />
          </a>
       </footer>

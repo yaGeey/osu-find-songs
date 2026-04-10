@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       // unoptimized: true,
    },
    experimental: {
-      viewTransition: true,
+      // viewTransition: true,
    },
    cacheComponents: true,
    productionBrowserSourceMaps: true,

@@ -14,7 +14,7 @@ export async function sendMapDownloadTelemetry({
    mapId: number
    playlistId: string
    all?: boolean
-   }) {
+}) {
    if (isDev) return
    const all_value = all ?? false
    await sql`
@@ -25,6 +25,8 @@ export async function sendMapDownloadTelemetry({
 
 //* Stats *//
 export async function getMapsDownloadedCount() {
+   'use cache'
+   cacheLife('days')
    const result = await sql`
       SELECT COUNT(*) AS count
       FROM downloads
@@ -32,6 +34,8 @@ export async function getMapsDownloadedCount() {
    return parseInt(result[0].count, 10)
 }
 export async function getPlaylistsCreatedCount() {
+   'use cache'
+   cacheLife('days')
    const result = await sql`
       SELECT COUNT(*) AS count FROM fo_playlists
    `
@@ -91,13 +95,22 @@ export async function playlistCreated(playlistId: string, sessionId: string) {
 }
 
 //* Not a Telemetry *//
-export async function getActiveBanner() {
+export type Banner = {
+   id: number
+   content: string
+   active: boolean
+   closable: boolean
+   show_on_visit?: number
+   show_on_page?: string
+   created_at: Date
+}
+export async function getActiveBanners() {
    'use cache'
    cacheLife('hours')
-   const result = await sql`
+   const results = await sql`
       SELECT * FROM banners
+      WHERE active = true
       ORDER BY id DESC
-      LIMIT 1
    `
-   return result[0] || null
+   return results as unknown as Banner[]
 }

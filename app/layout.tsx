@@ -13,6 +13,7 @@ import { config } from '@fortawesome/fontawesome-svg-core'
 import Telemetry from '@/components/Telemetry'
 import { Suspense } from 'react'
 import { metadataObj, JsonLd } from './metadata'
+import InitialLoadPage from '@/components/state/InitialLoadPage'
 // Prevent fontawesome from dynamically adding its css since we did it manually above
 config.autoAddCss = false
 
@@ -52,7 +53,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
          >
             {isDev && <Script src="https://unpkg.com/react-scan/dist/auto.global.js" strategy="beforeInteractive" />}
-            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+            <Suspense fallback={<InitialLoadPage />}>
                <Providers>
                   {/* <MobileDeviceCheck /> */}
                   <Telemetry />
