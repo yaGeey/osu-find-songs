@@ -1,7 +1,6 @@
 import RateLimitManager from '@/lib/api/RateLimitManager'
 import { getBeatmap } from '@/lib/osu/actions/osu'
 import { BeatmapSet } from '@/types/Osu'
-export const revalidate = 0
 
 const manager = RateLimitManager.getInstance('osu', { maxConcurrency: 3 })
 export async function GET(req: Request) {
