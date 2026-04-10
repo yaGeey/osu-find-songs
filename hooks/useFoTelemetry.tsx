@@ -25,8 +25,8 @@ export default function useFoTelemetry({
 
    const sessionId = useSessionId()
    const [isTelemetryReady, setIsTelemetryReady] = useState(false)
-   const telemetryIdRef = useRef<number | null>(null)
-   const telemetryStartPromiseRef = useRef<Promise<number | null> | null>(null)
+   const telemetryIdRef = useRef<number | undefined>(null)
+   const telemetryStartPromiseRef = useRef<Promise<number | null | undefined> | null>(null)
    const spotifyFinishedSentRef = useRef(false)
    const osuFinishedSentRef = useRef(false)
    const lastErrorSentRef = useRef<string>('')
