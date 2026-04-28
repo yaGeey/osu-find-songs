@@ -1,5 +1,5 @@
 import { type Instrumentation } from 'next'
-import getLDClient from './lib/ld-server'
+import getLDClient from './lib/initLDServer'
 
 export async function register() {
    if (process.env.NEXT_RUNTIME === 'nodejs') {

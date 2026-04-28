@@ -1,7 +1,7 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { sendMapDownloadTelemetry } from '@/lib/telemetry'
+import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import useBaseStore from '@/contexts/useBaseStore'
 import useSessionId from '@/hooks/useSessionId'

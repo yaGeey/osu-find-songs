@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AxiosError } from 'axios'
-import { customAxios } from '@/lib/axios'
+import { customAxios } from '@/lib/serverAxios'
 
 export async function GET(req: NextRequest) {
    const searchParams = req.nextUrl.searchParams

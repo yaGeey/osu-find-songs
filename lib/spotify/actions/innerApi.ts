@@ -1,6 +1,6 @@
 'use server'
 import { SpotifyPlaylistMetadataResponse, SpotifyPlaylistContentResponse } from '@/types/graphql-spotify/graphql-spotify'
-import { customAxios } from '../axios'
+import { customAxios } from '../../serverAxios'
 import { SpotifySearchQueryResponse, TrackResponseWrapper } from '@/types/graphql-spotify/searchDesktop'
 import { cookies } from 'next/headers'
 import { getHash, updateHashes } from './hashes'

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { twMerge as tw, twMerge } from 'tailwind-merge'
-import { getPlaylist } from '@/lib/spotify/officialApi'
+import { getPlaylist } from '@/lib/spotify/actions/officialApi'
 import { useMutation } from '@tanstack/react-query'
 
 export default function SelectPage() {

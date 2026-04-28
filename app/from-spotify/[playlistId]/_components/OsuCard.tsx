@@ -261,7 +261,7 @@ const difficultySpectrum: [number, string][] = [
    [9.0, '#000000'],
 ]
 
-export function getDifficultyColor(diff: number) {
+function getDifficultyColor(diff: number) {
    const textColor = diff > 6.5 ? '#FFD700' : '#000000'
 
    if (diff >= 9) return { backgroundColor: '#000000', color: textColor, fontWeight: 600 }

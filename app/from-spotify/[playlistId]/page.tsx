@@ -25,8 +25,8 @@ import { CardRenderer } from './_components/CardRenderer'
 import CustomLink from '@/components/CustomLink'
 import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
 import IconsSection from '@/components/IconsSection'
-import { getPlaylistMetadata, getPlaylistPage } from '@/lib/spotify/innerApi'
-import clientAxios from '@/lib/client-axios'
+import { getPlaylistMetadata, getPlaylistPage } from '@/lib/spotify/actions/innerApi'
+import clientAxios from '@/lib/clientAxios'
 import useBaseStore from '@/contexts/useBaseStore'
 
 export default function PlaylistPage() {

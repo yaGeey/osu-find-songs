@@ -1,5 +1,5 @@
 import useTimeLeft from '@/hooks/useTimeLeft'
-import clientAxios from '@/lib/client-axios'
+import clientAxios from '@/lib/clientAxios'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
 import { Song } from '@/types/types'
 import { MAX_SPOTIFY_SEARCH_CONCURRENCY } from '@/variables'

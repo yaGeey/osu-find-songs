@@ -1,5 +1,5 @@
 import { beatmapsSearch } from '@/lib/osu/actions/osu'
-import RateLimitManager from '@/lib/api/RateLimitManager'
+import RateLimitManager from '@/lib/limiter/RateLimitManager'
 import { BeatmapSet } from '@/types/Osu'
 import { MAX_OSU_SEARCH_CONCURRENCY } from '@/variables'
 

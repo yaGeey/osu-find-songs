@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import clientAxios from '@/lib/client-axios'
+import clientAxios from '@/lib/clientAxios'
 import useSessionId from '@/hooks/useSessionId'
 const botRegex =
    /bot|crawler|vercel|spider|slurp|facebookexternalhit|bingpreview|embedly|quora|baidu|yandex|sogou|exabot|rogerbot|uptime/i
@@ -38,13 +38,17 @@ export default function Telemetry() {
       // first req to db to log visit
       const logVisit = async () => {
          try {
-            const res = await clientAxios.post('/api/telemetry', {
-               session_id: sessionId,
-               user_agent: navigator.userAgent,
-               referrer: document.referrer || null,
-               page: pathname,
-               is_bot: botRegex.test(navigator.userAgent),
-            }, { context: 'TELEMETRY_VISIT' })
+            const res = await clientAxios.post(
+               '/api/telemetry',
+               {
+                  session_id: sessionId,
+                  user_agent: navigator.userAgent,
+                  referrer: document.referrer || null,
+                  page: pathname,
+                  is_bot: botRegex.test(navigator.userAgent),
+               },
+               { context: 'TELEMETRY_VISIT' },
+            )
             recordIfRef.current = res.data.id
          } catch (e) {}
       }

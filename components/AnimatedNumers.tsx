@@ -1,4 +1,4 @@
-import { getMapsDownloadedCount, getPlaylistsCreatedCount } from '@/lib/telemetry'
+import { getMapsDownloadedCount, getPlaylistsCreatedCount } from '@/lib/actions/telemetry'
 import AnimatedNumber from './AnimatedNumber'
 
 export async function MapsDownloaded() {

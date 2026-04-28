@@ -1,5 +1,5 @@
 import usePrepareMirrors from '@/lib/osu/hooks/usePrepareMirrors'
-import { getInternalTokens } from '@/lib/spotify/innerApi'
+import { getInternalTokens } from '@/lib/spotify/actions/innerApi'
 import { useQuery } from '@tanstack/react-query'
 
 export default function BackgroundFetcher() {

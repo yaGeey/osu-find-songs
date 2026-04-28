@@ -1,4 +1,3 @@
-import { Artist } from '@/types/Spotify'
 import { BeatmapSet } from '@/types/Osu'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop';
 

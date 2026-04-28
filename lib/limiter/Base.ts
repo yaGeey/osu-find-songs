@@ -2,7 +2,7 @@ import { AxiosResponse, isAxiosError } from 'axios'
 import PQueue from 'p-queue'
 import { sendUnknownError } from '@/lib/errorHandling'
 // TODO розрібратись з тайпскриптом
-export class SingletonInstance<T> {
+class SingletonInstance<T> {
    protected id: string
    private static instances = new Map<string, any>()
    protected constructor(id: string) {

@@ -2,7 +2,7 @@
 import { ArrowLeft, ArrowRight, MessageSquareWarning } from 'lucide-react'
 import { motion } from 'framer-motion'
 import React, { useEffect } from 'react'
-import { Banner } from '@/lib/telemetry'
+import { Banner } from '@/lib/actions/telemetry'
 import { twMerge } from 'tailwind-merge'
 
 export default function Banners({ banners }: { banners: Banner[] }) {
@@ -41,7 +41,10 @@ export default function Banners({ banners }: { banners: Banner[] }) {
             <div className="flex-1 overflow-hidden text-ellipsis line-clamp-2 min-w-0 text-sm/tight">
                {banners[current].content}
             </div>
-            <div suppressHydrationWarning className="text-xs/tight rounded-lg px-1 text-main-border grid items-center justify-center tracking-tight">
+            <div
+               suppressHydrationWarning
+               className="text-xs/tight rounded-lg px-1 text-main-border grid items-center justify-center tracking-tight"
+            >
                <span suppressHydrationWarning>{banners[current].created_at.toLocaleDateString()}</span>
                <span suppressHydrationWarning>{banners[current].created_at.toLocaleTimeString()}</span>
             </div>

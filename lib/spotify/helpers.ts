@@ -1,5 +1,5 @@
 import { Song } from '@/types/types'
-import { searchTopTracks } from './innerApi'
+import { searchTopTracks } from './actions/innerApi'
 
 const conditions = [
    (s: Song) => s,

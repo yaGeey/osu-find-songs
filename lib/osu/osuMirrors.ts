@@ -1,5 +1,5 @@
 import axios from 'axios'
-import RateLimitManager from '../api/RateLimitManager'
+import RateLimitManager from '../limiter/RateLimitManager'
 
 const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB

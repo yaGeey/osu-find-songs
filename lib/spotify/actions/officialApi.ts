@@ -1,8 +1,7 @@
 'use server'
 import { cookies } from 'next/headers'
-import { SpotifyAuthResponse, SpotifyError } from '@/types/Spotify'
 import { isAxiosError } from 'axios'
-import { customAxios as axios } from '../axios'
+import { customAxios as axios } from '../../serverAxios'
 
 export async function getServerToken(): Promise<string> {
    let token = (await cookies()).get('spotify_token')?.value
@@ -22,7 +21,11 @@ export async function fetchSpotify<T>(func: (token: string) => Promise<T>, token
       token = tokenType === 'api' ? await getServerToken() : await getUserToken()
       return await func(token)
    } catch (err) {
-      if (isAxiosError<SpotifyError>(err)) {
+      if (
+         isAxiosError<{
+            error: { status: number; message: string }
+         }>(err)
+      ) {
          if (err.response?.data.error.status === 429 && token) {
             const wait = parseInt(err.response?.headers?.['Retry-After'])
             if (wait > 60 || isNaN(wait)) throw new Error(`Spotify rate limit: wait too long (${wait}s)`)
@@ -54,7 +57,7 @@ export async function refreshToken(): Promise<string> {
       client_id: process.env.AUTH_SPOTIFY_ID!,
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
    })
-   const { data } = await axios.post<SpotifyAuthResponse>('https://accounts.spotify.com/api/token', body, {
+   const { data } = await axios.post<AuthResponse>('https://accounts.spotify.com/api/token', body, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
    })
    console.log('refresh_token NEW', data.refresh_token)
@@ -74,7 +77,7 @@ export async function revalidateSpotifyToken(): Promise<string> {
       client_secret: process.env.AUTH_SPOTIFY_SECRET!,
    })
 
-   const { data } = await axios.post<SpotifyAuthResponse>('https://accounts.spotify.com/api/token', body.toString(), {
+   const { data } = await axios.post<AuthResponse>('https://accounts.spotify.com/api/token', body.toString(), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
    })
 
@@ -177,4 +180,11 @@ export async function fetchWithToken(url: string) {
       const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } })
       return res.data
    })
+}
+
+type AuthResponse = {
+   access_token: string
+   expires_in: number
+   token_type: string
+   refresh_token?: string
 }

@@ -1,5 +1,5 @@
 'use server'
-import { customAxios } from '../axios'
+import { customAxios } from '../../serverAxios'
 
 type Response = { requested: Record<string, string>; all: Record<string, string> }
 

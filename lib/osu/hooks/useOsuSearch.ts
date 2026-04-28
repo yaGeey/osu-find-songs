@@ -1,5 +1,5 @@
 import useTimeLeft from '@/hooks/useTimeLeft'
-import clientAxios from '@/lib/client-axios'
+import clientAxios from '@/lib/clientAxios'
 import { BeatmapSet } from '@/types/Osu'
 import { Song } from '@/types/types'
 import { MAX_OSU_SEARCH_CONCURRENCY } from '@/variables'

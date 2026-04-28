@@ -1,4 +1,4 @@
-import RateLimitManager from '@/lib/api/RateLimitManager'
+import RateLimitManager from '@/lib/limiter/RateLimitManager'
 import { getBeatmap } from '@/lib/osu/actions/osu'
 import { BeatmapSet } from '@/types/Osu'
 

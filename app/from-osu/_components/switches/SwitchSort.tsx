@@ -29,7 +29,7 @@ export default function SwitchSort({
       if (selection !== option) return 'hidden'
       return sort === 'asc' ? 'flip' : 'visible'
    }
-   
+
    return (
       <div
          {...props}
@@ -59,6 +59,7 @@ export default function SwitchSort({
                   <motion.div
                      className="h-full"
                      variants={{ visible: { rotate: 0, opacity: 1 }, flip: { rotate: 180, opacity: 1 }, hidden: { opacity: 0 } }}
+                     transition={{ type: 'tween', duration: 0.15 }}
                      initial={getVariant(option)}
                      animate={getVariant(option)}
                   >

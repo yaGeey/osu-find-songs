@@ -2,7 +2,7 @@
 import axios, { AxiosResponse, isAxiosError } from 'axios'
 import { QueryClient } from '@tanstack/react-query'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import { BaseLimiter } from '@/lib/api/Base'
+import { BaseLimiter } from '@/lib/api/limiter/Base'
 import { reportSourceStatus } from '@/lib/osu/actions/osuMirrorsTracker'
 import { Mirror, getDownloadUrl } from './osuMirrors'
 

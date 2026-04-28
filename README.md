@@ -29,7 +29,7 @@ _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or 
    <strong style="font-size: 20px;">🎮 From osu! to Spotify</strong>
 </p>
 <div align="center">
-  <img src="./public/from-osu.webp" width="600" alt="osu! to Spotify feature"/>
+  <img src="./public/fo2.webp" width="600" alt="osu! to Spotify feature"/>
 </div>
 
 <br>
@@ -53,6 +53,7 @@ ThunderBirdo featured my app in [his video](https://www.youtube.com/watch?v=0uZ4
 ---
 
 ### Technical stuff
+
 The core application logic orchestrates via Next.js on Vercel while offloading resource-intensive scraping to a dedicated Digital Ocean VPS. This specialized microservice employs Playwright to emulate authentic user sessions, retrieving headers, tokens and dynamic query hashes.
 System observability and data integrity are maintained through a telemetry stack featuring NeonDB for serverless SQL analytics and LaunchDarkly for live sessions recordings and error logging.
-![c4 diagram](docs/c4.png) 
+![c4 diagram](public/c4.png)

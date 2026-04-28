@@ -1,6 +1,6 @@
 'use server'
 import { BeatmapSet } from '@/types/Osu'
-import { customAxios } from '../../axios'
+import { customAxios } from '../../serverAxios'
 import { cookies } from 'next/headers'
 
 let tokenRefreshPromise: Promise<string> | null = null
@@ -73,7 +73,7 @@ export async function beatmapsSearch(queries: Queries) {
    })
 }
 
-export async function revalidateOsuToken(): Promise<string> {
+async function revalidateOsuToken(): Promise<string> {
    const body = new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: process.env.OSU_CLIENT!,

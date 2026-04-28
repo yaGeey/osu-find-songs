@@ -1,6 +1,5 @@
 'use client'
 import { Button } from '@/components/buttons/Buttons'
-import { Input } from '@mui/material'
 import axios from 'axios'
 import { ToastContainer } from 'react-toastify'
 
@@ -20,9 +19,9 @@ export default function AdminPage() {
    return (
       <>
          <form action={sendMessage} className="bg-white w-fit h-fit p-6 rounded-lg flex flex-col gap-3 m-auto inset-0 absolute">
-            <Input placeholder="targetUserId" name="targetUserId" />
-            <Input placeholder="message" name="message" />
-            <Input placeholder="pwd" name="pwd" />
+            <input placeholder="targetUserId" name="targetUserId" />
+            <input placeholder="message" name="message" />
+            <input placeholder="pwd" name="pwd" />
             <Button type="submit">Send</Button>
          </form>
          <ToastContainer />

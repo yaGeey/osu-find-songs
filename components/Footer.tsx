@@ -1,6 +1,6 @@
 import { faArrowUpRightFromSquare, faStar } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { getGitHubRepoLastUpdate, getGitHubRepoStarCount } from '@/lib/github'
+import { getGitHubRepoLastUpdate, getGitHubRepoStarCount } from '@/lib/actions/github'
 
 export default async function Footer() {
    const lastUpdated = await getGitHubRepoLastUpdate()

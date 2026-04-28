@@ -6,7 +6,7 @@ import {
    foTelemetryFinishedSpotify,
    foTelemetryFinishedOsu,
    foTelemetryAttachSession,
-} from '@/lib/telemetry'
+} from '@/lib/actions/telemetry'
 import useSessionId from './useSessionId'
 
 export default function useFoTelemetry({

@@ -2,14 +2,15 @@ import { Button } from '@/components/buttons/Buttons'
 import CustomLink from '@/components/CustomLink'
 import Modal, { ModalProps } from '@/components/Modal'
 import useSessionId from '@/hooks/useSessionId'
-import { createPlaylist, addToPlaylist } from '@/lib/spotify/innerApi'
-import { playlistCreated } from '@/lib/telemetry'
+import { createPlaylist, addToPlaylist } from '@/lib/spotify/actions/innerApi'
+import { playlistCreated } from '@/lib/actions/telemetry'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { LinearProgress } from '@mui/material'
 import { useMutation } from '@tanstack/react-query'
 import { useState, useEffect, useRef } from 'react'
+import { ProgressInline } from '@/components/state/Progress'
+import ProgressBase from '@/components/state/ProgressBase'
 
 export default function CreatePlaylistButton({ data, dataTotal }: { data: (SpotifyTrack[] | null)[]; dataTotal: number }) {
    const [isOpen, setOpen] = useState(true)
@@ -152,25 +153,19 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: (Spoti
                         {addItemsMutation.isPending ? (
                            <>
                               <span className="animate-pulse duration-3000">Adding tracks to playlist</span>
-                              <div className="text-accent">
-                                 <LinearProgress color="inherit" />
-                              </div>
+                              <ProgressBase indeterminate color="bg-accent" />
                            </>
                         ) : data.length === dataTotal && data.length !== 0 ? (
                            <>
                               <span>All tracks added &#10004;</span>
-                              <div className="text-success">
-                                 <LinearProgress variant="determinate" value={100} color="inherit" />
-                              </div>
+                              <ProgressBase value={100} color="bg-success" disableAnimation />
                            </>
                         ) : (
                            <>
                               <span className="animate-pulse">
                                  Searching on Spotify ({data.length}/{dataTotal})
                               </span>
-                              <div className="text-accent">
-                                 <LinearProgress variant="determinate" value={(data.length / dataTotal) * 100} color="inherit" />
-                              </div>
+                              <ProgressInline value={(data.length / dataTotal) * 100} color="bg-accent" />
                            </>
                         )}
                      </div>

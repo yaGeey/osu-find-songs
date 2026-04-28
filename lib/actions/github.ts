@@ -1,7 +1,7 @@
 'use server'
 
 import { cacheLife } from 'next/cache'
-import { customAxios } from './axios'
+import { customAxios } from '../serverAxios'
 
 export async function getGitHubRepoLastUpdate() {
    'use cache'
