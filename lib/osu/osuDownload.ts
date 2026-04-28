@@ -2,9 +2,8 @@
 import axios, { AxiosResponse, isAxiosError } from 'axios'
 import { QueryClient } from '@tanstack/react-query'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import { BaseLimiter } from '@/lib/api/limiter/Base'
-import { reportSourceStatus } from '@/lib/osu/actions/osuMirrorsTracker'
 import { Mirror, getDownloadUrl } from './osuMirrors'
+import { BaseLimiter } from '../limiter/Base'
 
 const DOWNLOAD_PROGRESS_TIMEOUT_MS = 1000
 
