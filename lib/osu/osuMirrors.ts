@@ -1,13 +1,15 @@
 import axios from 'axios'
 import RateLimitManager from '../limiter/RateLimitManager'
+import { AxiosHeaders } from 'axios'
 
 const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB
-const MAX_TEST_TIME_MS = 3000
+const MAX_TEST_TIME_MS = 5000
 
 export type Mirror = {
    name: string
    manager: RateLimitManager
+   headers?: AxiosHeaders
 } & (
    | { downloadType: 'no-video'; buildUrl: (id: number) => string; buildUrlVideo?: never }
    | { downloadType: 'video'; buildUrl?: never; buildUrlVideo: (id: number) => string }
@@ -31,14 +33,32 @@ const mirrors = [
       name: 'sayobot',
       downloadType: 'both',
       manager: RateLimitManager.getInstance('sayobot', { showErrors: false }),
-      buildUrlVideo: (id: number) => `https://dl.sayobot.cn/beatmaps/download/full/${id}`,
+      buildUrlVideo: (id: number) => `/api/proxy?url=https://dl.sayobot.cn/beatmaps/download/full/${id}`,
       buildUrl: (id: number) => `https://dl.sayobot.cn/beatmaps/download/novideo/${id}`,
    },
+   {
+      name: 'osuDirectMirror',
+      downloadType: 'both',
+      manager: RateLimitManager.getInstance('osuDirectMirror', { showErrors: false }),
+      buildUrlVideo: (id: number) => `https://osu.direct/api/d/${id}`,
+      buildUrl: (id: number) => `https://osu.direct/api/d/${id}?noVideo=true`,
+   },
+   // akatsuki needs Referer header and too slow
    // {
    //    name: 'akatsuki',
    //    downloadType: 'video',
-   //    buildUrlVideo: (id: number) => `https://beatmaps.akatsuki.gg/d/${id}`,
+   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://akatsuki.gg/d/${id}`,
    //    manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
+   // },
+
+   // TODO: add osu download
+   // {
+   //    name: 'osu',
+   //    downloadType: 'both',
+   //    manager: RateLimitManager.getInstance('osu', { showErrors: false }),
+   //    buildUrlVideo: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download`,
+   //    buildUrl: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download?noVideo=1`,
+   //    headers: new AxiosHeaders({ Authorization: `Bearer ${process.env.OSU_TOKEN}` }),
    // },
    {
       name: 'nerinyan',
@@ -86,6 +106,7 @@ const testMirrorLatency = async (mirror: Mirror): Promise<number> => {
                }
             },
             timeout: MAX_TEST_TIME_MS,
+            headers: mirror.headers,
          })
          .catch((err) => {
             if (axios.isCancel(err)) return

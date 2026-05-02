@@ -73,6 +73,10 @@ export async function beatmapsSearch(queries: Queries) {
    })
 }
 
+type AuthResponse = {
+   access_token: string
+   expires_in: number
+}
 async function revalidateOsuToken(): Promise<string> {
    const body = new URLSearchParams({
       grant_type: 'client_credentials',
@@ -81,11 +85,7 @@ async function revalidateOsuToken(): Promise<string> {
       scope: 'public',
    })
 
-   const { data } = await customAxios.post<{
-      access_token: string
-      expires_in: number
-      token_type: string
-   }>('https://osu.ppy.sh/oauth/token', body.toString(), {
+   const { data } = await customAxios.post<AuthResponse>('https://osu.ppy.sh/oauth/token', body.toString(), {
       headers: {
          Accept: 'application/json',
          'Content-Type': 'application/x-www-form-urlencoded',
@@ -97,6 +97,35 @@ async function revalidateOsuToken(): Promise<string> {
    storage.set('osuToken', data.access_token, {
       path: '/',
       expires: new Date(Date.now() + data.expires_in * 1000),
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+   })
+   return data.access_token
+}
+
+const lazerCookieTokenName = 'lazerToken'
+export const getLazerToken = async () => (await cookies()).get(lazerCookieTokenName)?.value ?? (await lazerLogin())
+
+async function lazerLogin() {
+   const { data } = await customAxios.post<AuthResponse>(
+      'https://osu.ppy.sh/oauth/token',
+      `username=${process.env.LAZER_USERNAME}&password=${process.env.LAZER_PWD}&grant_type=password&client_id=5&client_secret=FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk&scope=*`,
+      {
+         headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+         },
+         context: 'lazer login',
+      },
+   )
+   const storage = await cookies()
+   storage.set(lazerCookieTokenName, data.access_token, {
+      path: '/',
+      expires: new Date(Date.now() + data.expires_in * 1000),
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
    })
    return data.access_token
 }

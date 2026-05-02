@@ -13,7 +13,7 @@ export async function POST(req: Request) {
    const results = responses.map((res) => (res && res.total > 0 ? res.beatmapsets : null))
 
    if (results.every((r) => r === null)) {
-      return new Response('No results found', {
+      return new Response(JSON.stringify([]), {
          status: 404,
          headers: { 'Content-Type': 'application/json' },
       })

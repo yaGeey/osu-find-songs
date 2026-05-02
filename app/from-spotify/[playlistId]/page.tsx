@@ -95,7 +95,7 @@ export default function PlaylistPage() {
                      if (!item) return
                      const artistName = item.artists?.items?.[0]?.profile?.name
                      if (!artistName) return //? sometimes no items in artists, idk why
-                     return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}}`
+                     return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}`
                   })
                   .filter(Boolean),
                m: searchParams.get('m'),
@@ -103,10 +103,12 @@ export default function PlaylistPage() {
                s: 'any',
             }
 
-            const { data } = await clientAxios.post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, {
-               signal,
-               context: 'search from spotify',
-            })
+            const { data } = await clientAxios
+               .post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, {
+                  signal,
+                  context: 'search from spotify',
+               })
+               .catch((err) => (err.response?.status === 404 ? { data: [] } : Promise.reject(err)))
             addTimeLeft(performance.now() - t0)
             return data
          },
