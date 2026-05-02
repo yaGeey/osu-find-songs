@@ -56,8 +56,7 @@ export async function fetchBeatmapWithFallback({
 )) {
    const wantsVideo = Boolean(video || onlyNoVideo)
 
-   const mirrors = queryClient.getQueryData<Mirror[]>(['osuMirrors'])
-   // from cache - if still fetching or error happened
+   const mirrors: Mirror[] = await queryClient.ensureQueryData({ queryKey: ['osuMirrors'] })
    if (!mirrors || mirrors.length === 0) {
       throw new Error('fetchBeatmapWithFallback: no mirrors available')
    }

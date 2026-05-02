@@ -4,7 +4,7 @@ import { AxiosHeaders } from 'axios'
 
 const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB
-const MAX_TEST_TIME_MS = 5000
+const MAX_TEST_TIME_MS = 8000
 
 export type Mirror = {
    name: string
@@ -23,12 +23,13 @@ const mirrors = [
       buildUrlVideo: (id: number) => `https://catboy.best/d/${id}`,
       manager: RateLimitManager.getInstance('catboy', { showErrors: false }),
    },
-   {
-      name: 'beatconnect',
-      downloadType: 'video',
-      buildUrlVideo: (id: number) => `/api/proxy?url=https://beatconnect.io/b/${id}/`,
-      manager: RateLimitManager.getInstance('beatconnect', { showErrors: false }),
-   },
+   // bot verification
+   // {
+   //    name: 'beatconnect',
+   //    downloadType: 'video',
+   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://beatconnect.io/b/${id}/`,
+   //    manager: RateLimitManager.getInstance('beatconnect', { showErrors: false }),
+   // },
    {
       name: 'sayobot',
       downloadType: 'both',
@@ -43,13 +44,13 @@ const mirrors = [
       buildUrlVideo: (id: number) => `https://osu.direct/api/d/${id}`,
       buildUrl: (id: number) => `https://osu.direct/api/d/${id}?noVideo=true`,
    },
-   // akatsuki needs Referer header and too slow
-   // {
-   //    name: 'akatsuki',
-   //    downloadType: 'video',
-   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://akatsuki.gg/d/${id}`,
-   //    manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
-   // },
+   {
+      name: 'akatsuki',
+      downloadType: 'video',
+      buildUrlVideo: (id: number) => `/api/proxy?url=https://akatsuki.gg/d/${id}`,
+      manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
+      headers: new AxiosHeaders({ Referer: 'https://akatsuki.gg/' }),
+   },
 
    // TODO: add osu download
    // {
@@ -141,5 +142,5 @@ export const getDownloadUrl = (mirror: Mirror, video: boolean, id: number) => {
          return mirror.buildUrl(id)
       }
    }
-   throw new Error(`Mirror ${mirror.name} does not support the requested download type`)
+   return null
 }

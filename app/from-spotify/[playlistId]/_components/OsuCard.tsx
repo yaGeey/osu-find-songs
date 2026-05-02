@@ -123,7 +123,10 @@ export default function OsuCard({
          <a
             target="_blank"
             href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
-            className="no-jump select-none absolute top-0 left-21 w-[calc(100%-5.25rem)] h-full z-20 px-4 py-1 flex flex-col justify-between text-white hover:w-[calc(100%-5.25rem-1.75rem)] hover:rounded-r-[14px]"
+            className={tw(
+               'no-jump select-none absolute top-0 left-21 w-full h-full z-20 px-4 py-1 flex flex-col justify-between text-white hover:rounded-r-[14px] group-hover:w-[calc(100%-5.25rem-1rem)] overflow-hidden',
+               isPending && 'w-[calc(100%-5.25rem-1rem)]',
+            )}
          >
             {/* INFORMATION */}
             <div className="truncate font-outline">

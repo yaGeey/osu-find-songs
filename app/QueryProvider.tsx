@@ -1,7 +1,7 @@
 'use client'
 
 // Since QueryClientProvider relies on useContext under the hood, we have to put 'use client' on top
-import { isServer, MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
+import { isServer, MutationCache, QueryCache, QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
@@ -70,7 +70,18 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
    //       render if it suspends and there is no boundary
    const queryClient = getQueryClient()
    return (
-      <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+      <PersistQueryClientProvider
+         client={queryClient}
+         persistOptions={{
+            persister,
+            dehydrateOptions: {
+               shouldDehydrateQuery: (query) => {
+                  if (query.queryKey.includes('osuMirrors')) return false
+                  return defaultShouldDehydrateQuery(query)
+               },
+            },
+         }}
+      >
          {children}
          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
       </PersistQueryClientProvider>
