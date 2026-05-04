@@ -1,10 +1,11 @@
 'use server'
-import { SpotifyPlaylistMetadataResponse, SpotifyPlaylistContentResponse } from '@/types/graphql-spotify/graphql-spotify'
 import { customAxios } from '../../serverAxios'
 import { SpotifySearchQueryResponse, TrackResponseWrapper } from '@/types/graphql-spotify/searchDesktop'
 import { cookies } from 'next/headers'
 import { getHash, updateHashes } from './hashes'
-import { AxiosError, isAxiosError } from 'axios'
+import { isAxiosError } from 'axios'
+import { BaseSpotifyResponse, UnexpectedSpotifyError } from '@/types/graphql-spotify/basics'
+import { SpotifyPlaylistContentResponse, SpotifyPlaylistResponse } from '@/types/graphql-spotify/graphql-spotify'
 
 // TODO for graph handle error when hash is wrong - returns an json error
 
@@ -51,14 +52,6 @@ type TokenResponse = {
    client: { expires_at: number; token: string; version: string }
 }
 
-type SpotifyApiError = {
-   errors: Array<{
-      message: string
-      extensions: {
-         code: string
-      }
-   }>
-}
 async function getInternalTokenFromServer() {
    const { data } = await customAxios.get<TokenResponse>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/token`, {
       headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
@@ -86,9 +79,14 @@ async function getInternalTokenFromServer() {
    return { accessToken: data.access.accessToken, clientToken: data.client.token, appVersion: data.client.version }
 }
 
-async function getInnerGraphApi<T>(operationName: string, variables: Record<string, any>, hash: string, retries = 2) {
+async function fetchInnerGraphApi<T extends Record<string, any>>(
+   operationName: string,
+   variables: Record<string, any>,
+   hash: string,
+   retries = 2,
+) {
    try {
-      const { data } = await customAxios.post<T>(
+      const { data } = await customAxios.post<BaseSpotifyResponse<T>>(
          'https://api-partner.spotify.com/pathfinder/v2/query',
          {
             variables,
@@ -106,25 +104,38 @@ async function getInnerGraphApi<T>(operationName: string, variables: Record<stri
             ignoredErrors: [400],
          },
       )
-      return data
+      if (data?.data) {
+         const key = Object.keys(data.data)[0]
+         const value = data.data[key]
+         if ('__typename' in value && value.__typename === 'GenericError') {
+            throw new Error(
+               JSON.stringify({
+                  ...data.data,
+                  operationName,
+                  variables,
+               }),
+            )
+         }
+      }
+      return data.data
    } catch (err) {
       if (isAxiosError(err) && err.response?.data) {
-         const errorData = err.response.data as SpotifyApiError
+         const errorData = err.response.data as UnexpectedSpotifyError
          // hash is outdated, update and retry
          if (
             (errorData.errors.every((e) => e.extensions.code === 'GRAPHQL_UNKNOWN_OPERATION_NAME') || err.status === 412) &&
             retries > 0
          ) {
             await updateHashes([operationName])
-            return getInnerGraphApi(operationName, variables, await getHash(operationName), retries - 1)
+            return fetchInnerGraphApi(operationName, variables, await getHash(operationName), retries - 1)
          }
       }
       throw err
    }
 }
 
-export async function getPlaylistPage(playlistId: string, offset = 0, limit = 50) {
-   const { data } = await getInnerGraphApi<SpotifyPlaylistContentResponse>(
+export async function fetchPlaylistContents(playlistId: string, offset = 0, limit = 50) {
+   const data = await fetchInnerGraphApi<SpotifyPlaylistContentResponse>(
       'fetchPlaylistContents',
       {
          uri: `spotify:playlist:${playlistId}`,
@@ -133,13 +144,16 @@ export async function getPlaylistPage(playlistId: string, offset = 0, limit = 50
       },
       playlistHash,
    )
+   if (data.playlistV2.__typename === 'NotFound') {
+      throw new Error(`Playlist with id ${playlistId} not found`)
+   }
    const content = data.playlistV2.content
    const nextOffset = offset + limit < content.totalCount ? offset + limit : null
    return { items: content.items, nextOffset, total: content.totalCount }
 }
 
-export async function getPlaylistMetadata(playlistId: string) {
-   const { data } = await getInnerGraphApi<SpotifyPlaylistMetadataResponse>(
+export async function fetchPlaylist(playlistId: string) {
+   const data = await fetchInnerGraphApi<SpotifyPlaylistResponse>(
       'fetchPlaylist',
       {
          uri: `spotify:playlist:${playlistId}`,
@@ -149,11 +163,12 @@ export async function getPlaylistMetadata(playlistId: string) {
       },
       playlistHash,
    )
+   if (data.playlistV2.__typename === 'NotFound') return null
    return data.playlistV2
 }
 
 export async function searchTopTracks(query: string) {
-   const { data } = await getInnerGraphApi<SpotifySearchQueryResponse>(
+   const data = await fetchInnerGraphApi<SpotifySearchQueryResponse>(
       'searchDesktop',
       {
          includeArtistHasConcertsField: false,
@@ -178,34 +193,6 @@ export async function searchTopTracks(query: string) {
    if (tracks.length === 0 && types.length) throw new Error(`Spotify innerAPI: ${query} track not found. Types: {${types}}`)
 
    return tracks.map((i) => i.item.data)
-}
-
-export async function getPlaylistPages(playlistId: string) {
-   const limit = 50
-   let offset = 0
-   let totalCount = 1
-
-   const items = []
-   while (offset < totalCount) {
-      const { data } = await getInnerGraphApi<SpotifyPlaylistContentResponse>(
-         'fetchPlaylistContents',
-         {
-            uri: `spotify:playlist:${playlistId}`,
-            offset,
-            limit,
-         },
-         playlistHash,
-      )
-      const content = data.playlistV2.content
-
-      offset += content.pagingInfo.limit
-      totalCount = content.totalCount
-      items.push(...content.items)
-
-      const delay = Math.floor(Math.random() * 1000) + 800
-      await new Promise((r) => setTimeout(r, delay))
-   }
-   return { items, total: totalCount }
 }
 
 export async function createPlaylist({ name, description }: { name: string; description: string }) {
@@ -264,7 +251,7 @@ export async function createPlaylist({ name, description }: { name: string; desc
 }
 
 export async function addToPlaylist(playlistUri: string, tracksUris: string[]) {
-   await getInnerGraphApi(
+   await fetchInnerGraphApi(
       'addToPlaylist',
       {
          newPosition: {

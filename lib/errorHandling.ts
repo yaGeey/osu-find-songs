@@ -29,7 +29,7 @@ export const modifyErrorMessage = (err: unknown, context: string) => {
    return new Error(`[${contextFormatted}] Unknown error: ${JSON.stringify(err)}`)
 }
 
-const ignoredErrorStatuses = [429, 404]
+const ignoredErrorStatuses = [429, 404, 504]
 export const getErrorHandlingMeta = (err: unknown, context: string) => {
    if (isAxiosError(err)) {
       const ignoredErrors = (err.config?.ignoredErrors || []).concat(ignoredErrorStatuses)

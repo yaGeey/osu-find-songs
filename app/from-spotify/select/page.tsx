@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { twMerge as tw, twMerge } from 'tailwind-merge'
-import { getPlaylist } from '@/lib/spotify/actions/officialApi'
 import { useMutation } from '@tanstack/react-query'
+import { fetchPlaylist } from '@/lib/spotify/actions/innerApi'
 
 export default function SelectPage() {
    const [isLoading, setIsLoading] = useState(false)
@@ -19,16 +19,17 @@ export default function SelectPage() {
    }
 
    const mutation = useMutation({
-      mutationFn: async (id: string) => await getPlaylist(id),
-      onSuccess: (data, playlistId) => {
+      mutationFn: async (id: string) => {
+         const res = await fetchPlaylist(id)
+         if (!res) {
+            setError('Playlist not found or is private')
+            return
+         }
          setError(null)
          setIsLoading(true)
-         router.push('/from-spotify/' + playlistId)
+         router.push('/from-spotify/' + id)
       },
-      onError: (e) => {
-         console.error(e)
-         setError('Playlist not found or is private')
-      },
+      onError: (e) => setError('Unexpected error occured'),
    })
 
    return (
@@ -36,6 +37,7 @@ export default function SelectPage() {
          <div className="flex flex-col justify-center items-center flex-1 sm:text-nowrap mt-1">
             <h1 className="text-4xl max-sm:text-2xl tracking-tight font-semibold mb-3">Select a public playlist</h1>
             <h3 className="text-lg max-sm:text-sm text-white/60">*NOT Albums, Daily Mixes, or Private playlists</h3>
+            {/*TODO <h3 className="text-lg max-sm:text-sm text-white/60">Even private ones work!</h3> */}
             <h2 className="text-xl max-sm:text-base mt-7 mb-3 text-center">
                Right-click the playlist → Share → Copy link to playlist
             </h2>
@@ -43,7 +45,7 @@ export default function SelectPage() {
             <div className="relative w-full">
                <input
                   placeholder="Spotify playlist link"
-                  pattern="https://open.spotify.com/playlist/.*"
+                  pattern="https?://open\.spotify\.com/playlist/[a-zA-Z0-9]{22}(\?.*)?"
                   onChange={(e) => {
                      if (e.target.value) {
                         if (e.target.checkValidity()) {

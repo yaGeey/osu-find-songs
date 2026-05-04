@@ -1,4 +1,19 @@
-// --- 1. Базові / Повторювані типи (Helpers) ---
+import { ExpectedSpotifyError } from './basics'
+
+export interface SpotifyPlaylistContentResponse {
+   playlistV2:
+      | {
+           __typename: 'Playlist'
+           content: PlaylistContent
+        }
+      | ExpectedSpotifyError<'NotFound'>
+}
+
+export interface SpotifyPlaylistResponse {
+   playlistV2: Playlist | ExpectedSpotifyError<'NotFound'>
+}
+
+////////////////////////////////
 
 // Зображення (використовується в обкладинках альбомів та візуальній ідентичності)
 export interface ImageSource {
@@ -152,15 +167,6 @@ type PlaylistContent = {
    totalCount: number
 }
 
-export interface SpotifyPlaylistContentResponse {
-   data: {
-      playlistV2: {
-         __typename: 'Playlist'
-         content: PlaylistContent
-      }
-   }
-}
-
 // ==========================================
 // 2. Специфічні метадані Плейлиста (Header)
 // ==========================================
@@ -189,61 +195,55 @@ export interface UserCapabilities {
 // 4. Головний тип (FetchPlaylistQuery)
 // ==========================================
 
-export interface SpotifyPlaylistMetadataResponse {
-   data: {
-      playlistV2: {
-         __typename: 'Playlist'
+interface Playlist {
+   __typename: 'Playlist'
+   // Ідентифікатори
+   uri: string
+   name: string
+   description: string
+   format: string
+   revisionId: string
 
-         // Ідентифікатори
-         uri: string
-         name: string
-         description: string
-         format: string
-         revisionId: string
+   // Статистика
+   followers: number
+   following: boolean
 
-         // Статистика
-         followers: number
-         following: boolean
+   // Права та налаштування
+   abuseReportingEnabled: boolean
+   basePermission: string
+   currentUserCapabilities: UserCapabilities
 
-         // Права та налаштування
-         abuseReportingEnabled: boolean
-         basePermission: string
-         currentUserCapabilities: UserCapabilities
-
-         // Метадані
-         ownerV2: User
-         members: {
-            totalCount: number
-            items: Array<{
-               isOwner: boolean
-               permissionLevel: string // e.g. "CONTRIBUTOR"
-               user: User // Використовує ту ж структуру User
-            }>
-         }
-         images: {
-            items: Array<{
-               sources: ImageSource[]
-            }>
-         }
-         sharingInfo: {
-            shareId: string
-            shareUrl: string
-         }
-         visualIdentity: {
-            squareCoverImage: {
-               __typename: 'VisualIdentityImage'
-               extractedColorSet: ExtractedColors
-            }
-         }
-         watchFeedEntrypoint?: {
-            entrypointUri: string
-            thumbnailImage: {
-               data: ImageWrapper
-            }
-         }
-
-         // Список треків (Content)
-         content: PlaylistItem
+   // Метадані
+   ownerV2: User
+   members: {
+      totalCount: number
+      items: Array<{
+         isOwner: boolean
+         permissionLevel: string // e.g. "CONTRIBUTOR"
+         user: User // Використовує ту ж структуру User
+      }>
+   }
+   images: {
+      items: Array<{
+         sources: ImageSource[]
+      }>
+   }
+   sharingInfo: {
+      shareId: string
+      shareUrl: string
+   }
+   visualIdentity: {
+      squareCoverImage: {
+         __typename: 'VisualIdentityImage'
+         extractedColorSet: ExtractedColors
       }
    }
+   watchFeedEntrypoint?: {
+      entrypointUri: string
+      thumbnailImage: {
+         data: ImageWrapper
+      }
+   }
+
+   content: PlaylistContent
 }

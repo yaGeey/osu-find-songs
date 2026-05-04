@@ -1,15 +1,14 @@
 export type SpotifySearchQueryResponse = {
-   data: {
-      searchV2: SpotifySearchV2
-   }
-   extensions: {
-      requestIds: Record<string, Record<string, string>>
-   }
+   searchV2: SpotifySearchV2
+   // extensions: {
+   //    requestIds: Record<string, Record<string, string>>
+   // }
 }
 
 // --- Main Search Structure ---
 
 export interface SpotifySearchV2 {
+   __typename: 'SearchResultV2'
    chipOrder: {
       items: { typeName: string }[]
    }

@@ -25,7 +25,7 @@ import { CardRenderer } from './_components/CardRenderer'
 import CustomLink from '@/components/CustomLink'
 import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
 import IconsSection from '@/components/IconsSection'
-import { getPlaylistMetadata, getPlaylistPage } from '@/lib/spotify/actions/innerApi'
+import { fetchPlaylist, fetchPlaylistContents } from '@/lib/spotify/actions/innerApi'
 import clientAxios from '@/lib/clientAxios'
 import useBaseStore from '@/contexts/useBaseStore'
 
@@ -48,7 +48,7 @@ export default function PlaylistPage() {
 
    const { data: playlistInfo, isFetching: playlistLoading } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
-      queryFn: async () => getPlaylistMetadata(playlistId as string),
+      queryFn: async () => fetchPlaylist(playlistId as string),
    })
 
    // fetching playlist
@@ -66,7 +66,7 @@ export default function PlaylistPage() {
             const delay = Math.floor(Math.random() * 600) + 800
             await new Promise((r) => setTimeout(r, delay))
          }
-         return await getPlaylistPage(playlistId as string, pageParam)
+         return await fetchPlaylistContents(playlistId as string, pageParam)
       },
       getNextPageParam: (lastPage) => lastPage.nextOffset,
       initialPageParam: 0,

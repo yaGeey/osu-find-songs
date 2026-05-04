@@ -81,7 +81,7 @@ export async function foTelemetryError(id: number, errorMessage: string) {
    if (isDev) return
    await sql`
       UPDATE fo_loading
-      SET error = ${errorMessage}, finish_at = NOW()
+      SET error = ${errorMessage}
       WHERE id = ${id}
    `
 }
