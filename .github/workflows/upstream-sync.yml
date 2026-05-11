@@ -1,0 +1,52 @@
+name: Sync with upstream
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: git remote add upstream https://github.com/yaGeey/osu-find-songs.git
+
+      - name: Fetch remotes
+        run: |
+          git fetch origin
+          git fetch upstream
+
+      - name: Create sync branch
+        run: |
+          git switch -C chore/upstream-sync upstream/main
+
+      - name: Push sync branch
+        run: git push --force-with-lease origin chore/upstream-sync
+
+      - name: Open or update PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base main \
+            --head chore/upstream-sync \
+            --title "chore: sync upstream/main into main" \
+            --body "Automated upstream sync PR from \`upstream/main\` into \`main\`." \
+          || gh pr edit chore/upstream-sync \
+            --title "chore: sync upstream/main into main" \
+            --body "Automated upstream sync PR from \`upstream/main\` into \`main\`."
