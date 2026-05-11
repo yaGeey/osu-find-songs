@@ -3,12 +3,12 @@ import { getWindowsFriendlyLocalTime } from '@/utils/dates'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
+import sortFn from '@/app/from-lastfm/[username]/_utils/sortBeatmaps'
 import RateLimitManager from '@/lib/limiter/RateLimitManager'
-import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import useSessionId from '../../../hooks/useSessionId'
 import { useQueryClient } from '@tanstack/react-query'
 import { fetchBeatmapWithFallback, download } from '../osuDownload'
+import { sendUnknownError } from '@/lib/errorHandling'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
@@ -30,19 +30,9 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
          const filename = `${b.id} ${b.artist} - ${b.title}.osz`
          const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, sessionId, queryClient })
 
-         // telemetry
-         sendMapDownloadTelemetry({
-            sessionId,
-            mapId: b.id,
-            playlistId: window.location.pathname.split('/')[2]!,
-            all: true,
-         }).catch(() => {})
-
-         // UI
          count++
          setText(`Downloading... (${count}/${valid.length})`)
          setProgress((count / valid.length) * 99)
-         console.log(`Downloaded ${filename}. Total progress ${progress}%`)
 
          return { filename, blob }
       })
@@ -61,8 +51,8 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
             setText(null)
          })
          .catch((error) => {
-            console.error('Download failed:', error)
             toast.error('Download failed')
+            sendUnknownError(error, 'DOWNLOAD_ALL', false)
             setProgress(-1)
          })
 

@@ -1,0 +1,292 @@
+import { BeatmapSet } from '@/types/Osu'
+import Image from 'next/image'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
+import { faDownload, faFileVideo, faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
+import { twMerge as tw, twJoin } from 'tailwind-merge'
+import { useMapDownload } from '@/lib/osu/hooks/useMapDownload'
+import { groupBy } from '@/utils/arrayManaging'
+import { useRef } from 'react'
+import ImageFallback from '@/components/ImageFallback'
+import { useAudioStore } from '@/contexts/useAudioStore'
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+import Loading from '@/components/state/Loading'
+
+export default function OsuCard({
+   beatmapset,
+   onHover = true,
+   className,
+}: {
+   beatmapset: BeatmapSet
+   onHover?: boolean
+   className?: string
+}) {
+   const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
+   const mutationNoVideo = useMapDownload({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video })
+   const mutationVideo = useMapDownload({ id: beatmapset.id, fileName, video: true })
+
+   const ref = useRef<HTMLDivElement>(null)
+   const currentUrl = useAudioStore((state) => state.currentUrl)
+
+   // Dates tooltip text
+   const dates = {
+      'Submitted at': beatmapset.submitted_date,
+      'Last updated at': beatmapset.last_updated,
+      'Ranked at': beatmapset.ranked_date,
+   }
+   const dateString = Object.entries(dates)
+      .filter(([_, v]) => v)
+      .map(([k, v]) => `${k} ${new Date(v!).toLocaleDateString()}`)
+      .join(' | ')
+
+   function handleDownload(video: boolean) {
+      useMapDownloadStore.getState().add(beatmapset.id, `${beatmapset.artist} - ${beatmapset.title}`)
+      if (video) mutationVideo.mutate()
+      else mutationNoVideo.mutate()
+   }
+
+   const isPending = mutationNoVideo.isPending || mutationVideo.isPending
+   return (
+      <div
+         ref={ref}
+         className={tw(
+            'no-jump select-none group relative h-26 font-inter overflow-hidden rounded-2xl min-w-[386px] w-[464px] bg-main-border flex _border-2 _border-main-border outline-3 outline-main-border -outline-offset-1 transition-all z-0',
+            '_hover:-translate-y-[2px] _hover:shadow-[0_4px_0_0_var(--color-main-border)]',
+            className,
+         )}
+      >
+         {/* IMAGES */}
+         <button
+            className="bg-main-border relative w-21 h-full overflow-hidden z-0 group/play"
+            onClick={() => {
+               if (currentUrl === beatmapset.preview_url) useAudioStore.getState().stop()
+               else useAudioStore.getState().play(beatmapset.preview_url)
+            }}
+         >
+            {currentUrl === beatmapset.preview_url ? (
+               <FontAwesomeIcon
+                  icon={faPause}
+                  className="text-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white stroke-[25px] stroke-main-border/80 z-20"
+               />
+            ) : (
+               <FontAwesomeIcon
+                  icon={faPlay}
+                  className="text-3xl group-hover:visible invisible absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white stroke-[25px] stroke-main-border/80 z-20"
+               />
+            )}
+            <ImageFallback
+               src={beatmapset.covers.list}
+               alt="list"
+               fill
+               sizes="100%"
+               loading="lazy"
+               fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
+               className={twJoin(
+                  'group-hover:brightness-80 group-hover/play:scale-107 transition-transform duration-300 ease-in-out object-cover min-h-[104px]',
+                  currentUrl === beatmapset.preview_url && 'scale-107 brightness-80',
+               )}
+            />
+         </button>
+         <div
+            className={twJoin(
+               'relative flex-grow flex justify-end bg-main group-hover:brightness-90 transition-[filter]',
+               'transition-all will-change-[clip-path] duration-300 ease-out',
+
+               // inset(0 0 0 0 round 0) keeps the full card visible and leaves corners sharp or inherited.
+               '[clip-path:inset(0_0_0_0_round_0)]',
+
+               // Reveal the download rail by trimming the right edge and rounding only the new right corners.
+               'group-hover:[clip-path:inset(0_1.5rem_0_0_round_0_1rem_1rem_0)]',
+               isPending && '[clip-path:inset(0_1.5rem_0_0_round_0_1rem_1rem_0)]',
+            )}
+         >
+            <ImageFallback
+               src={beatmapset.covers.card}
+               alt="cover"
+               width={286}
+               height={104}
+               className="z-10 object-cover"
+               loading="lazy"
+               fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
+            />
+            <div
+               className={twJoin(
+                  'absolute top-0 right-0 w-[289px] h-full z-15 pointer-events-none',
+                  'bg-gradient-to-r from-main to-main/70',
+                  'group-hover:to-main/55 transition-colors duration-300',
+               )}
+            ></div>
+         </div>
+         <a
+            target="_blank"
+            href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
+            className={tw(
+               'no-jump select-none absolute top-0 left-21 w-full h-full z-20 px-4 py-1 flex flex-col justify-between text-white hover:rounded-r-[14px] group-hover:w-[calc(100%-5.25rem-1rem)] overflow-hidden',
+               isPending && 'w-[calc(100%-5.25rem-1rem)]',
+            )}
+         >
+            {/* INFORMATION */}
+            <div className="truncate font-outline">
+               <h2 className="font-semibold text-[17px]">{beatmapset.title}</h2>
+               <h3 className="font-medium text-sm -mt-1">from {beatmapset.artist}</h3>
+            </div>
+            <h4 className="text-xs">
+               <span className="font-outline-sm">
+                  mapped by <span className="text-accent-light">{beatmapset.creator}</span>
+               </span>
+            </h4>
+            <div className="flex gap-2.5 text-main-gray text-[11px] items-center ">
+               <FontAwesomeIcon icon={faHeart} />
+               <span className="-ml-1.75 -mb-0.25">{beatmapset.favourite_count}</span>
+               <FontAwesomeIcon icon={faCirclePlay} />
+               <span className="-ml-1.75 -mb-0.25">{beatmapset.play_count.toLocaleString(undefined)}</span>
+               {beatmapset.ranked_date && (
+                  <>
+                     <FontAwesomeIcon icon={faStar} />
+                     <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
+                  </>
+               )}
+               <FontAwesomeIcon icon={beatmapset.ranked_date ? faCircleCheck : faClock} />
+               <span className="-ml-1.75 -mb-0.25" data-tooltip-id={'tooltip'} data-tooltip-content={dateString}>
+                  {new Date(beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date).toLocaleDateString()}
+               </span>
+            </div>
+            <div className="flex gap-1 items-center">
+               {/* STATE */}
+               <h4
+                  className={tw(
+                     'text-xs w-fit px-1 rounded-full font-medium',
+                     'bg-main-gray text-main-light',
+                     beatmapset.status === 'ranked' && 'bg-[#B3FF66] text-main-gray',
+                     beatmapset.status === 'approved' && 'bg-[#B3FF66 text-main-gray',
+                     beatmapset.status === 'qualified' && 'bg-[#FFD966] text-main-gray',
+                     beatmapset.status === 'loved' && 'bg-[#FF66AB] text-main-gray',
+                  )}
+               >
+                  {beatmapset.status.toUpperCase()}
+               </h4>
+
+               {/* DIFFICULTY */}
+               <section className="peer group/diff flex text-[11px] text-main-gray font-inter-tight gap-1">
+                  {beatmapset.beatmaps.length < 15 ? (
+                     Object.keys(groupBy(beatmapset.beatmaps, 'mode')).map((mode, i) => (
+                        <div key={i} className="flex gap-0.5">
+                           <Image src={`/osu/${mode}.png`} alt={mode} width={15} height={15} />
+                           <div className="flex gap-0.25">
+                              {groupBy(beatmapset.beatmaps, 'mode')
+                                 [mode].sort((a, b) => a.difficulty_rating - b.difficulty_rating)
+                                 .map((beatmap, j) => (
+                                    <div
+                                       style={getDifficultyColor(beatmap.difficulty_rating)}
+                                       data-tooltip-id={'tooltip'}
+                                       data-tooltip-content={`${beatmap.mode} | ${
+                                          Math.round((beatmap.difficulty_rating + Number.EPSILON) * 100) / 100
+                                       } - ${beatmap.version}`}
+                                       key={j}
+                                       className="h-[15px] w-[8px] rounded-full drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.15)]"
+                                    ></div>
+                                 ))}
+                           </div>
+                        </div>
+                     ))
+                  ) : (
+                     <span className="font-semibold text-xs">{beatmapset.beatmaps.length}</span>
+                  )}
+               </section>
+            </div>
+         </a>
+
+         {/* download buttons */}
+         <div
+            className={tw(
+               'absolute -right-6 top-0 w-5.5 z-1000 h-full transition-[right] flex flex-col items-center justify-center gap-5 text-main-white text-sm overflow-hidden',
+               onHover && 'group-hover:right-0',
+               isPending && 'right-0',
+            )}
+         >
+            {!isPending ? (
+               <>
+                  <FontAwesomeIcon
+                     icon={faDownload}
+                     onClick={() => handleDownload(false)}
+                     className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-[scale]"
+                     data-tooltip-id="tooltip"
+                     data-tooltip-content="Download without video"
+                     data-tooltip-delay-show={400}
+                  />
+                  {beatmapset.video && (
+                     <FontAwesomeIcon
+                        icon={faFileVideo}
+                        onClick={() => handleDownload(true)}
+                        className="cursor-pointer outline-hidden hover:scale-120 active:scale-90 transition-[scale]"
+                        data-tooltip-id="tooltip"
+                        data-tooltip-content="Download with video"
+                        data-tooltip-delay-show={400}
+                     />
+                  )}
+               </>
+            ) : (
+               <Loading color="#fed2d0" radius={15} />
+            )}
+         </div>
+      </div>
+   )
+}
+
+const hexToRgb = (hex: string) => {
+   const bigint = parseInt(hex.slice(1), 16)
+   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255]
+}
+
+// example: for each channel: 246 + 0.55 * (255 - 246) = 246 + 5 = 251 (55% between two colors)
+const interpolate = (start: number[], end: number[], factor: number) => {
+   return start.map((startChannel, i) => Math.round(startChannel + factor * (end[i] - startChannel)))
+}
+
+const difficultySpectrum: [number, string][] = [
+   [0.1, '#4290FB'],
+   [1.25, '#4FC0FF'],
+   [2.11, '#5bffc1'],
+   [2.48, '#7bff58'],
+   [3.3, '#F6F05C'],
+   [3.84, '#fbb763'],
+   [4.2, '#FF8068'],
+   [4.9, '#fe4e71'],
+   [5.7, '#cb46b4'],
+   [5.93, '#bb4abe'],
+   [6.18, '#a554c9'],
+   [7, '#5453c7'],
+   [7.8, '#171488'],
+   [9.0, '#000000'],
+]
+
+function getDifficultyColor(diff: number) {
+   const textColor = diff > 6.5 ? '#FFD700' : '#000000'
+
+   if (diff >= 9) return { backgroundColor: '#000000', color: textColor, fontWeight: 600 }
+
+   // interval search to find where the difficulty falls in the spectrum
+   let startColor = difficultySpectrum[0]
+   let endColor = difficultySpectrum.at(-1)!
+
+   for (let i = 0; i < difficultySpectrum.length - 1; i++) {
+      if (diff >= difficultySpectrum[i][0] && diff < difficultySpectrum[i + 1][0]) {
+         startColor = difficultySpectrum[i]
+         endColor = difficultySpectrum[i + 1]
+         break
+      }
+   }
+
+   // progress between two colors in 0 to 1
+   const range = endColor[0] - startColor[0]
+   const progress = (diff - startColor[0]) / range
+
+   const rgb = interpolate(hexToRgb(startColor[1]), hexToRgb(endColor[1]), progress)
+   const backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
+
+   return {
+      backgroundColor,
+      color: textColor,
+      fontWeight: 600,
+   }
+}

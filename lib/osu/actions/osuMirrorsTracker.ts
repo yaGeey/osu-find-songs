@@ -33,5 +33,4 @@ export async function reportSourceStatus(sourceName: string, status: 'success' |
       }
    }
    sourceTracker.set(sourceName, state)
-   console.log(sourceTracker)
 }

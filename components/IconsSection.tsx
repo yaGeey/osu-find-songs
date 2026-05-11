@@ -1,5 +1,6 @@
 import { House, Github } from 'lucide-react'
 import Link from 'next/link'
+import { repositoryUrl } from '@/lib/site'
 
 export default function IconsSection({ children }: { children?: React.ReactNode }) {
    return (
@@ -20,7 +21,7 @@ export function HomeIcon({ className }: { className?: string }) {
 }
 export function GithubIcon({ className }: { className?: string }) {
    return (
-      <a href="https://github.com/yaGeey/osu-find-songs" target="_blank" rel="noopener noreferrer">
+      <a href={repositoryUrl} target="_blank" rel="noopener noreferrer">
          <Github className={className} />
       </a>
    )

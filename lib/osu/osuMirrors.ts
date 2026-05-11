@@ -52,7 +52,6 @@ const mirrors = [
       headers: new AxiosHeaders({ Referer: 'https://akatsuki.gg/' }),
    },
 
-   // TODO: add osu download
    // {
    //    name: 'osu',
    //    downloadType: 'both',
@@ -125,7 +124,6 @@ export const getPrioritizedMirrorsFilteredByDead = async (deadMirrorNames?: stri
          return { mirror, bpms }
       }),
    )
-   // console.log(results.filter((r) => r.bpms !== Infinity).sort((a, b) => b.bpms - a.bpms))
    return results
       .filter((r) => r.bpms !== Infinity)
       .sort((a, b) => b.bpms - a.bpms)

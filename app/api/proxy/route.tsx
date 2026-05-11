@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server'
 
+const allowedProxyHosts = new Set(['akatsuki.gg', 'dl.sayobot.cn', 'osu.gatari.pw'])
+
 export async function GET(req: Request) {
    try {
       const { searchParams } = new URL(req.url)
       const targetUrl = searchParams.get('url')
       if (!targetUrl) return NextResponse.json({ error: 'Missing url parameter' }, { status: 400 })
+
+      const parsedUrl = new URL(targetUrl)
+      if (parsedUrl.protocol !== 'https:' || !allowedProxyHosts.has(parsedUrl.hostname)) {
+         return NextResponse.json({ error: 'Proxy target is not allowed' }, { status: 400 })
+      }
 
       const res = await fetch(targetUrl, {
          redirect: 'follow',

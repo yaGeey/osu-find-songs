@@ -3,13 +3,13 @@ import { Button } from './buttons/Buttons'
 import Image from 'next/image'
 import { sendUnknownError } from '@/lib/errorHandling'
 import ExternalLink from './ExternalLink'
+import { repositoryUrl } from '@/lib/site'
 
 export default function ErrorCallback({ error, resetErrorBoundary }: { error: unknown; resetErrorBoundary: () => void }) {
    const errorMessage =
       error instanceof Error ? error.message : typeof error === 'string' ? error : 'Unknown error (non-Error exception)'
 
    useEffect(() => {
-      console.error(error)
       if (process.env.NODE_ENV !== 'development') sendUnknownError(error, 'ERROR_BOUNDARY')
    }, [error])
 
@@ -42,7 +42,7 @@ export default function ErrorCallback({ error, resetErrorBoundary }: { error: un
                      <Button onClick={resetErrorBoundary}>Reload the page</Button>
                      <Button onClick={() => window.location.assign('/')}>Go to Home</Button>
                   </div>
-                  <ExternalLink href="https://github.com/yaGeey/osu-find-songs/issues">Report on GitHub</ExternalLink>
+                  <ExternalLink href={`${repositoryUrl}/issues`}>Report on GitHub</ExternalLink>
                </div>
             </div>
          </div>

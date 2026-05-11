@@ -1,7 +1,7 @@
 import { AxiosResponse, isAxiosError } from 'axios'
 import PQueue from 'p-queue'
 import { sendUnknownError } from '@/lib/errorHandling'
-// TODO розрібратись з тайпскриптом
+
 class SingletonInstance<T> {
    protected id: string
    private static instances = new Map<string, any>()
@@ -67,10 +67,9 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
       const promises = tasks.map((task, i) => this.execute(task, -(priorityOffset + i)))
       const results = await Promise.allSettled(promises)
 
-      return results.map((result, i) => {
+      return results.map((result) => {
          if (result.status === 'fulfilled') return result.value
          else {
-            console.error(`✗ Task ${i} failed:`, result.reason?.message || result.reason)
             return null
          }
       })
@@ -93,7 +92,6 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                   const remaining = parseInt(res.headers['x-ratelimit-remaining'] || res.headers['ratelimit-remaining'])
                   if (!isNaN(remaining) && remaining < this.remainingThreshold && !this.q.isPaused) {
                      const ms = this.getWaitTimeMs(res) + 100
-                     console.warn(`[${this.id}] 🚦 Pausing queue due to low remaining (${remaining}) for ${ms / 1000}s`)
                      this.pauseQueue(ms)
                   }
                }
@@ -103,7 +101,6 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                if (isAxiosError(err) && (err?.response?.status === 429 || err?.status === 429)) {
                   if (!this.q.isPaused && err.response) {
                      const ms = this.getWaitTimeMs(err.response) + 100
-                     console.error(`[${this.id}] ⛔ 429. Retrying in ${ms}ms`)
                      this.pauseQueue(ms)
                   }
                   // Retry with higher priority

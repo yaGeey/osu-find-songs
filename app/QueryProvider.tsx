@@ -8,8 +8,7 @@ import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persist
 import { toast } from 'react-toastify'
 import useBaseStore from '@/contexts/useBaseStore'
 
-const displayError = (err: unknown, errMsg: string) => {
-   console.error(err)
+const displayError = (_err: unknown, errMsg: string) => {
    toast.error(errMsg, { autoClose: 8000 })
    useBaseStore.getState().progressNotifyRef?.current?.blink('error', 4000)
 }
@@ -32,7 +31,7 @@ function makeQueryClient() {
          onError: (error, query) => {
             displayError(
                error,
-               (query.meta?.errMsg as string) ?? 'An error occurred while fetching data. Open console for details.',
+               (query.meta?.errMsg as string) ?? 'An error occurred while fetching data.',
             )
          },
       }),
@@ -40,7 +39,7 @@ function makeQueryClient() {
          onError: (error, _variables, _context, mutation) => {
             displayError(
                error,
-               (mutation.meta?.errMsg as string) ?? 'An error occurred while performing the action. Open console for details.',
+               (mutation.meta?.errMsg as string) ?? 'An error occurred while performing the action.',
             )
          },
       }),

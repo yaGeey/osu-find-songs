@@ -1,7 +1,6 @@
 import axios from 'axios'
 import https from 'https'
 import http from 'http'
-import { LDObserve } from '@launchdarkly/observability-node'
 import { getErrorHandlingMeta, modifyErrorMessage } from './errorHandling'
 
 export const customAxios = axios.create({
@@ -13,8 +12,7 @@ customAxios.interceptors.response.use(
    (response) => response,
    (err) => {
       const { skip, context } = getErrorHandlingMeta(err, 'SERVER_AXIOS')
-      const errToReport = modifyErrorMessage(err, context)
-      if (!skip) LDObserve.recordError(errToReport, undefined, undefined)
+      if (!skip) modifyErrorMessage(err, context)
       return Promise.reject(err)
    },
 )

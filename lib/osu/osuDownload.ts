@@ -70,7 +70,6 @@ export async function fetchBeatmapWithFallback({
          // if (sessionId) reportSourceStatus(mirror.name, 'success', sessionId).catch(() => {}) // reset state on success
          return res
       } catch (err) {
-         console.warn(`${mirror.name} failed:`, err)
          if (sessionId && isAxiosError(err)) {
             // await reportSourceStatus(mirror.name, 'failure', sessionId).catch(() => {}) // await to ensure state is updated before next attempt
          }

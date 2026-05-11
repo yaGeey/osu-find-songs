@@ -10,7 +10,7 @@ export default function useProgressVariant(
    useEffect(() => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
-      setVariant(defaultVariant)
+      queueMicrotask(() => setVariant(defaultVariant))
       timeoutRef.current = setTimeout(() => {
          setVariant('indeterminate')
       }, 7000)

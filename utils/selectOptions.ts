@@ -19,7 +19,6 @@ export const groupOptions: { value: GroupOptionValue; label: string[] }[] = [
    { value: 'length', label: ['length'] },
 ]
 
-export const filterOptions = [{ value: 'exact-spotify', label: 'Exact Spotify match' }]
 
 export const languageOptions = [
    { value: 'en', label: 'English' },

@@ -1,58 +1,45 @@
 {
-  "name": "osu-find-songs",
+  "name": "osu-lastfm",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "postbuild": "npx --package=@launchdarkly/ldcli ldcli sourcemaps upload --project $LD_PROJECT_KEY --app-version $VERCEL_GIT_COMMIT_SHA --path .next/static --base-path _next/static --access-token $LD_ACCESS_TOKEN ",
     "start": "next start",
     "lint": "eslint .",
-    "test": "jest"
+    "check": "npm run lint && npm run build",
+    "test": "jest --runInBand --passWithNoTests"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@launchdarkly/node-server-sdk": "^9.10.6",
-    "@launchdarkly/observability": "^1.0.1",
-    "@launchdarkly/observability-node": "^1.0.1",
-    "@launchdarkly/session-replay": "^1.0.1",
-    "@neondatabase/serverless": "^1.0.1",
-    "@next/third-parties": "16.2.3",
     "@tanstack/query-sync-storage-persister": "^5.66.0",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-query-devtools": "^5.66.0",
     "@tanstack/react-query-persist-client": "^5.66.0",
     "@types/js-cookie": "^3.0.6",
-    "@types/spotify-api": "^0.0.25",
-    "@vercel/analytics": "^1.5.0",
+    "axios": "^1.16.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "framer-motion": "^12.29.2",
     "js-cookie": "^3.0.5",
     "jszip": "^3.10.1",
-    "launchdarkly-react-client-sdk": "^3.9.0",
     "lucide-react": "^0.563.0",
     "next": "16.2.3",
     "nuqs": "^2.4.1",
     "p-limit": "^7.3.0",
     "p-queue": "^9.0.1",
-    "pusher": "^5.3.2",
-    "pusher-js": "^8.4.0",
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "react-error-boundary": "^5.0.0",
     "react-spinner-material": "^1.4.0",
-    "react-spotify-embed": "^2.0.4",
     "react-toastify": "^11.0.5",
     "react-tooltip": "^5.28.0",
     "react-virtuoso": "^4.13.0",
     "schema-dts": "^1.1.5",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "ytmusic-api": "^5.3.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
@@ -79,5 +66,11 @@
   "overrides": {
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/test\\.[jt]sx?$"
+    ]
   }
 }

@@ -103,29 +103,3 @@ async function revalidateOsuToken(): Promise<string> {
    })
    return data.access_token
 }
-
-const lazerCookieTokenName = 'lazerToken'
-export const getLazerToken = async () => (await cookies()).get(lazerCookieTokenName)?.value ?? (await lazerLogin())
-
-async function lazerLogin() {
-   const { data } = await customAxios.post<AuthResponse>(
-      'https://osu.ppy.sh/oauth/token',
-      `username=${process.env.LAZER_USERNAME}&password=${process.env.LAZER_PWD}&grant_type=password&client_id=5&client_secret=FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk&scope=*`,
-      {
-         headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-         },
-         context: 'lazer login',
-      },
-   )
-   const storage = await cookies()
-   storage.set(lazerCookieTokenName, data.access_token, {
-      path: '/',
-      expires: new Date(Date.now() + data.expires_in * 1000),
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-   })
-   return data.access_token
-}

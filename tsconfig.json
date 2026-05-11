@@ -2,7 +2,7 @@
    "compilerOptions": {
       "target": "ES2017",
       "lib": ["dom", "dom.iterable", "esnext"],
-      "types": ["spotify-api"],
+      "types": [],
       "allowJs": true,
       "skipLibCheck": true,
       "strict": true,

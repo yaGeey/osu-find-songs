@@ -34,8 +34,7 @@ export default class RateLimitManager extends BaseLimiter {
       let firstResult: T | null = null
       try {
          firstResult = await this.execute(tasks[0], 0)
-      } catch (e) {
-         console.error(`[${this.id}] ⚠️ Probe task failed`, e)
+      } catch {
          firstResult = null
       }
 
@@ -44,7 +43,6 @@ export default class RateLimitManager extends BaseLimiter {
          const res = firstResult as unknown as AxiosResponse
          const calculatedConcurrency = this.calculateConcurrency(res)
          if (this.q.concurrency !== calculatedConcurrency) {
-            console.log(`[${this.id}] 📊 Adjusting Concurrency to ${calculatedConcurrency}`)
             this.q.concurrency = calculatedConcurrency
          }
       }

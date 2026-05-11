@@ -1,7 +1,6 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import useBaseStore from '@/contexts/useBaseStore'
 import useSessionId from '@/hooks/useSessionId'
@@ -20,7 +19,6 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo }: UseMapDownl
 
    return useMutation({
       mutationFn: async () => {
-         sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(() => {})
          return video
             ? await fetchBeatmapWithFallback({ id, video: true, priority: 1, queryClient, sessionId })
             : await fetchBeatmapWithFallback({ id, video: false, onlyNoVideo, priority: 1, queryClient, sessionId })

@@ -1,26 +1,13 @@
 import { MetadataRoute } from 'next'
+import { siteUrl } from '@/lib/site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-   const baseUrl = 'https://osu.yageey.me'
-
    return [
       {
-         url: baseUrl,
+         url: siteUrl,
          lastModified: new Date(),
          changeFrequency: 'weekly',
          priority: 1,
-      },
-      {
-         url: `${baseUrl}/from-osu/select`,
-         lastModified: new Date(),
-         changeFrequency: 'monthly',
-         priority: 0.8,
-      },
-      {
-         url: `${baseUrl}/from-spotify/select`,
-         lastModified: new Date(),
-         changeFrequency: 'monthly',
-         priority: 0.8,
       },
    ]
 }
