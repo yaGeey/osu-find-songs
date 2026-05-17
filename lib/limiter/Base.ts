@@ -1,4 +1,4 @@
-import { AxiosResponse, isAxiosError } from 'axios'
+import axios, { AxiosResponse, isAxiosError } from 'axios'
 import PQueue from 'p-queue'
 import { sendUnknownError } from '@/lib/errorHandling'
 // TODO розрібратись з тайпскриптом
@@ -28,6 +28,8 @@ export type BaseLimiterParameters = {
    defaultDelayMs?: number
    remainingThreshold?: number
    showErrors?: boolean
+   waitTimeThresholdMs?: number
+   blockForMsOnError?: number
 }
 
 export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
@@ -35,6 +37,11 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
    protected defaultDelayMs: number
    protected remainingThreshold: number
    protected showErrors: boolean
+   protected waitTimeThresholdMs: number
+   protected blockForMsOnError?: number
+
+   protected maxRetries = 2
+   protected blockedUntil = 0
 
    /**
     * @param id Unique identifier for the limiter instance.
@@ -49,12 +56,16 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
       defaultDelayMs = 500,
       remainingThreshold = 5,
       showErrors = true,
+      waitTimeThresholdMs = 1000 * 10,
+      blockForMsOnError,
    }: BaseLimiterParameters & BaseLimiterInternal) {
       super(id)
       this.q = q
       this.defaultDelayMs = defaultDelayMs
       this.remainingThreshold = remainingThreshold
       this.showErrors = showErrors
+      this.waitTimeThresholdMs = waitTimeThresholdMs
+      this.blockForMsOnError = blockForMsOnError
    }
    abstract executeBatch<T>(tasks: Array<() => Promise<T>>): Promise<(T | null)[]>
 
@@ -67,6 +78,7 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
       const promises = tasks.map((task, i) => this.execute(task, -(priorityOffset + i)))
       const results = await Promise.allSettled(promises)
 
+      //FIXME bad practice. Maybe we should throw an error
       return results.map((result, i) => {
          if (result.status === 'fulfilled') return result.value
          else {
@@ -82,17 +94,24 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
     * @param priority Optional priority for the task in the queue (default is 0, higher = bigger).
     * @returns Promise with a result.
     */
-   public async execute<T>(task: () => Promise<T>, priority: number = 0): Promise<T> {
+   public async execute<T>(task: () => Promise<T>, priority: number = 0, attempt: number = 0): Promise<T> {
+      if (Date.now() < this.blockedUntil) {
+         throw new Error(`Queue ${this.id} paused until ${new Date(this.blockedUntil).toISOString()}. Skipping task.`)
+      }
       return this.q.add(
          async () => {
             try {
                const result = await task()
-               const res = result as unknown as AxiosResponse
 
-               if (res?.headers) {
-                  const remaining = parseInt(res.headers['x-ratelimit-remaining'] || res.headers['ratelimit-remaining'])
+               if (result && typeof result === 'object' && 'headers' in result) {
+                  const response = result as unknown as AxiosResponse
+                  const remaining = parseInt(response.headers['x-ratelimit-remaining'] || response.headers['ratelimit-remaining'])
                   if (!isNaN(remaining) && remaining < this.remainingThreshold && !this.q.isPaused) {
-                     const ms = this.getWaitTimeMs(res) + 100
+                     const ms = this.getWaitTimeMs(response) + 100
+                     if (ms > this.waitTimeThresholdMs) {
+                        this.blockedUntil = Date.now() + ms
+                        return this.execute(task, priority, attempt) // throw error on start and don't trigger catch block
+                     }
                      console.warn(`[${this.id}] 🚦 Pausing queue due to low remaining (${remaining}) for ${ms / 1000}s`)
                      this.pauseQueue(ms)
                   }
@@ -101,13 +120,24 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                return result
             } catch (err) {
                if (isAxiosError(err) && (err?.response?.status === 429 || err?.status === 429)) {
-                  if (!this.q.isPaused && err.response) {
-                     const ms = this.getWaitTimeMs(err.response) + 100
-                     console.error(`[${this.id}] ⛔ 429. Retrying in ${ms}ms`)
-                     this.pauseQueue(ms)
+                  if (this.blockForMsOnError) {
+                     this.blockedUntil = Date.now() + this.blockForMsOnError
+                  }
+
+                  const nextAttempt = attempt + 1
+                  if (nextAttempt > this.maxRetries) {
+                     throw err
+                  }
+
+                  const baseMs = err.response ? this.getWaitTimeMs(err.response) + 100 : this.defaultDelayMs
+                  const backoffMs = baseMs * Math.pow(2, attempt)
+
+                  if (!this.q.isPaused) {
+                     console.error(`[${this.id}] ⛔ 429. Retrying in ${backoffMs}ms (attempt ${nextAttempt}/${this.maxRetries})`)
+                     this.pauseQueue(backoffMs)
                   }
                   // Retry with higher priority
-                  return this.execute(task, 1)
+                  return this.execute(task, 1, nextAttempt)
                }
                sendUnknownError(err, `${this.id}_LIMITER`, this.showErrors)
                throw err || new Error('Task failed with undefined error')

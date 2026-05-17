@@ -20,9 +20,7 @@ export default class RateLimitManager extends BaseLimiter {
       super({
          id,
          q: new PQueue({ concurrency: options?.maxConcurrency || 1 }),
-         remainingThreshold: options?.remainingThreshold,
-         defaultDelayMs: options?.defaultDelayMs,
-         showErrors: options?.showErrors,
+         ...options,
       })
       this.maxConcurrency = options?.maxConcurrency || 1
    }
@@ -44,11 +42,9 @@ export default class RateLimitManager extends BaseLimiter {
          const res = firstResult as unknown as AxiosResponse
          const calculatedConcurrency = this.calculateConcurrency(res)
          if (this.q.concurrency !== calculatedConcurrency) {
-            console.log(`[${this.id}] 📊 Adjusting Concurrency to ${calculatedConcurrency}`)
             this.q.concurrency = calculatedConcurrency
          }
       }
-
       const mainBatch = await this.processBatch(tasks.slice(1), 1)
       return [firstResult, ...mainBatch]
    }

@@ -21,7 +21,7 @@ const mirrors = [
       name: 'catboy',
       downloadType: 'video',
       buildUrlVideo: (id: number) => `https://catboy.best/d/${id}`,
-      manager: RateLimitManager.getInstance('catboy', { showErrors: false }),
+      manager: RateLimitManager.getInstance('catboy', { showErrors: false, blockForMsOnError: 1000 * 60 * 60 * 5 }),
    },
    // bot verification
    // {
