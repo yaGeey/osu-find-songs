@@ -89,12 +89,7 @@ export default function Modal({ buttons, children, status, title, className, set
                      {buttons.map(
                         (btn, index) =>
                            btn.children && (
-                              <Button
-                                 key={index}
-                                 onClick={btn.onClick}
-                                 className={tw(btn.className)}
-                                 textClassName="font-outline-sm"
-                              >
+                              <Button key={index} onClick={btn.onClick} className={tw(btn.className)}>
                                  {btn.children}
                               </Button>
                            ),

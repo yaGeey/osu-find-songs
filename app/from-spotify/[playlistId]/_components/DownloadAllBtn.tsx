@@ -37,15 +37,15 @@ export default function DownloadAllBtn({
                status: 'info' as const,
                children: (
                   <p>
-                     The estimated total size of the maps is <span className="font-medium">{maps.length * 11} MB</span>.
+                     The estimated total size of the maps is <span className="font-medium text-xl">{maps.length * 11} MB</span>.
                      {maps.length > 100 && <span className="font-medium"> This may take a very long time.</span>} Are you sure you
                      want to proceed downloading? No videos will be included. If multiple beatmap sets exist for a song, the first
                      one matching your search <span className="underline">filters</span> will be downloaded
                   </p>
                ),
                buttons: [
-                  { onClick: handleStartDownload, children: 'Download', className: 'bg-success w-31' },
-                  { onClick: closeModal, children: 'Later', className: 'w-31' },
+                  { onClick: handleStartDownload, children: 'Download', className: 'w-31' },
+                  { onClick: closeModal, children: 'Later', className: 'w-31 bg-transparent border-none text-black' },
                ],
             }
          case 'downloading':
@@ -82,15 +82,18 @@ export default function DownloadAllBtn({
 
    return (
       <>
-         <Button
-            onClick={() => setIsOpen(true)}
-            className="text-white py-0.5 px-5 bg-main-dark _invisible"
-            textClassName="font-outline-sm"
-            disabled={disabled}
-         >
-            Download all
-            <FontAwesomeIcon icon={faDownload} className="ml-2" />
-         </Button>
+         <div className="relative w-fit group">
+            <Button
+               className="text-white py-0.5 px-5 bg-main-dark opacity-0 group-hover:opacity-100 transition-opacity"
+               textClassName="font-outline-sm "
+               disabled={disabled}
+               onClick={() => setIsOpen(true)}
+            >
+               Download all
+               <FontAwesomeIcon icon={faDownload} className="ml-2 group-hover:visible" />
+            </Button>
+            <FontAwesomeIcon icon={faDownload} className="absolute right-5 top-1.5 text-xl group-hover:invisible" />
+         </div>
 
          <Modal
             isOpen={isOpen}
