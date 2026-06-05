@@ -1,5 +1,5 @@
 'use server'
-import { BeatmapSet } from '@/types/Osu'
+import { BeatmapSet, BeatmapSetFromOsu } from '@/types/Osu'
 import { customAxios } from '../../serverAxios'
 import { cookies } from 'next/headers'
 
@@ -43,6 +43,28 @@ export async function getBeatmap(id: string): Promise<BeatmapSet> {
          context: 'fetch beatmap details',
       })
       return res.data
+   })
+}
+
+export async function getBeatmapForFromOsu(id: string): Promise<BeatmapSetFromOsu> {
+   return fetchOsu(async (token) => {
+      const res = await customAxios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
+         headers: buildHeaders(token),
+         context: 'fetch beatmap details',
+      })
+      return {
+         bpm: res.data.bpm,
+         genre: res.data.genre.name,
+         id: res.data.id,
+         language: res.data.language.name,
+         submitted_date: res.data.submitted_date,
+         rating: res.data.rating,
+         covers: {
+            cover: res.data.covers.cover,
+            'card@2x': res.data.covers['card@2x'],
+            list: res.data.covers.list,
+         },
+      } satisfies BeatmapSetFromOsu // TODO maybe trim it more?
    })
 }
 

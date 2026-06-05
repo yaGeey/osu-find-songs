@@ -2,23 +2,15 @@
 import Image from 'next/image'
 import { CombinedSingleSimple } from '@/types/types'
 import { Spotify } from 'react-spotify-embed'
-import { useEffect, useRef } from 'react'
-import AuthorString from './AuthorString'
-import SpotifyEmbed from '../../../components/embeds/Spotify'
+import { useRef } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import useBaseStore from '@/contexts/useBaseStore'
 import CloseBtn from '@/components/buttons/CloseBtn'
 import CustomLink from '@/components/CustomLink'
 
 export default function Info({ data }: { data: CombinedSingleSimple }) {
-   const showSpotifyEmbeds = useBaseStore((state) => state.showSpotifyEmbeds)
    const { local, spotify, osu } = data
    const container = useRef<HTMLDivElement>(null)
-
-   useEffect(() => {
-      if (!localStorage.getItem('showSpotifyEmbeds')) localStorage.setItem('showSpotifyEmbeds', 'true')
-      // if (!Cookies.get('showYouTubeEmbeds')) Cookies.set('showYouTubeEmbeds', 'true')
-   }, [])
 
    return (
       <div
@@ -35,7 +27,7 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
          />
          <div className="relative flex gap-4 border-b-4 border-main-border p-4">
             <Image
-               src={osu?.covers.cover || local.image}
+               src={osu?.covers.cover || '/backoff.webp'}
                width={0}
                height={0}
                sizes="100vw"
@@ -58,27 +50,9 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
                      </CustomLink>
                   </span>
                </h1>
-               <h2 className="font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]/[19px]">
-                  {spotify && spotify?.length != 20 && osu ? (
-                     <AuthorString artists={spotify[0].artists.items} beatmapset={osu} />
-                  ) : (
-                     <span>{osu?.artist}</span>
-                  )}
-                  {!osu && <span>{local.author}</span>}
-               </h2>
+               <h2 className="font-medium mt-1 line-clamp-2 font-outline-sm text-[15px]/[19px]">{local.artist}</h2>
             </div>
          </div>
-
-         {/* <div className="relative bg-amber-800 w-full h-full"> */}
-         {/* <Image
-               src={osu?.covers.cover || local.image}
-               width={0}
-               height={0}
-               sizes="100vw"
-               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-               alt="cover"
-               className="absolute inset-0 opacity-7 z-1"
-            /> */}
          <div className="relative scrollbar flex flex-col gap-2 px-1 py-3 w-full h-full bg-main-dark-vivid overflow-auto max-h-[456px]">
             {spotify?.length == 20 && (
                <div className="flex gap-2">
@@ -88,17 +62,10 @@ export default function Info({ data }: { data: CombinedSingleSimple }) {
                   </span>
                </div>
             )}
-            {spotify?.map((track, i: number) =>
-               showSpotifyEmbeds ? (
-                  <Spotify wide link={'https://open.spotify.com/track/' + track.id} key={i} className="z-2 overflow-hidden" />
-               ) : (
-                  <div className="z-2" key={i}>
-                     <SpotifyEmbed track={track} />
-                  </div>
-               ),
-            )}
+            {spotify?.map((ids, i: number) => (
+               <Spotify wide link={'https://open.spotify.com/track/' + ids} key={i} className="z-2 overflow-hidden" />
+            ))}
          </div>
-         {/* </div> */}
       </div>
    )
 }

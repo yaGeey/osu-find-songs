@@ -4,15 +4,15 @@ import Modal, { ModalProps } from '@/components/Modal'
 import useSessionId from '@/hooks/useSessionId'
 import { createPlaylist, addToPlaylist } from '@/lib/spotify/actions/innerApi'
 import { playlistCreated } from '@/lib/actions/telemetry'
-import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useMutation } from '@tanstack/react-query'
 import { useState, useEffect, useRef } from 'react'
 import { ProgressInline } from '@/components/state/Progress'
 import ProgressBase from '@/components/state/ProgressBase'
+import { ServerSpotifyResponse } from '@/app/api/batch/spotify/route'
 
-export default function CreatePlaylistButton({ data, dataTotal }: { data: (SpotifyTrack[] | null)[]; dataTotal: number }) {
+export default function CreatePlaylistButton({ data, dataTotal }: { data: ServerSpotifyResponse; dataTotal: number }) {
    const [isOpen, setOpen] = useState(true)
    const [textState, setTextState] = useState<'error' | 'ready' | 'creating'>('ready')
    const [step, setStep] = useState<'confirm' | 'playlistCreation' | 'allowNotifications'>('confirm')
@@ -54,7 +54,7 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: (Spoti
       if (createPlaylistMutation.data && step === 'playlistCreation' && addItemsMutation.isIdle && isTracksLoadingFinished) {
          addItemsMutation.mutate({
             playlistUri: createPlaylistMutation.data.uri,
-            tracksUris: data.filter(Boolean).map((tracks) => tracks![0].uri),
+            tracksUris: data.filter(Boolean).map((ids) => `spotify:track:${ids![0]}`),
          })
       }
    }, [step, createPlaylistMutation.data, isTracksLoadingFinished])

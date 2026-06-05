@@ -34,54 +34,53 @@ export type Beatmap = {
 
 export type BeatmapSet = {
    artist: string
-   artist_unicode: string
    covers: {
       cover: string
+      'cover@2x': string
       card: string
+      'card@2x': string
       list: string
-      slimcover: string
-   }
-   availability: {
-      download_disabled: boolean
-      more_information: string | null
    }
    beatmaps: Beatmap[]
    bpm: number
-   can_be_hyped: boolean
-   converts: Beatmap[]
+   // converts: Beatmap[] // TODO
    creator: string
-   deleted_at: string | null
-   discussion_enabled: boolean
-   discussion_locked: boolean
    favourite_count: number
    genre: {
       id: number
       name: string
    }
    id: number
-   is_scoreable: boolean
    language: {
       id: number
       name: string
    }
    last_updated: string
-   legacy_thread_url: string | null
-   nsfw: boolean
    play_count: number
    preview_url: string
    source: string | null
-   spotlight: boolean
    status: Status
-   storyboard: boolean
-   tags: string
+   // tags: string // TODO search tags too
    title: string
-   title_unicode: string
-   track_id: number | null
-   user_id: number
+   // title_unicode: string // TODO
    video: boolean
    ranked: number
    ranked_date: string | null
    submitted_date: string
    rating: number
 }
+export type BeatmapSetFromOsu = {
+   covers: {
+      cover: string
+      'card@2x': string
+      list: string
+   }
+   bpm: number
+   genre: string
+   id: number
+   language: string
+   submitted_date: string
+   rating: number
+}
+
 type Status = 'ranked' | 'approved' | 'qualified' | 'loved' | 'pending' | 'graveyard' | 'wip'

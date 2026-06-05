@@ -1,12 +1,15 @@
 import { searchSongWithConditions } from '@/lib/spotify/helpers'
-import { Song } from '@/types/types'
+import { SpotifyTrackFromOsu } from '@/types/graphql-spotify/searchDesktop'
+import { LocalBeatmap } from '@/types/types'
 import { MAX_SPOTIFY_SEARCH_CONCURRENCY, OSU_BATCH_SIZE } from '@/variables'
 import pLimit from 'p-limit'
-// TODO maybe remove pLimit or make it conccurent to emulate user? 
+// TODO maybe remove pLimit or make it conccurent to emulate user?
 const limit = pLimit(MAX_SPOTIFY_SEARCH_CONCURRENCY)
 
+export type ServerSpotifyResponse = (number[] | null)[]
+
 export async function POST(req: Request) {
-   const songs: Song[] = await req.json()
+   const songs: LocalBeatmap[] = await req.json()
 
    if (!songs.length || songs.length > OSU_BATCH_SIZE)
       return new Response(`No songs provided or more than ${OSU_BATCH_SIZE}`, {
@@ -18,8 +21,12 @@ export async function POST(req: Request) {
    const tasks = songs.map((song) => limit(() => searchSongWithConditions(song).catch((err) => null)))
    const res = await Promise.all(tasks)
 
-   return new Response(JSON.stringify(res), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-   })
+   return new Response(
+      // FIXME satisfies ServerSpotifyResponse
+      JSON.stringify(res.map((tracks) => (tracks ? tracks.map((t) => t.id) : null)) as ServerSpotifyResponse),
+      {
+         status: 200,
+         headers: { 'Content-Type': 'application/json' },
+      },
+   )
 }

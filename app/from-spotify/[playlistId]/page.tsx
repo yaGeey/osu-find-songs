@@ -271,14 +271,14 @@ export default function PlaylistPage() {
                   <AnimatePresence mode="popLayout">
                      {maps.length > 0 && (
                         <motion.div
-                           key={maps[0][0]?.covers.slimcover}
+                           key={maps[0][0]?.covers['cover@2x']}
                            initial={{ opacity: 0 }}
                            animate={{ opacity: 1 }}
                            exit={{ opacity: 0 }}
                            transition={{ duration: 0.1 }}
                         >
                            <Image
-                              src={maps[0][0]?.covers.slimcover}
+                              src={maps[0][0]?.covers['cover@2x']}
                               alt="bg"
                               fill
                               className="object-cover opacity-5 pointer-events-none"

@@ -1,6 +1,6 @@
 'use client'
-import { Song } from '@/types/types'
-import { useSongContext } from '@/contexts/SongContext'
+import { LocalBeatmap } from '@/types/types'
+import { useLocalBeatmapsContext } from '@/contexts/SongContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
@@ -10,19 +10,36 @@ import { faCopy, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { twJoin, twMerge } from 'tailwind-merge'
 import { sendUnknownError } from '@/lib/errorHandling'
 
+type LocalOsuMetadata = Omit<LocalBeatmap, 'imageURL'> & { bgFileName: string | null }
+type OsuMetadataFromFile = Omit<LocalOsuMetadata, 'id'>
+
 export default function SelectPage() {
-   const { setSongs } = useSongContext()
+   const { setLocalBeatmaps } = useLocalBeatmapsContext()
    const router = useRouter()
 
-   useEffect(() => {
-      if (Cookies.get('showSpotifyEmbeds') === undefined) Cookies.set('showSpotifyEmbeds', 'true')
-      if (Cookies.get('showYouTubeEmbeds') === undefined) Cookies.set('showYouTubeEmbeds', 'true')
-   }, [])
-
-   function readFileAsText(file: File): Promise<string> {
+   function parseOsuFile(file: File): Promise<OsuMetadataFromFile> {
       return new Promise((resolve, reject) => {
          const reader = new FileReader()
-         reader.onload = () => resolve(reader.result as string)
+         reader.onload = () => {
+            const content = reader.result as string
+            const lines = content.split(/\r?\n/)
+            const result: Partial<OsuMetadataFromFile> = {}
+
+            for (let i = 0; i < lines.length; i++) {
+               const line = lines[i].trim()
+
+               if (line.startsWith('Title:')) result.title = line.replace('Title:', '').trim()
+               if (line.startsWith('Artist:')) result.artist = line.replace('Artist:', '').trim()
+               if (line.startsWith('Creator:')) result.artist = line.replace('Artist:', '').trim()
+               if (line.startsWith('[Difficulty]')) break
+            }
+
+            if (!result.title || !result.artist) {
+               reject(new Error('Missing required metadata in .osu file'))
+               return
+            }
+            resolve(result as OsuMetadataFromFile)
+         }
          reader.onerror = () => reject(reader.error)
          reader.readAsText(file)
       })
@@ -32,12 +49,11 @@ export default function SelectPage() {
       const files = e.target.files
       if (!files || files.length === 0) throw new Error('No files selected')
 
-      const songs: Song[] = []
-      const fileList = Array.from(files)
+      const beatmaps: LocalBeatmap[] = []
 
       // grouping files by folders
       const folders = new Map<string, File[]>()
-      for (const file of fileList) {
+      for (const file of files) {
          const parts = file.webkitRelativePath.split('/')
          if (parts.length <= 1) continue
          const folderName = parts[1]
@@ -52,49 +68,27 @@ export default function SelectPage() {
          try {
             const mapParts = folderName.split(' ')
 
-            // check if folder is map folder
+            // check if folder is a map folder
             const id = mapParts.length > 0 && !isNaN(parseInt(mapParts[0])) ? mapParts.shift() : null
             if (!id) continue
 
             const osuFile = files.find((f) => f.name.endsWith('.osu'))
             if (!osuFile) continue
 
-            // getting file content -> bg filename
-            const content = await readFileAsText(osuFile)
-            const lines = content.split('\n')
-
-            let bgFileName: null | string = null
-
-            for (let i = 0; i < lines.length; i++) {
-               const line = lines[i]
-
-               if (!bgFileName && line.trim().startsWith('//Background and Video events')) {
-                  const bgLine = lines[i + 1]
-                  const match = bgLine.match(/"(.*?)"/)
-                  if (match) bgFileName = match[1]
-               }
-            }
-            if (!bgFileName) continue // TODO we can live without bg
-
-            // searching bg file
-            const imageFile = files.find((f) => f.name === bgFileName)
-            if (!imageFile) continue
-            const image = URL.createObjectURL(imageFile)
+            const metadata = await parseOsuFile(osuFile)
 
             const mapName = mapParts.join(' ').split(' - ')
-            const title = mapName[1].replace('[no video]', '').trim()
-            songs.push({
-               author: mapName[0],
-               title,
-               text: `${mapName[0]} - ${title}`,
-               image,
+            beatmaps.push({
+               artist: mapName[0],
+               title: mapName[1].replace('[no video]', '').trim(),
+               creator: metadata.creator,
                id,
             })
          } catch (err) {
             console.warn(`Skipping folder "${folderName}" due to read/parse error`, err)
          }
       }
-      setSongs(songs)
+      setLocalBeatmaps(beatmaps)
       router.push('/from-osu')
    }
 
@@ -105,7 +99,9 @@ export default function SelectPage() {
       <div className="flex flex-col justify-center items-center min-h-screen text-white">
          <div className="flex flex-col justify-center items-center flex-1 text-nowrap">
             <h1 className="text-4xl tracking-tight font-semibold mb-3">Select your osu! beatmaps folder</h1>
-            <h3 className="text-lg text-white/60">This may take some time</h3>
+            <h3 className="text-lg text-white/60">
+               This may take some time, or the app may even crash if you have too many maps
+            </h3>
             <div
                className="text-xl flex items-center gap-2 cursor-pointer hover:underline active:text-main-white"
                onClick={async (e) => {
@@ -143,6 +139,10 @@ export default function SelectPage() {
                         })
                         .catch((e) => {
                            setState('error')
+                           if (e instanceof Error && e.message === 'No files selected') {
+                              setMessage('No files selected. Are you sure you selected the folder?')
+                              return
+                           }
                            setMessage('Failed. Check console for more details')
                            console.error(e)
                            sendUnknownError(e, 'FILE_SELECT')

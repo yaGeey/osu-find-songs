@@ -1,6 +1,6 @@
 'use client'
 import QueryProvider from './QueryProvider'
-import { SongContextProvider } from '@/contexts/SongContext'
+import { LocalBeatmapsContextProvider } from '@/contexts/SongContext'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorCallback from '@/components/ErrorFallback'
@@ -31,12 +31,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
    const content = (
       <QueryProvider>
          <NuqsAdapter>
-            <SongContextProvider>
+            <LocalBeatmapsContextProvider>
                <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
                <ProgressNotify ref={progressNotifyRef} />
                <BackgroundFetcher />
                {children}
-            </SongContextProvider>
+            </LocalBeatmapsContextProvider>
          </NuqsAdapter>
       </QueryProvider>
    )

@@ -1,14 +1,15 @@
+import { ServerSpotifyResponse } from '@/app/api/batch/spotify/route';
 import useTimeLeft from '@/hooks/useTimeLeft'
 import clientAxios from '@/lib/clientAxios'
 import { SpotifyTrack } from '@/types/graphql-spotify/searchDesktop'
-import { Song } from '@/types/types'
+import { LocalBeatmap } from '@/types/types'
 import { MAX_SPOTIFY_SEARCH_CONCURRENCY } from '@/variables'
 import { useQueries } from '@tanstack/react-query'
 import pLimit from 'p-limit'
 import { useEffect, useRef } from 'react'
 const limit = pLimit(MAX_SPOTIFY_SEARCH_CONCURRENCY)
 
-export default function useSpotifySearch({ chunks }: { chunks: Song[][] }) {
+export default function useSpotifySearch({ chunks }: { chunks: LocalBeatmap[][] }) {
    const addTimeLeftRef = useRef<(time: number) => void>(() => {})
 
    const queries = useQueries({
@@ -17,7 +18,7 @@ export default function useSpotifySearch({ chunks }: { chunks: Song[][] }) {
          queryFn: async () => {
             const t0 = performance.now()
             const res = await limit(() =>
-               clientAxios.post<(SpotifyTrack[] | null)[]>('/api/batch/spotify', c, {
+               clientAxios.post<ServerSpotifyResponse>('/api/batch/spotify', c, {
                   context: 'spotify search',
                   ignoredErrors: [504],
                }),

@@ -1,4 +1,4 @@
-import { BeatmapSet } from '@/types/Osu'
+import { BeatmapSet, BeatmapSetFromOsu } from '@/types/Osu'
 import { CombinedQueried, CombinedSingleSimple } from '@/types/types'
 import { GroupOptionValue, SortOptionValue } from './selectOptions'
 
@@ -15,8 +15,8 @@ export const searchFilterFn = (search: string) => (a: CombinedSingleSimple) => {
    const str = search.toLowerCase()
    return (
       a.local.title?.toLowerCase().includes(str) ||
-      a.local.author?.toLowerCase().includes(str) ||
-      a.osu.creator?.toLowerCase().includes(str)
+      a.local.artist?.toLowerCase().includes(str) ||
+      a.local.creator?.toLowerCase().includes(str)
    )
 }
 
@@ -82,17 +82,7 @@ export const getGroupedArray = (groupFn: GroupOptionValue | null, combinedArray:
       case 'year':
          return Object.groupBy(combinedArray, (q) => q.osu?.submitted_date?.split('-')[0] ?? 'Unknown')
       case 'genre':
-         return Object.groupBy(combinedArray, (q) => q.osu?.genre.name ?? 'Unknown')
-      case 'length':
-         return Object.groupBy(combinedArray, (q) => {
-            if (!q.osu) return 'Unknown'
-            const length = q.osu.beatmaps[0].total_length
-            if (length < 60) return '< 1 minute'
-            if (length < 120) return '1 - 2 minutes'
-            if (length < 300) return '2 - 5 minutes'
-            if (length < 600) return '5 - 10 minutes'
-            return '> 10 minutes'
-         })
+         return Object.groupBy(combinedArray, (q) => q.osu?.genre ?? 'Unknown')
       case 'bpm':
          return Object.groupBy(combinedArray, (q) => {
             if (!q.osu) return 'Unknown'
@@ -103,7 +93,9 @@ export const getGroupedArray = (groupFn: GroupOptionValue | null, combinedArray:
             return '> 300 bpm'
          })
       case 'artist':
-         return Object.groupBy(combinedArray, (q) => q.osu?.artist ?? 'Unknown')
+         return Object.groupBy(combinedArray, (q) => q.local.artist ?? 'Unknown')
+      case 'language':
+         return Object.groupBy(combinedArray, (q) => q.osu?.language ?? 'Unknown')
       case null:
          return { '': combinedArray }
       default:
@@ -111,21 +103,15 @@ export const getGroupedArray = (groupFn: GroupOptionValue | null, combinedArray:
    }
 }
 
-const sortBeatmaps = (sortFn: SortOptionValue | null, a: BeatmapSet | null, b: BeatmapSet | null) => {
+const sortBeatmaps = (sortFn: SortOptionValue | null, a: BeatmapSetFromOsu | null, b: BeatmapSetFromOsu | null) => {
    if (!a || !b) return 0
    switch (sortFn) {
-      case 'artist':
-         return a.artist.localeCompare(b.artist)
       case 'bpm':
          return a.bpm - b.bpm
-      case 'creator':
-         return a.creator.localeCompare(b.creator)
-      case 'date-updated':
-         return new Date(a.last_updated).getTime() - new Date(b.last_updated).getTime()
-      case 'length':
-         return a.beatmaps[0].total_length - b.beatmaps[0].total_length
-      case 'title':
-         return a.title.localeCompare(b.title)
+      case 'newest':
+         return new Date(a.submitted_date).getTime() - new Date(b.submitted_date).getTime()
+      case 'rating':
+         return a.rating - b.rating
       case null:
          return 0
       default:

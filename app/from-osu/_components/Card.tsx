@@ -9,19 +9,12 @@ import { SortOptionValue } from '@/utils/selectOptions'
 const getSortValue = (sortFn: SortOptionValue, c: CombinedSingleSimple) => {
    if (!c.osu || !c.spotify) return null
    switch (sortFn) {
-      case 'title':
-      case 'artist':
-         return null
       case 'bpm':
          return Math.round(c.osu.bpm!)
-      case 'creator':
-         return c.osu.creator
-      case 'date-updated':
-         return c.osu.last_updated ? new Date(c.osu.last_updated).toLocaleDateString() : null
-      case 'length':
-         return c.osu.beatmaps[0].total_length
-            ? new Date(c.osu.beatmaps[0].total_length * 1000).toISOString().slice(14, 19)
-            : null
+      case 'newest':
+         return c.osu.submitted_date ? new Date(c.osu.submitted_date).toLocaleDateString() : null
+      case 'rating':
+         return c.osu.rating ? c.osu.rating.toFixed(3) : null
       default:
          throw new Error(`Unknown sort function: ${sortFn satisfies never}`)
    }
@@ -66,20 +59,18 @@ function Card({
          >
             {isOsuLoading && isSpotifyLoading && <Loading />}
             {error && spotify === null && <ErrorMessage msg={error} />}
-            {(local.image || osu?.covers.card) && (
-               <div className="relative w-[150px] h-[86px]">
-                  <Image
-                     src={local.image || osu?.covers.card || ''}
-                     alt={local.title || 'alt'}
-                     fill
-                     style={{ objectFit: 'cover' }}
-                  />
-               </div>
-            )}
+            <div className="relative w-[150px] h-[86px]">
+               <Image
+                  src={osu?.covers['list'] || '/backoff.webp'}
+                  alt={local.title || 'alt'}
+                  fill
+                  style={{ objectFit: 'cover' }}
+               />
+            </div>
             <div className="flex justify-between items-center w-full py-2 px-4">
                <div className="w-fit max-w-[250px] -mt-0.5">
-                  <h1 className="text-lg font-outline-sm">{local.title || osu?.title}</h1>
-                  <h2 className="text-white/85 text-sm font-outline-sm">{local.author || osu?.artist}</h2>
+                  <h1 className="text-lg font-outline-sm">{local.title}</h1>
+                  <h2 className="text-white/85 text-sm font-outline-sm">{local.artist}</h2>
                </div>
                <div
                   className={tw('flex gap-2.5 mt-2 items-center -mr-0.5', sortFn && getSortValue(sortFn, data) && 'min-w-[90px]')}
@@ -103,7 +94,7 @@ function Card({
                      </div>
                   )}
                   {spotify && spotify.length == 1 && (
-                     <a className="hover:brightness-120 transition-all" href={'https://open.spotify.com/track/' + spotify[0].id}>
+                     <a className="hover:brightness-120 transition-all" href={'https://open.spotify.com/track/' + spotify[0]}>
                         <SpotifyIcon />
                      </a>
                   )}

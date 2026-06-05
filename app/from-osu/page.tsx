@@ -2,10 +2,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CombinedSingleSimple } from '@/types/types'
 import Info from './_components/Info'
-import { twMerge as tw } from 'tailwind-merge'
 import { groupOptions, GroupOptionValue } from '@/utils/selectOptions'
-import { useSongContext } from '@/contexts/SongContext'
-import SettingsPopup from '@/components/SettingsPopup'
+import { useLocalBeatmapsContext } from '@/contexts/SongContext'
 import { useRouter } from 'next/navigation'
 import CreatePlaylistButton from './_components/CreatePlaylistButton'
 import { searchFilterFn, chunkArray, flatCombinedArray, getGroupedArray, sortGroupedArray } from '@/utils/arrayManaging'
@@ -19,7 +17,6 @@ import VirtuosoCardFO from './_components/VirtuosoCardFO'
 import { motion, AnimatePresence } from 'framer-motion'
 import BgImage from '@/components/BgImage'
 import IconsSection from '@/components/IconsSection'
-import { Settings } from 'lucide-react'
 import useOsuSearch from '@/lib/osu/hooks/useOsuSearch'
 import useSpotifySearch from '@/lib/spotify/hooks/useSpotifySearch'
 
@@ -30,25 +27,24 @@ export type ListItem = { type: 'group'; key: string } | { type: 'card'; data: Co
 
 export default function FromOsu() {
    const router = useRouter()
-   const { songs } = useSongContext()
+   const { localBeatmaps } = useLocalBeatmapsContext()
    useEffect(() => {
-      if (!songs.length) router.replace('/from-osu/select')
-   }, [songs, router])
+      if (!localBeatmaps.length) router.replace('/from-osu/select')
+   }, [localBeatmaps, router])
 
    // chunk songs
    const chunkSize = useMemo(() => {
-      if (songs.length <= MAX_PARALLEL_QUERIES * ABSOLUTE_MIN_CHUNK_SIZE) return ABSOLUTE_MIN_CHUNK_SIZE
-      return Math.ceil(songs.length / MAX_PARALLEL_QUERIES)
-   }, [songs.length])
+      if (localBeatmaps.length <= MAX_PARALLEL_QUERIES * ABSOLUTE_MIN_CHUNK_SIZE) return ABSOLUTE_MIN_CHUNK_SIZE
+      return Math.ceil(localBeatmaps.length / MAX_PARALLEL_QUERIES)
+   }, [localBeatmaps.length])
 
-   const chunkedLocal = useMemo(() => chunkArray(songs, chunkSize), [songs, chunkSize])
+   const chunkedLocal = useMemo(() => chunkArray(localBeatmaps, chunkSize), [localBeatmaps, chunkSize])
 
    const sortFnName = useBaseStore((state) => state.sortFnName)
    const selectedGroup = useBaseStore((state) => state.selectedGroup)
    const current = useBaseStore((state) => state.current)
 
    const [groupFn, setGroupFn] = useState<GroupOptionValue | null>(null)
-   const [isSettingsVisible, setIsSettingsVisible] = useState(false)
    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
    const [search, setSearch] = useState('')
 
@@ -99,12 +95,12 @@ export default function FromOsu() {
    useFoTelemetry({
       spotifyQueries: sp.queries,
       osuQueries: osu.queries,
-      songsLength: songs.length,
+      songsLength: localBeatmaps.length,
    })
 
    const spNotNullCount = combined.filter((q) => q.spotify !== null).length
-   const totalTracks = sp.isFetching && spNotNullCount === 0 ? songs.length : spNotNullCount
-   const src = useBaseStore((state) => (state.current ? state.current.local.image : undefined))
+   const totalTracks = sp.isFetching && spNotNullCount === 0 ? localBeatmaps.length : spNotNullCount
+   const src = useBaseStore((state) => (state.current ? state.current.osu?.covers['card@2x'] : undefined))
    return (
       <div className="overflow-hidden" translate="no">
          <AnimatePresence>
@@ -117,32 +113,23 @@ export default function FromOsu() {
                   transition={{ duration: 0.1 }}
                   className="-z-9 pointer-events-none fixed inset-0"
                >
-                  <BgImage image={src} className="brightness-[.4]" />
+                  <BgImage image={src} className="brightness-[.45] blur-[4px]" />
                </motion.div>
             )}
          </AnimatePresence>
 
          <Progress isVisible={isFetching} value={(combined.filter((q) => !q.isSpotifyLoading).length * 100) / combined.length}>
-            {`${sp.queries.filter((q) => !q.isLoading).length * chunkSize}/${songs.length} | ${sp.timeLeft} left`}
+            {`${sp.queries.filter((q) => !q.isLoading).length * chunkSize}/${localBeatmaps.length} | ${sp.timeLeft} left`}
          </Progress>
 
          <header className="bg-triangles [--color-dialog:var(--color-main])] border-b-4 border-main-border w-screen h-12 flex justify-between items-center px-4 gap-3">
             <section className="flex gap-3 items-center min-w-fit">
-               <IconsSection>
-                  <Settings
-                     className={tw(
-                        'size-[30px] hover:animate-spin hover:duration-2000 cursor-pointer',
-                        isSettingsVisible && 'animate-spin duration-2000',
-                     )}
-                     onClick={() => setIsSettingsVisible((p) => !p)}
-                  />
-               </IconsSection>
+               <IconsSection />
                <CreatePlaylistButton
                   data={combined.map((item) => item.spotify).filter((item) => item !== null)}
                   dataTotal={totalTracks}
                />
             </section>
-            <SettingsPopup className={!isSettingsVisible ? '-left-full' : ''} />
             <section className="flex gap-2">
                <Dropdown
                   onSelected={(option) => {
