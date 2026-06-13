@@ -32,6 +32,18 @@ export type Beatmap = {
    version: string
 }
 
+export type BeatmapSimplified = {
+   accuracy: number
+   ar: number
+   bpm: number
+   // convert: boolean
+   cs: number
+   difficulty_rating: number
+   drain: number
+   max_combo: number
+   mode: 'osu' | 'taiko' | 'fruits' | 'mania'
+}
+
 export type BeatmapSet = {
    artist: string
    covers: {
@@ -79,6 +91,34 @@ export type BeatmapSetFromOsu = {
    genre: string
    id: number
    language: string
+   submitted_date: string
+   rating: number
+}
+
+export type BeatmapSetFromSpotify = {
+   artist: string
+   covers: {
+      cover: string
+      'cover@2x': string
+      card: string
+      'card@2x': string
+      list: string
+   }
+   beatmaps: Beatmap[]
+   bpm: number
+   // converts: Beatmap[] // TODO
+   creator: string
+   favourite_count: number
+   id: number
+   last_updated: string
+   play_count: number
+   preview_url: string
+   status: Status
+   title: string
+   // title_unicode: string // TODO
+   video: boolean
+   ranked: number
+   ranked_date: string | null
    submitted_date: string
    rating: number
 }

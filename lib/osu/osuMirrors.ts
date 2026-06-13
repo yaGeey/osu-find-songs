@@ -23,20 +23,6 @@ const mirrors = [
       buildUrlVideo: (id: number) => `https://catboy.best/d/${id}`,
       manager: RateLimitManager.getInstance('catboy', { showErrors: false, blockForMsOnError: 1000 * 60 * 60 * 5 }),
    },
-   // bot verification
-   // {
-   //    name: 'beatconnect',
-   //    downloadType: 'video',
-   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://beatconnect.io/b/${id}/`,
-   //    manager: RateLimitManager.getInstance('beatconnect', { showErrors: false }),
-   // },
-   {
-      name: 'sayobot',
-      downloadType: 'both',
-      manager: RateLimitManager.getInstance('sayobot', { showErrors: false }),
-      buildUrlVideo: (id: number) => `/api/proxy?url=https://dl.sayobot.cn/beatmaps/download/full/${id}`,
-      buildUrl: (id: number) => `https://dl.sayobot.cn/beatmaps/download/novideo/${id}`,
-   },
    {
       name: 'osuDirectMirror',
       downloadType: 'both',
@@ -44,15 +30,29 @@ const mirrors = [
       buildUrlVideo: (id: number) => `https://osu.direct/api/d/${id}`,
       buildUrl: (id: number) => `https://osu.direct/api/d/${id}?noVideo=true`,
    },
-   {
-      name: 'akatsuki',
-      downloadType: 'video',
-      buildUrlVideo: (id: number) => `/api/proxy?url=https://akatsuki.gg/d/${id}`,
-      manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
-      headers: new AxiosHeaders({ Referer: 'https://akatsuki.gg/' }),
-   },
+   //!! TEMP DISABLED
+   // {
+   //    name: 'sayobot',
+   //    downloadType: 'both',
+   //    manager: RateLimitManager.getInstance('sayobot', { showErrors: false }),
+   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://dl.sayobot.cn/beatmaps/download/full/${id}`,
+   //    buildUrl: (id: number) => `https://dl.sayobot.cn/beatmaps/download/novideo/${id}`,
+   // },
+   // {
+   //    name: 'akatsuki',
+   //    downloadType: 'video',
+   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://akatsuki.gg/d/${id}`,
+   //    manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
+   //    headers: new AxiosHeaders({ Referer: 'https://akatsuki.gg/' }),
+   // },
+   // {
+   //    name: 'gatari',
+   //    downloadType: 'no-video',
+   //    buildUrl: (id: number) => `/api/proxy?url=https://osu.gatari.pw/d/${id}`,
+   //    manager: RateLimitManager.getInstance('gatari', { showErrors: false }),
+   // },
 
-   // TODO: add osu download
+   //* TODO Add osu
    // {
    //    name: 'osu',
    //    downloadType: 'both',
@@ -60,6 +60,15 @@ const mirrors = [
    //    buildUrlVideo: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download`,
    //    buildUrl: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download?noVideo=1`,
    //    headers: new AxiosHeaders({ Authorization: `Bearer ${process.env.OSU_TOKEN}` }),
+   // },
+
+   //* DEAD MIRRORS
+   //? bot verification
+   // {
+   //    name: 'beatconnect',
+   //    downloadType: 'video',
+   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://beatconnect.io/b/${id}/`,
+   //    manager: RateLimitManager.getInstance('beatconnect', { showErrors: false }),
    // },
    {
       name: 'nerinyan',
@@ -72,12 +81,6 @@ const mirrors = [
       }),
       buildUrlVideo: (id: number) => `https://api.nerinyan.moe/d/${id}?nv=0`,
       buildUrl: (id: number) => `https://api.nerinyan.moe/d/${id}?nv=1`,
-   },
-   {
-      name: 'gatari',
-      downloadType: 'no-video',
-      buildUrl: (id: number) => `/api/proxy?url=https://osu.gatari.pw/d/${id}`,
-      manager: RateLimitManager.getInstance('gatari', { showErrors: false }),
    },
 ] satisfies Mirror[]
 

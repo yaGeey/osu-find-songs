@@ -1,5 +1,5 @@
 'use server'
-import { BeatmapSet, BeatmapSetFromOsu } from '@/types/Osu'
+import { BeatmapSet, BeatmapSetFromOsu, BeatmapSetFromSpotify } from '@/types/Osu'
 import { customAxios } from '../../serverAxios'
 import { cookies } from 'next/headers'
 
@@ -36,21 +36,11 @@ async function fetchOsu<T>(func: (token: string) => Promise<T>, retries = 3): Pr
    return await func(token)
 }
 
-export async function getBeatmap(id: string): Promise<BeatmapSet> {
-   return fetchOsu(async (token) => {
-      const res = await customAxios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
-         headers: buildHeaders(token),
-         context: 'fetch beatmap details',
-      })
-      return res.data
-   })
-}
-
 export async function getBeatmapForFromOsu(id: string): Promise<BeatmapSetFromOsu> {
    return fetchOsu(async (token) => {
       const res = await customAxios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
          headers: buildHeaders(token),
-         context: 'fetch beatmap details',
+         context: 'fetch beatmap details from osu',
       })
       return {
          bpm: res.data.bpm,
@@ -78,7 +68,7 @@ function getQueryString(queries: Queries) {
       .join('&')
 }
 
-export async function beatmapsSearch(queries: Queries) {
+export async function beatmapsSearch(queries: Queries): Promise<{ beatmapsets: BeatmapSetFromSpotify[]; total: number }> {
    return fetchOsu(async (token) => {
       const queryString = getQueryString(queries)
 
@@ -89,9 +79,39 @@ export async function beatmapsSearch(queries: Queries) {
             context: 'search beatmaps',
          },
       )
-      if (res.data.beatmapsets?.find((b) => b.id === 22156) && res.data.beatmapsets.length === 50)
-         return { beatmapsets: [], total: 0 }
-      return res.data
+      const bs = res.data.beatmapsets
+      if (bs?.find((b) => b.id === 22156) && bs.length === 50) return { beatmapsets: [], total: 0 }
+      return {
+         total: res.data.total,
+         beatmapsets: bs.map(
+            (b) =>
+               ({
+                  bpm: b.bpm,
+                  id: b.id,
+                  submitted_date: b.submitted_date,
+                  rating: b.rating,
+                  covers: {
+                     cover: b.covers.cover,
+                     'card@2x': b.covers['card@2x'],
+                     list: b.covers.list,
+                     'cover@2x': b.covers['cover@2x'],
+                     card: b.covers.card,
+                  },
+                  artist: b.artist,
+                  beatmaps: b.beatmaps,
+                  creator: b.creator,
+                  favourite_count: b.favourite_count,
+                  last_updated: b.last_updated,
+                  play_count: b.play_count,
+                  preview_url: b.preview_url,
+                  ranked: b.ranked,
+                  ranked_date: b.ranked_date,
+                  status: b.status,
+                  title: b.title,
+                  video: b.video,
+               }) satisfies BeatmapSetFromSpotify,
+         ),
+      }
    })
 }
 
