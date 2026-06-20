@@ -34,6 +34,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <html lang="en">
          <head>
             <JsonLd />
+            {isDev && (
+               <Script src="//unpkg.com/react-scan/dist/auto.global.js" crossOrigin="anonymous" strategy="beforeInteractive" />
+            )}
             <Script id="error-handler" strategy="beforeInteractive">
                {`
                   window.addEventListener('error', function(event) {
@@ -52,7 +55,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
          <body
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
          >
-            {isDev && <Script src="https://unpkg.com/react-scan/dist/auto.global.js" strategy="beforeInteractive" />}
             <Suspense fallback={<InitialLoadPage />}>
                <Providers>
                   {/* <MobileDeviceCheck /> */}

@@ -161,7 +161,7 @@ export default function OsuCard({
                      'text-xs w-fit px-1 rounded-full font-medium',
                      'bg-main-gray text-main-light',
                      beatmapset.status === 'ranked' && 'bg-[#B3FF66] text-main-gray',
-                     beatmapset.status === 'approved' && 'bg-[#B3FF66 text-main-gray',
+                     beatmapset.status === 'approved' && 'bg-[#B3FF66] text-main-gray',
                      beatmapset.status === 'qualified' && 'bg-[#FFD966] text-main-gray',
                      beatmapset.status === 'loved' && 'bg-[#FF66AB] text-main-gray',
                   )}

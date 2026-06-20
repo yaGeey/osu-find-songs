@@ -2,7 +2,6 @@ import { Song } from '@/types/yt'
 import Image from 'next/image'
 
 export default function YtSongEmbed({ song }: { song: Song }) {
-   console.log(song)
    return (
       <a
          className="bg-main border-2 w-full border-main-border rounded-lg flex items-center hover:brightness-110 transition-all shadow-sm"

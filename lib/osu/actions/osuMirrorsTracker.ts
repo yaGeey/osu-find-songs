@@ -4,6 +4,9 @@ type SourceStatus = {
    failedUsers: Set<string>
    cooldownUntil: number
 }
+// NOTE: In-memory tracker resets on server restart.
+// In Vercel's serverless environment, each instance maintains its own state.
+// For persistent tracking across instances, consider using Upstash Redis or a database.
 const sourceTracker = new Map<string, SourceStatus>()
 
 const SOURCES_MAX_FAILURES = 2
@@ -33,5 +36,4 @@ export async function reportSourceStatus(sourceName: string, status: 'success' |
       }
    }
    sourceTracker.set(sourceName, state)
-   console.log(sourceTracker)
 }

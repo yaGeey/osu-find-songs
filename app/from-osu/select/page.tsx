@@ -30,7 +30,7 @@ export default function SelectPage() {
 
                if (line.startsWith('Title:')) result.title = line.replace('Title:', '').trim()
                if (line.startsWith('Artist:')) result.artist = line.replace('Artist:', '').trim()
-               if (line.startsWith('Creator:')) result.artist = line.replace('Artist:', '').trim()
+               if (line.startsWith('Creator:')) result.creator = line.replace('Creator:', '').trim()
                if (line.startsWith('[Difficulty]')) break
             }
 

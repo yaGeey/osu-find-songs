@@ -12,7 +12,6 @@ export default function useSessionId() {
          return
       }
 
-      // polling
       const interval = setInterval(() => {
          const sessionId = localStorage.getItem('highlightIdentifier')
          if (sessionId) {
@@ -20,7 +19,14 @@ export default function useSessionId() {
             clearInterval(interval)
          }
       }, 100)
-      return () => clearInterval(interval)
+      const timeout = setTimeout(() => {
+         clearInterval(interval)
+      }, 10000)
+
+      return () => {
+         clearInterval(interval)
+         clearTimeout(timeout)
+      }
    }, [])
 
    return id

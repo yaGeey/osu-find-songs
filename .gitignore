@@ -44,3 +44,4 @@ app/**/test/*
 TODO.txt
 /.vscode/
 test.*
+local

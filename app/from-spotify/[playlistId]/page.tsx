@@ -121,12 +121,10 @@ export default function PlaylistPage() {
    const { addTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // full data
-   const mapsFlatten = useMemo(() => {
-      return beatmapsetQueries
-         .map((q) => q.data)
-         .flat()
-         .filter((item) => item != null)
-   }, [beatmapsetQueries.map((q) => q.data).join(',')])
+   const mapsFlatten = beatmapsetQueries
+      .map((q) => q.data)
+      .flat()
+      .filter((item) => item != null)
    const mapsFetched = mapsFlatten.length
 
    // prepara data for display

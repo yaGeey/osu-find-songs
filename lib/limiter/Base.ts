@@ -110,7 +110,7 @@ export abstract class BaseLimiter extends SingletonInstance<BaseLimiter> {
                      const ms = this.getWaitTimeMs(response) + 100
                      if (ms > this.waitTimeThresholdMs) {
                         this.blockedUntil = Date.now() + ms
-                        return this.execute(task, priority, attempt) // throw error on start and don't trigger catch block
+                        throw new Error(`Queue ${this.id} blocked for ${ms}ms — wait exceeds threshold. Task discarded.`)
                      }
                      console.warn(`[${this.id}] 🚦 Pausing queue due to low remaining (${remaining}) for ${ms / 1000}s`)
                      this.pauseQueue(ms)

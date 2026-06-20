@@ -9,16 +9,10 @@ export const sortBeatmapsMatrix = (a: BeatmapSet[], b: BeatmapSet[], sortFnName:
       case 'artist':
          return sign * a[0].artist.localeCompare(b[0].artist)
       case 'difficulty':
-         if (order === 'asc')
-            return (
-               Math.min(...a[0].beatmaps.map((beatmap) => beatmap.difficulty_rating)) -
-               Math.min(...b[0].beatmaps.map((beatmap) => beatmap.difficulty_rating))
-            )
-         if (order === 'desc')
-            return (
-               Math.max(...b[0].beatmaps.map((beatmap) => beatmap.difficulty_rating)) -
-               Math.max(...a[0].beatmaps.map((beatmap) => beatmap.difficulty_rating))
-            )
+         return sign * (
+            Math.min(...a[0].beatmaps.map((beatmap) => beatmap.difficulty_rating)) -
+            Math.min(...b[0].beatmaps.map((beatmap) => beatmap.difficulty_rating))
+         )
       // TODO don't work
       case 'date ranked':
          if (!a[0].ranked_date) return 1
