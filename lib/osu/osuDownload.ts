@@ -2,7 +2,7 @@
 import axios, { AxiosResponse, isAxiosError } from 'axios'
 import { QueryClient } from '@tanstack/react-query'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import { Mirror, getDownloadUrl } from './osuMirrors'
+import { Mirror, getDownloadData } from './osuMirrors'
 import { BaseLimiter } from '../limiter/Base'
 
 const DOWNLOAD_PROGRESS_TIMEOUT_MS = 1000
@@ -19,7 +19,13 @@ export function download(blob: Blob, filename: string) {
    window.URL.revokeObjectURL(url)
 }
 
-const executeDownload = async (manager: BaseLimiter, url: string, id: number, priority: number = 0) => {
+const executeDownload = async (
+   manager: BaseLimiter,
+   url: string,
+   id: number,
+   priority: number = 0,
+   headers?: Record<string, string>,
+) => {
    const controller = new AbortController()
    let progressTimer: NodeJS.Timeout
 
@@ -27,6 +33,7 @@ const executeDownload = async (manager: BaseLimiter, url: string, id: number, pr
       () =>
          axios.get(url, {
             responseType: 'blob',
+            headers,
             onDownloadProgress: (progressEvent) => {
                clearTimeout(progressTimer)
                progressTimer = setTimeout(() => {
@@ -62,11 +69,11 @@ export async function fetchBeatmapWithFallback({
    }
 
    for (const mirror of mirrors) {
-      const url = getDownloadUrl(mirror, wantsVideo, id)
+      const { url, headers } = await getDownloadData(mirror, wantsVideo, id)
       if (!url) continue
 
       try {
-         const res = await executeDownload(mirror.manager, url, id, priority)
+         const res = await executeDownload(mirror.manager, url, id, priority, headers)
          // if (sessionId) reportSourceStatus(mirror.name, 'success', sessionId).catch(() => {}) // reset state on success
          return res
       } catch (err) {

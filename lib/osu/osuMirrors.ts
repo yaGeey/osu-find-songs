@@ -1,6 +1,6 @@
 import axios from 'axios'
 import RateLimitManager from '../limiter/RateLimitManager'
-import { AxiosHeaders } from 'axios'
+import { getLazerToken } from './actions/osu'
 
 const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB
@@ -9,7 +9,8 @@ const MAX_TEST_TIME_MS = 8000
 export type Mirror = {
    name: string
    manager: RateLimitManager
-   headers?: AxiosHeaders
+   buildHeaders?: () => Promise<Record<string, string>>
+   isProxied?: boolean
 } & (
    | { downloadType: 'no-video'; buildUrl: (id: number) => string; buildUrlVideo?: never }
    | { downloadType: 'video'; buildUrl?: never; buildUrlVideo: (id: number) => string }
@@ -52,15 +53,18 @@ const mirrors = [
    //    manager: RateLimitManager.getInstance('gatari', { showErrors: false }),
    // },
 
-   //* TODO Add osu
-   // {
-   //    name: 'osu',
-   //    downloadType: 'both',
-   //    manager: RateLimitManager.getInstance('osu', { showErrors: false }),
-   //    buildUrlVideo: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download`,
-   //    buildUrl: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download?noVideo=1`,
-   //    headers: new AxiosHeaders({ Authorization: `Bearer ${process.env.OSU_TOKEN}` }),
-   // },
+   {
+      name: 'osu',
+      downloadType: 'both',
+      isProxied: true,
+      manager: RateLimitManager.getInstance('osu', { showErrors: false }),
+      buildUrlVideo: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download`,
+      buildUrl: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download?noVideo=1`,
+      buildHeaders: async () => {
+         const token = await getLazerToken()
+         return { Authorization: `Bearer ${token}`, Referer: 'https://osu.ppy.sh/' }
+      },
+   },
 
    //* DEAD MIRRORS
    //? bot verification
@@ -85,8 +89,11 @@ const mirrors = [
 ] satisfies Mirror[]
 
 const testMirrorLatency = async (mirror: Mirror): Promise<number> => {
-   const url = mirror.buildUrlVideo?.(TEST_MAP_ID) ?? mirror.buildUrl?.(TEST_MAP_ID)
-   if (!url) return Infinity
+   const buildedUrl = mirror.buildUrlVideo?.(TEST_MAP_ID) ?? mirror.buildUrl?.(TEST_MAP_ID)
+   if (!buildedUrl) return Infinity
+
+   const headers = mirror.buildHeaders ? await mirror.buildHeaders() : undefined
+   const url = mirror.isProxied ? `/api/proxy?url=${encodeURIComponent(buildedUrl)}` : buildedUrl
 
    return new Promise((resolve) => {
       const start = performance.now()
@@ -110,7 +117,7 @@ const testMirrorLatency = async (mirror: Mirror): Promise<number> => {
                }
             },
             timeout: MAX_TEST_TIME_MS,
-            headers: mirror.headers,
+            headers,
          })
          .catch((err) => {
             if (axios.isCancel(err)) return
@@ -135,15 +142,20 @@ export const getPrioritizedMirrorsFilteredByDead = async (deadMirrorNames?: stri
       .map((r) => r.mirror)
 }
 
-export const getDownloadUrl = (mirror: Mirror, video: boolean, id: number) => {
+export const getDownloadData = async (mirror: Mirror, video: boolean, id: number) => {
+   let rawUrl: string | null = null
    if (video) {
       if (mirror.downloadType === 'video' || mirror.downloadType === 'both') {
-         return mirror.buildUrlVideo(id)
+         rawUrl = mirror.buildUrlVideo(id)
       }
    } else {
       if (mirror.downloadType === 'no-video' || mirror.downloadType === 'both') {
-         return mirror.buildUrl(id)
+         rawUrl = mirror.buildUrl(id)
       }
    }
-   return null
+   if (!rawUrl) return { url: null, headers: undefined }
+
+   const url = mirror.isProxied ? `/api/proxy?url=${encodeURIComponent(rawUrl)}` : rawUrl
+   const headers = mirror.buildHeaders ? await mirror.buildHeaders() : undefined
+   return { url, headers }
 }
