@@ -6,6 +6,8 @@ const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB
 const MAX_TEST_TIME_MS = 8000
 
+const isProxied = process.env.NEXT_PUBLIC_PROXIED_MIRRORS === '1'
+
 export type Mirror = {
    name: string
    manager: RateLimitManager
@@ -31,40 +33,42 @@ const mirrors = [
       buildUrlVideo: (id: number) => `https://osu.direct/api/d/${id}`,
       buildUrl: (id: number) => `https://osu.direct/api/d/${id}?noVideo=true`,
    },
-   //!! TEMP DISABLED
-   // {
-   //    name: 'sayobot',
-   //    downloadType: 'both',
-   //    manager: RateLimitManager.getInstance('sayobot', { showErrors: false }),
-   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://dl.sayobot.cn/beatmaps/download/full/${id}`,
-   //    buildUrl: (id: number) => `https://dl.sayobot.cn/beatmaps/download/novideo/${id}`,
-   // },
-   // {
-   //    name: 'akatsuki',
-   //    downloadType: 'video',
-   //    buildUrlVideo: (id: number) => `/api/proxy?url=https://akatsuki.gg/d/${id}`,
-   //    manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
-   //    headers: new AxiosHeaders({ Referer: 'https://akatsuki.gg/' }),
-   // },
-   // {
-   //    name: 'gatari',
-   //    downloadType: 'no-video',
-   //    buildUrl: (id: number) => `/api/proxy?url=https://osu.gatari.pw/d/${id}`,
-   //    manager: RateLimitManager.getInstance('gatari', { showErrors: false }),
-   // },
-
    {
-      name: 'osu',
-      downloadType: 'both',
+      name: 'sayobot',
       isProxied: true,
-      manager: RateLimitManager.getInstance('osu', { showErrors: false }),
-      buildUrlVideo: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download`,
-      buildUrl: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download?noVideo=1`,
-      buildHeaders: async () => {
-         const token = await getLazerToken()
-         return { Authorization: `Bearer ${token}`, Referer: 'https://osu.ppy.sh/' }
-      },
+      downloadType: 'both',
+      manager: RateLimitManager.getInstance('sayobot', { showErrors: false }),
+      buildUrlVideo: (id: number) => `https://dl.sayobot.cn/beatmaps/download/full/${id}`,
+      buildUrl: (id: number) => `https://dl.sayobot.cn/beatmaps/download/novideo/${id}`,
    },
+   {
+      name: 'akatsuki',
+      isProxied: true,
+      downloadType: 'video',
+      buildUrlVideo: (id: number) => `https://akatsuki.gg/d/${id}`,
+      manager: RateLimitManager.getInstance('akatsuki', { showErrors: false }),
+      buildHeaders: async () => ({ Referer: 'https://akatsuki.gg/' }),
+   },
+   {
+      name: 'gatari',
+      isProxied: true,
+      downloadType: 'no-video',
+      buildUrl: (id: number) => `https://osu.gatari.pw/d/${id}`,
+      manager: RateLimitManager.getInstance('gatari', { showErrors: false }),
+   },
+
+   // {
+   //    name: 'osu',
+   //    downloadType: 'both',
+   //    isProxied: true,
+   //    manager: RateLimitManager.getInstance('osu', { showErrors: false }),
+   //    buildUrlVideo: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download`,
+   //    buildUrl: (id: number) => `https://osu.ppy.sh/api/v2/beatmapsets/${id}/download?noVideo=1`,
+   //    buildHeaders: async () => {
+   //       const token = await getLazerToken()
+   //       return { Authorization: `Bearer ${token}`, Referer: 'https://osu.ppy.sh/' }
+   //    },
+   // },
 
    //* DEAD MIRRORS
    //? bot verification
@@ -74,21 +78,22 @@ const mirrors = [
    //    buildUrlVideo: (id: number) => `/api/proxy?url=https://beatconnect.io/b/${id}/`,
    //    manager: RateLimitManager.getInstance('beatconnect', { showErrors: false }),
    // },
-   {
-      name: 'nerinyan',
-      downloadType: 'both',
-      manager: RateLimitManager.getInstance('nerinyan', {
-         avg: 25,
-         burst: 100,
-         durationMs: 60000,
-         showErrors: false,
-      }),
-      buildUrlVideo: (id: number) => `https://api.nerinyan.moe/d/${id}?nv=0`,
-      buildUrl: (id: number) => `https://api.nerinyan.moe/d/${id}?nv=1`,
-   },
+   // {
+   //    name: 'nerinyan',
+   //    downloadType: 'both',
+   //    manager: RateLimitManager.getInstance('nerinyan', {
+   //       avg: 25,
+   //       burst: 100,
+   //       durationMs: 60000,
+   //       showErrors: false,
+   //    }),
+   //    buildUrlVideo: (id: number) => `https://api.nerinyan.moe/d/${id}?nv=0`,
+   //    buildUrl: (id: number) => `https://api.nerinyan.moe/d/${id}?nv=1`,
+   // },
 ] satisfies Mirror[]
 
 const testMirrorLatency = async (mirror: Mirror): Promise<number> => {
+   if (mirror.isProxied && !isProxied) return Infinity
    const buildedUrl = mirror.buildUrlVideo?.(TEST_MAP_ID) ?? mirror.buildUrl?.(TEST_MAP_ID)
    if (!buildedUrl) return Infinity
 

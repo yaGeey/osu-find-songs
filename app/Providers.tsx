@@ -10,9 +10,9 @@ import useUserListener from '@/hooks/useUserListener'
 import { LDProvider } from 'launchdarkly-react-client-sdk'
 import Observability from '@launchdarkly/observability'
 import SessionReplay from '@launchdarkly/session-replay'
-import ProgressNotify, { ProgressNotifyHandle } from '@/components/state/ProgressNotify'
 import useBaseStore from '@/contexts/useBaseStore'
 import BackgroundFetcher from '@/components/BackgroundFetcher'
+import { NotifyHandle, ProgressNotify } from '@/components/state/HeaderError'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    useUserListener()
@@ -22,10 +22,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
          ? process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID!
          : process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID_TEST!
 
-   const progressNotifyRef = useRef<ProgressNotifyHandle>(null)
+   const progressNotifyRef = useRef<NotifyHandle>(null)
    useEffect(() => {
       if (typeof window === 'undefined') return
-      if (progressNotifyRef.current) useBaseStore.setState({ progressNotifyRef })
+      if (progressNotifyRef.current) useBaseStore.setState({ notifyRef: progressNotifyRef })
    }, [progressNotifyRef])
 
    const content = (

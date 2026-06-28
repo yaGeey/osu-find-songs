@@ -10,8 +10,10 @@ export const useMapDownloadStore = create<{
    add: (id: number, filename: string) => void
    remove: (id: number) => void
    update: (id: number, downloadedBytes: number, totalBytes: number) => void
+   isAvailableMirror: boolean
 }>((set, get) => ({
    pending: {},
+   isAvailableMirror: false,
 
    add: (id, filename) => {
       const { pending } = get()

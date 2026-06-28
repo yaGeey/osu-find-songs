@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDeadMirrors } from '../actions/osuMirrorsTracker'
 import { getPrioritizedMirrorsFilteredByDead } from '../osuMirrors'
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 
 export default function usePrepareMirrors() {
    useQuery({
@@ -12,9 +13,10 @@ export default function usePrepareMirrors() {
          // })
 
          const mirrors = await getPrioritizedMirrorsFilteredByDead()
-         if (mirrors.length === 0) {
+         if (mirrors.length === 0 || !mirrors) {
             throw new Error('No map download sources available at the moment.')
          }
+         useMapDownloadStore.setState({ isAvailableMirror: true })
          return mirrors
       },
       staleTime: 60 * 60 * 1000,

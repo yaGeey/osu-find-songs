@@ -14,7 +14,7 @@ type UseMapDownloadOptions = {
 } & ({ video: true; onlyNoVideo?: never } | { video: false; onlyNoVideo?: boolean })
 export const useMapDownload = ({ id, fileName, video, onlyNoVideo }: UseMapDownloadOptions) => {
    const remove = useMapDownloadStore((s) => s.remove)
-   const progressBlinkRef = useBaseStore((s) => s.progressNotifyRef)
+   const notify = useBaseStore((s) => s.notificationBlink)
    const sessionId = useSessionId()
    const queryClient = useQueryClient()
 
@@ -46,15 +46,15 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo }: UseMapDownl
             },
          )
          sendUnknownError(error, 'MAP_DOWNLOAD')
-         progressBlinkRef?.current?.blink('error', 4000, 'Download failed')
+         notify({ type: 'error', content: 'Download failed' }, 4000)
       },
       onSuccess: (data: Blob) => {
          remove(id)
          download(data, fileName)
 
          const { pending } = useMapDownloadStore.getState()
-         if (progressBlinkRef && progressBlinkRef.current && !Object.values(pending).length) {
-            progressBlinkRef.current.blink('success', 2000)
+         if (!Object.values(pending).length) {
+            notify({ type: 'success' }, 2000)
          }
       },
    })

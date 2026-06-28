@@ -146,8 +146,15 @@ async function revalidateOsuToken(): Promise<string> {
    return data.access_token
 }
 
-const lazerCookieTokenName = 'lazerToken'
-export const getLazerToken = async () => (await cookies()).get(lazerCookieTokenName)?.value ?? (await lazerLogin())
+// --- Lazer login for osu direct mirror ---
+
+let cachedToken: string | null = null
+let tokenExpiresAt: number = 0
+
+export const getLazerToken = async () => {
+   if (cachedToken && Date.now() < tokenExpiresAt - 5000) return cachedToken
+   else return await lazerLogin()
+}
 
 async function lazerLogin() {
    const { data } = await customAxios.post<AuthResponse>(
@@ -161,13 +168,7 @@ async function lazerLogin() {
          context: 'lazer login',
       },
    )
-   const storage = await cookies()
-   storage.set(lazerCookieTokenName, data.access_token, {
-      path: '/',
-      expires: new Date(Date.now() + data.expires_in * 1000),
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-   })
+   cachedToken = data.access_token
+   tokenExpiresAt = Date.now() + data.expires_in * 1000
    return data.access_token
 }

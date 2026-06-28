@@ -2,8 +2,7 @@ import useBaseStore from '@/contexts/useBaseStore'
 import { isAxiosError } from 'axios'
 
 export const sendUnknownError = (err: unknown, context: string, throwErr: boolean = true) => {
-   const blinkRef = useBaseStore.getState().progressNotifyRef
-   if (blinkRef?.current) blinkRef.current.blink('error')
+   useBaseStore.getState().notificationBlink({ type: 'error' })
 
    const errToReport = modifyErrorMessage(err, context)
    if (throwErr && typeof window !== 'undefined' && typeof window.reportError === 'function') {

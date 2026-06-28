@@ -13,7 +13,6 @@ import useDownloadAll from '@/lib/osu/hooks/useDownloadAll'
 import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
 import Loading from '@/components/state/Loading'
-import ProgressNotify from '@/components/state/ProgressNotify'
 import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
 import { FS_CHUNK_SIZE, MAPS_AMOUNT_TO_SHOW_VIRTUALIZED } from '@/variables'
 import DevLoadingTime from '@/components/DevLoadingTime'
@@ -28,12 +27,15 @@ import IconsSection from '@/components/IconsSection'
 import { fetchPlaylist, fetchPlaylistContents } from '@/lib/spotify/actions/innerApi'
 import clientAxios from '@/lib/clientAxios'
 import useBaseStore from '@/contexts/useBaseStore'
+import { NotifyHeader } from '@/components/state/HeaderError'
+import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 
 export default function PlaylistPage() {
    const params = useParams()
    const searchParams = useSearchParams()
    const { playlistId } = params
-   const progressNotifyRef = useBaseStore((state) => state.progressNotifyRef)
+   const progressNotifyRef = useBaseStore((state) => state.notifyRef)
+   const notify = useBaseStore((state) => state.notificationBlink)
 
    // remove scrollbar
    useEffect(() => {
@@ -166,13 +168,14 @@ export default function PlaylistPage() {
    // Handle errors
    useEffect(() => {
       if (beatmapsetQueries.some((q) => q.isError)) {
-         const errorMsg = beatmapsetQueries.find((q) => q.isError)?.error?.message || 'An error occurred while fetching beatmaps.'
-         progressNotifyRef?.current?.blink('error', 4000, errorMsg)
+         const errorMsg = beatmapsetQueries.find((q) => q.isError)?.error?.message
+         console.error('Error fetching beatmaps from Spotify playlist:', errorMsg)
+         notify({ type: 'error', content: 'An error occurred while fetching beatmaps' }, 4000)
       }
    }, [beatmapsetQueries.map((q) => q.isError).join(',')])
 
    useEffect(() => {
-      if (progress === -1) progressNotifyRef?.current?.blink('error', 4000, 'An error occurred during the download process.')
+      if (progress === -1) notify({ type: 'error', content: 'An error occurred during the download process' }, 4000)
    }, [progress])
 
    // animation
@@ -204,6 +207,8 @@ export default function PlaylistPage() {
       ))
    }, [maps, sortQuery])
 
+   // TODO when const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror) is not - show an error once
+   const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror)
    return (
       <div className="min-w-[710px] overflow-hidden" translate="no">
          <DevLoadingTime isLoading={isLoading} dataLength={maps.length} />
@@ -223,7 +228,6 @@ export default function PlaylistPage() {
          <Progress isVisible={progress !== null} value={progress || 0} color="text-success">
             {text}
          </Progress>
-         <ProgressNotify ref={progressNotifyRef} />
          <ProgressMapDownload />
 
          <header
@@ -233,12 +237,8 @@ export default function PlaylistPage() {
          >
             <IconsSection />
             <AnimatePresence>
-               {playlistInfo?.name && (
-                  <motion.p
-                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                     className="absolute left-1/2 -translate-x-1/2 font-semibold text-main-gray bg-main/40 px-3 py-1 rounded-md max-w-[30%] w-full min-w-fit text-center overflow-hidden text-ellipsis"
-                  >
+               <NotifyHeader ref={progressNotifyRef}>
+                  {playlistInfo?.name && (
                      <CustomLink
                         href={`https://open.spotify.com/playlist/${playlistId}`}
                         className={tw(
@@ -249,12 +249,12 @@ export default function PlaylistPage() {
                      >
                         {playlistInfo?.name}
                      </CustomLink>
-                  </motion.p>
-               )}
+                  )}
+               </NotifyHeader>
             </AnimatePresence>
             <div className="_invisible">
                <DownloadAllBtn
-                  disabled={isLoading}
+                  disabled={isLoading || isDownloadAvailable === false}
                   maps={maps}
                   progress={progress}
                   handleDownloadAll={handleDownloadAll}

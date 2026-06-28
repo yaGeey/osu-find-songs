@@ -2,8 +2,8 @@ import { BeatmapSet } from '@/types/Osu'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
-import { faDownload, faFileVideo, faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
-import { twMerge as tw, twJoin } from 'tailwind-merge'
+import { faDownload, faFileVideo, faPlay, faPause, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
+import { twMerge as tw, twJoin, twMerge } from 'tailwind-merge'
 import { useMapDownload } from '@/lib/osu/hooks/useMapDownload'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef } from 'react'
@@ -46,6 +46,7 @@ export default function OsuCard({
    }
 
    const isPending = mutationNoVideo.isPending || mutationVideo.isPending
+   const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror)
    return (
       <div
          ref={ref}
@@ -207,7 +208,21 @@ export default function OsuCard({
                isPending && 'right-0',
             )}
          >
-            {!isPending ? (
+            {!isDownloadAvailable ? (
+               <a
+                  href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="no-jump inline-block outline-hidden hover:scale-120 active:scale-90 transition-transform duration-200"
+                  data-tooltip-id="tooltip"
+                  data-tooltip-content="Download from osu website"
+                  data-tooltip-delay-show={400}
+               >
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+               </a>
+            ) : isPending ? (
+               <Loading color="#fed2d0" radius={15} />
+            ) : (
                <>
                   <FontAwesomeIcon
                      icon={faDownload}
@@ -228,8 +243,6 @@ export default function OsuCard({
                      />
                   )}
                </>
-            ) : (
-               <Loading color="#fed2d0" radius={15} />
             )}
          </div>
       </div>

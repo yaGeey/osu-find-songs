@@ -11,7 +11,7 @@ import useBaseStore from '@/contexts/useBaseStore'
 const displayError = (err: unknown, errMsg: string) => {
    console.error(err)
    toast.error(errMsg, { autoClose: 8000 })
-   useBaseStore.getState().progressNotifyRef?.current?.blink('error', 4000)
+   useBaseStore.getState().notifyRef?.current?.blink({type: 'error'}, 4000)
 }
 
 const persister = createSyncStoragePersister({
