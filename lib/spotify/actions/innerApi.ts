@@ -2,14 +2,17 @@
 import { customAxios } from '../../serverAxios'
 import { SpotifySearchQueryResponse, TrackResponseWrapper } from '@/types/graphql-spotify/searchDesktop'
 import { cookies } from 'next/headers'
-import { getHash, updateHashes } from './hashes'
 import { isAxiosError } from 'axios'
 import { BaseSpotifyResponse, UnexpectedSpotifyError } from '@/types/graphql-spotify/basics'
 import { SpotifyPlaylistContentResponse, SpotifyPlaylistResponse } from '@/types/graphql-spotify/graphql-spotify'
 
 // TODO for graph handle error when hash is wrong - returns an json error
 
-const playlistHash = await getHash('fetchPlaylist')
+const hashes = {
+   addToPlaylist: '47b2a1234b17748d332dd0431534f22450e9ecbb3d5ddcdacbd83368636a0990',
+   fetchPlaylist: 'a65e12194ed5fc443a1cdebed5fabe33ca5b07b987185d63c72483867ad13cb4',
+   searchDesktop: '63a93cc04f6d8dea84a85de315e43f396a76cb681500de9ac5ccf5fc618c84cb', // / searchTopResultsList
+} as const
 
 const headers = {
    'User-Agent':
@@ -122,13 +125,13 @@ async function fetchInnerGraphApi<T extends Record<string, any>>(
       if (isAxiosError(err) && err.response?.data) {
          const errorData = err.response.data as UnexpectedSpotifyError
          // hash is outdated, update and retry
-         if (
-            (errorData.errors.every((e) => e.extensions.code === 'GRAPHQL_UNKNOWN_OPERATION_NAME') || err.status === 412) &&
-            retries > 0
-         ) {
-            await updateHashes([operationName])
-            return fetchInnerGraphApi(operationName, variables, await getHash(operationName), retries - 1)
-         }
+         // if (
+         //    (errorData.errors.every((e) => e.extensions.code === 'GRAPHQL_UNKNOWN_OPERATION_NAME') || err.status === 412) &&
+         //    retries > 0
+         // ) {
+         //    await updateHashes([operationName])
+         //    return fetchInnerGraphApi(operationName, variables, await getHash(operationName), retries - 1)
+         // }
       }
       throw err
    }
@@ -142,7 +145,7 @@ export async function fetchPlaylistContents(playlistId: string, offset = 0, limi
          offset,
          limit,
       },
-      playlistHash,
+      hashes.fetchPlaylist,
    )
    if (data.playlistV2.__typename === 'NotFound') {
       throw new Error(`Playlist with id ${playlistId} not found`)
@@ -161,7 +164,7 @@ export async function fetchPlaylist(playlistId: string) {
          offset: 0,
          limit: 25,
       },
-      playlistHash,
+      hashes.fetchPlaylist,
    )
    if (data.playlistV2.__typename === 'NotFound') return null
    return data.playlistV2
@@ -180,7 +183,7 @@ export async function searchTopTracks(query: string) {
          offset: 0,
          searchTerm: query,
       },
-      await getHash('searchDesktop'),
+      hashes.searchDesktop,
    )
    const items = data.searchV2.topResultsV2.itemsV2
 
@@ -261,8 +264,6 @@ export async function addToPlaylist(playlistUri: string, tracksUris: string[]) {
          playlistItemUris: tracksUris,
          playlistUri,
       },
-      // FIXME critical hash
-      // await getHash('addToPlaylist'),
-      '47b2a1234b17748d332dd0431534f22450e9ecbb3d5ddcdacbd83368636a0990',
+      hashes.addToPlaylist
    )
 }
