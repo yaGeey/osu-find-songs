@@ -57,7 +57,7 @@ type TokenResponse = {
 
 async function getInternalTokenFromServer() {
    const { data } = await customAxios.get<TokenResponse>(`https://spotify-token-server-g0ac.onrender.com/token`, {
-      headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
+      headers: { Authorization: 'AYWJvYmE=' },
       context: 'get internal token',
    })
 
