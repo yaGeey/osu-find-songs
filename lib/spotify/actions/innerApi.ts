@@ -56,7 +56,7 @@ type TokenResponse = {
 }
 
 async function getInternalTokenFromServer() {
-   const { data } = await customAxios.get<TokenResponse>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/token`, {
+   const { data } = await customAxios.get<TokenResponse>(`https://spotify-token-server-g0ac.onrender.com/token`, {
       headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
       context: 'get internal token',
    })
@@ -264,6 +264,6 @@ export async function addToPlaylist(playlistUri: string, tracksUris: string[]) {
          playlistItemUris: tracksUris,
          playlistUri,
       },
-      hashes.addToPlaylist
+      hashes.addToPlaylist,
    )
 }
