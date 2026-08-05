@@ -4,8 +4,11 @@ import { QueryClient } from '@tanstack/react-query'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import { Mirror, getDownloadData } from './osuMirrors'
 import { BaseLimiter } from '../limiter/Base'
+import { Status } from '@/types/Osu'
 
 const DOWNLOAD_PROGRESS_TIMEOUT_MS = 1000
+
+export const BANNED_STATUSES: readonly Status[] = ['graveyard', 'wip', 'pending']
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)
@@ -56,8 +59,7 @@ export async function fetchBeatmapWithFallback({
    onlyNoVideo,
    priority = 0,
    queryClient,
-   sessionId,
-}: { id: number; priority?: number; queryClient: QueryClient; sessionId: string | undefined } & (
+}: { id: number; priority?: number; queryClient: QueryClient } & (
    | { video: true; onlyNoVideo?: never }
    | { video: false; onlyNoVideo?: boolean }
 )) {
@@ -73,14 +75,9 @@ export async function fetchBeatmapWithFallback({
       if (!url) continue
 
       try {
-         const res = await executeDownload(mirror.manager, url, id, priority, headers)
-         // if (sessionId) reportSourceStatus(mirror.name, 'success', sessionId).catch(() => {}) // reset state on success
-         return res
+         return await executeDownload(mirror.manager, url, id, priority, headers)
       } catch (err) {
          console.warn(`${mirror.name} failed:`, err)
-         if (sessionId && isAxiosError(err)) {
-            // await reportSourceStatus(mirror.name, 'failure', sessionId).catch(() => {}) // await to ensure state is updated before next attempt
-         }
       }
    }
 

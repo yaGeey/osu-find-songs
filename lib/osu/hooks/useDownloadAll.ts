@@ -8,7 +8,7 @@ import RateLimitManager from '@/lib/limiter/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import useSessionId from '../../../hooks/useSessionId'
 import { useQueryClient } from '@tanstack/react-query'
-import { fetchBeatmapWithFallback, download } from '../osuDownload'
+import { fetchBeatmapWithFallback, download, BANNED_STATUSES } from '../osuDownload'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
@@ -23,12 +23,14 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
       setProgress(0)
       let count = 0
 
-      const valid = maps.filter((set) => set.length)
-      const tasks = valid.map((set) => async () => {
-         const b: BeatmapSet = [...set].sort(sortFn(sortQuery))[0]
+      const validMaps = maps
+         .filter((set) => set.length)
+         .map((set) => [...set].sort(sortFn(sortQuery))[0])
+         .filter((b) => !BANNED_STATUSES.includes(b.status))
 
+      const tasks = validMaps.map((b) => async () => {
+         const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, queryClient })
          const filename = `${b.id} ${b.artist} - ${b.title}.osz`
-         const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, sessionId, queryClient })
 
          // telemetry
          sendMapDownloadTelemetry({
@@ -37,11 +39,11 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
             playlistId: window.location.pathname.split('/')[2]!,
             all: true,
          }).catch(() => {})
-
+         
          // UI
          count++
-         setText(`Downloading... (${count}/${valid.length})`)
-         setProgress((count / valid.length) * 99)
+         setText(`Downloading... (${count}/${validMaps.length})`)
+         setProgress((count / validMaps.length) * 99)
          console.log(`Downloaded ${filename}. Total progress ${progress}%`)
 
          return { filename, blob }

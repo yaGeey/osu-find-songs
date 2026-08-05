@@ -123,4 +123,4 @@ export type BeatmapSetFromSpotify = {
    rating: number
 }
 
-type Status = 'ranked' | 'approved' | 'qualified' | 'loved' | 'pending' | 'graveyard' | 'wip'
+export type Status = 'ranked' | 'approved' | 'qualified' | 'loved' | 'pending' | 'graveyard' | 'wip'

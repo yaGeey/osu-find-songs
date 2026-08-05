@@ -6,13 +6,15 @@ import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import useBaseStore from '@/contexts/useBaseStore'
 import useSessionId from '@/hooks/useSessionId'
 import { sendUnknownError } from '@/lib/errorHandling'
-import { fetchBeatmapWithFallback, download } from '../osuDownload'
+import { fetchBeatmapWithFallback, download, BANNED_STATUSES } from '../osuDownload'
+import { Status } from '@/types/Osu'
 
 type UseMapDownloadOptions = {
    id: number
    fileName: string
+   status: Status
 } & ({ video: true; onlyNoVideo?: never } | { video: false; onlyNoVideo?: boolean })
-export const useMapDownload = ({ id, fileName, video, onlyNoVideo }: UseMapDownloadOptions) => {
+export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: UseMapDownloadOptions) => {
    const remove = useMapDownloadStore((s) => s.remove)
    const notify = useBaseStore((s) => s.notificationBlink)
    const sessionId = useSessionId()
@@ -21,9 +23,10 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo }: UseMapDownl
    return useMutation({
       mutationFn: async () => {
          sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(() => {})
+         if (BANNED_STATUSES.includes(status)) throw new Error(`Status not allowed`)
          return video
-            ? await fetchBeatmapWithFallback({ id, video: true, priority: 1, queryClient, sessionId })
-            : await fetchBeatmapWithFallback({ id, video: false, onlyNoVideo, priority: 1, queryClient, sessionId })
+            ? await fetchBeatmapWithFallback({ id, video: true, priority: 1, queryClient })
+            : await fetchBeatmapWithFallback({ id, video: false, onlyNoVideo, priority: 1, queryClient })
       },
       onError: (error) => {
          remove(id)
@@ -41,14 +44,14 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo }: UseMapDownl
                </a>
             </div>,
             {
-               autoClose: 15000,
+               autoClose: 10000,
                closeOnClick: false,
             },
          )
          sendUnknownError(error, 'MAP_DOWNLOAD')
          notify({ type: 'error', content: 'Download failed' }, 4000)
       },
-      onSuccess: (data: Blob) => {
+      onSuccess: (data) => {
          remove(id)
          download(data, fileName)
 

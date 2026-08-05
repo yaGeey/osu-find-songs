@@ -11,6 +11,7 @@ import ImageFallback from '@/components/ImageFallback'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import Loading from '@/components/state/Loading'
+import { BANNED_STATUSES } from '@/lib/osu/osuDownload';
 
 export default function OsuCard({
    beatmapset,
@@ -22,8 +23,8 @@ export default function OsuCard({
    className?: string
 }) {
    const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
-   const mutationNoVideo = useMapDownload({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video })
-   const mutationVideo = useMapDownload({ id: beatmapset.id, fileName, video: true })
+   const mutationNoVideo = useMapDownload({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video, status: beatmapset.status })
+   const mutationVideo = useMapDownload({ id: beatmapset.id, fileName, video: true, status: beatmapset.status })
 
    const ref = useRef<HTMLDivElement>(null)
    const currentUrl = useAudioStore((state) => state.currentUrl)
@@ -46,7 +47,7 @@ export default function OsuCard({
    }
 
    const isPending = mutationNoVideo.isPending || mutationVideo.isPending
-   const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror)
+   const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror) || BANNED_STATUSES.includes(beatmapset.status)
    return (
       <div
          ref={ref}
