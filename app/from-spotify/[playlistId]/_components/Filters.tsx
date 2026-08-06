@@ -8,12 +8,10 @@ import Search from './Search'
 // TODO If =1 then res: 1 - 1.99
 
 export default function Filters({
-   foundString,
    disabled = false,
    onFilterChange,
    onSearch,
 }: {
-   foundString?: string
    disabled?: boolean
    onFilterChange: (filters: SelectedOption[]) => void
    onSearch: React.Dispatch<React.SetStateAction<string>>
@@ -23,15 +21,13 @@ export default function Filters({
    const [sort, setSort] = useQueryState('sort', { defaultValue: '' })
 
    return (
-      <div className="relative flex flex-col gap-3 text-[15px]">
-         {/* Main filters */}
+      <>
          <div className="flex justify-between ">
             <div className="flex items-center gap-6.5">
                <h4 className="font-outline-sm">Mode</h4>
                <SwitchFullDict
-                  className="font-inter"
                   required
-                  defaultValue="any"
+                  defaultValue={m || 'any'}
                   options={{
                      any: '',
                      'osu!': '0',
@@ -48,9 +44,8 @@ export default function Filters({
          <section className="flex items-center gap-7.5">
             <h4 className="font-outline-sm">State</h4>
             <SwitchFullDict
-               className="font-inter"
                required
-               defaultValue="has leaderboard"
+               defaultValue={s || 'has leaderboard'}
                options={{
                   any: 'any',
                   'has leaderboard': '',
@@ -79,11 +74,6 @@ export default function Filters({
                disabled={disabled}
             />
          </section>
-         {foundString && !disabled && (
-            <div className="absolute right-2 bottom-1 text-white tracking-wide text-sm hidden [@media(min-width:830px)]:block">
-               {foundString}
-            </div>
-         )}
-      </div>
+      </>
    )
 }

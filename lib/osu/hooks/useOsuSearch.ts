@@ -17,7 +17,7 @@ export default function useOsuSearch({ chunks }: { chunks: LocalBeatmap[][] }) {
          queryFn: async () => {
             const t0 = performance.now()
             const res = await limit(() =>
-               clientAxios.get<BeatmapSetFromOsu[] | null>(`/api/batch/osu`, {
+               clientAxios.get<BeatmapSetFromOsu[] | null>(`/api/batch/osu-by-id`, {
                   params: {
                      id: c.map((s) => s.id),
                   },

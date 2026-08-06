@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import Pusher from 'pusher'
 
 const pusher = new Pusher({
@@ -10,15 +9,18 @@ const pusher = new Pusher({
 })
 
 export async function POST(req: Request) {
-   const { targetUserId, message, pwd } = await req.json()
-   if (pwd !== process.env.ADMIN_PWD) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
-   }
-   if (typeof targetUserId !== 'string' || typeof message !== 'string') {
-      return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
-   }
+   try {
+      const { targetUserId, message, pwd } = await req.json()
+      if (pwd !== process.env.ADMIN_PWD) {
+         return Response.json({ message: 'Unauthorized' }, { status: 401 })
+      }
+      if (typeof targetUserId !== 'string' || typeof message !== 'string') {
+         return Response.json({ message: 'Invalid payload' }, { status: 400 })
+      }
 
-   await pusher.trigger(`user-${targetUserId}`, 'message', { message })
-
-   return NextResponse.json({})
+      await pusher.trigger(`user-${targetUserId}`, 'message', { message })
+      return Response.json({ message: 'Notification sent' }, { status: 200 })
+   } catch (error) {
+      return Response.json({ message: 'Invalid JSON or internal error' }, { status: 400 })
+   }
 }

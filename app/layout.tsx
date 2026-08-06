@@ -39,6 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             )}
          </head>
          <body
+            suppressHydrationWarning
             className={`${inter.variable} ${interTight.variable} antialiased font-inter selection:bg-main-white selection:text-main-border`}
          >
             <Suspense fallback={<InitialLoadPage />}>

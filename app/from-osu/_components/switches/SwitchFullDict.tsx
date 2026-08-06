@@ -1,7 +1,6 @@
 'use client'
-import { twMerge as tw } from 'tailwind-merge'
-import { useEffect, useState } from 'react'
-import CursorBtn from './CursorBtn'
+import { twMerge as tw } from 'tailwind-merge';
+import { useState } from 'react';
 
 export default function SwitchFull({
    options,
@@ -22,7 +21,7 @@ export default function SwitchFull({
    return (
       <div
          className={tw(
-            'font-inter-tight border-2 border-main-border rounded-full flex items-center gap-1 h-[26px] cursor-pointer',
+            'border-2 border-main-border rounded-full flex items-center gap-1 h-[26px] cursor-pointer',
             disabled && 'brightness-75',
             !required && 'pl-1.5 bg-gray-200',
             className,

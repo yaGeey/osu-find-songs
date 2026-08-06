@@ -100,9 +100,6 @@ export default function PlaylistPage() {
                      return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}`
                   })
                   .filter(Boolean),
-               m: searchParams.get('m'),
-               // s: searchParams.get('s'),
-               s: 'any',
             }
 
             const { data } = await clientAxios
@@ -200,7 +197,7 @@ export default function PlaylistPage() {
 
    const sortQuery = searchParams.get('sort') || 'relevance_asc'
    const renderedGrid = useMemo(() => {
-      return maps.map((data, i) => (
+      return maps.map((data) => (
          <li key={data[0].id} className="opacity-0">
             <CardRenderer data={data} sortQuery={sortQuery} />
          </li>
@@ -295,12 +292,15 @@ export default function PlaylistPage() {
                         </motion.div>
                      )}
                   </AnimatePresence>
-                  <Filters
-                     foundString={Array.isArray(maps) && maps.length ? `${maps.length}/${tracks.length} found` : ''}
-                     disabled={isLoading}
-                     onFilterChange={setFilters}
-                     onSearch={setSearchQuery}
-                  />
+                  <div className="relative flex flex-col gap-3 text-[15px]">
+                     <Filters disabled={isLoading} onFilterChange={setFilters} onSearch={setSearchQuery} />
+                     {Array.isArray(maps) && !isLoading && (
+                        <div className="absolute right-2 bottom-1 rounded-xl gap-1 text-white/90 tracking-wide text-sm hidden [@media(min-width:830px)]:grid text-end">
+                           <p>{`${mapsFetched}/${tracks.length} found`}</p>
+                           <p>{`${maps.length} displayed`}</p>
+                        </div>
+                     )}
+                  </div>
                </div>
 
                {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (

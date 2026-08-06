@@ -1,5 +1,4 @@
 import { neon } from '@neondatabase/serverless'
-import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
    const body = await req.json()
@@ -11,9 +10,8 @@ export async function POST(req: Request) {
          SET duration_ms = ${Math.floor(duration_ms)}
          WHERE id = ${id}
       `
-      return NextResponse.json({ message: 'Duration updated' }, { status: 200 })
+      return Response.json({ message: 'Duration updated' }, { status: 200 })
    } catch (err) {
-      console.error('Error updating telemetry duration:', err)
-      return NextResponse.json({ message: 'Error updating duration' }, { status: 500 })
+      return Response.json({ message: 'Error updating duration' }, { status: 500 })
    }
 }

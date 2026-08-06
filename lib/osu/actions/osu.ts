@@ -36,7 +36,7 @@ async function fetchOsu<T>(func: (token: string) => Promise<T>, retries = 3): Pr
    return await func(token)
 }
 
-export async function getBeatmapForFromOsu(id: string): Promise<BeatmapSetFromOsu> {
+export async function getBeatmapById(id: string): Promise<BeatmapSetFromOsu> {
    return fetchOsu(async (token) => {
       const res = await customAxios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
          headers: buildHeaders(token),

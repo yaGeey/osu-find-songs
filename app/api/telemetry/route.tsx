@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import axios from 'axios'
 
@@ -31,9 +30,9 @@ export async function POST(req: Request) {
          VALUES (${session_id}, ${user_agent}, ${referrer}, ${country}, ${city}, ${page}, ${is_bot})
          RETURNING id
       `
-      return NextResponse.json({ message: 'Telemetry received', id: res[0]?.id }, { status: 200 })
+      return Response.json({ message: 'Telemetry received', id: res[0]?.id }, { status: 200 })
    } catch (err) {
       console.error('Error storing telemetry:', err)
-      return NextResponse.json({ message: 'Error storing telemetry' }, { status: 500 })
+      return Response.json({ message: 'Error storing telemetry' }, { status: 500 })
    }
 }

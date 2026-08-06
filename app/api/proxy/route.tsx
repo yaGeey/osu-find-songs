@@ -1,11 +1,15 @@
-import { NextResponse } from 'next/server'
-
 const FORWARDED_HEADERS = ['Authorization', 'Referer']
 
 export async function GET(req: Request) {
    const { searchParams } = new URL(req.url)
    const targetUrl = searchParams.get('url')
-   if (!targetUrl) return NextResponse.json({ error: 'Missing url parameter' }, { status: 400 })
+   if (!targetUrl) return Response.json({ message: 'Missing url parameter' }, { status: 400 })
+
+   try {
+      new URL(targetUrl)
+   } catch {
+      return Response.json({ error: 'Invalid url parameter' }, { status: 400 })
+   }
 
    const forwardHeaders: Record<string, string> = {}
    for (const h of FORWARDED_HEADERS) {

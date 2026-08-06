@@ -11,7 +11,8 @@ import ImageFallback from '@/components/ImageFallback'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import Loading from '@/components/state/Loading'
-import { BANNED_STATUSES } from '@/lib/osu/osuDownload';
+import { BANNED_STATUSES } from '@/lib/osu/osuDownload'
+import { OSU_FALLBACK_IMAGE } from '@/variables'
 
 export default function OsuCard({
    beatmapset,
@@ -23,7 +24,13 @@ export default function OsuCard({
    className?: string
 }) {
    const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
-   const mutationNoVideo = useMapDownload({ id: beatmapset.id, fileName, video: false, onlyNoVideo: !beatmapset.video, status: beatmapset.status })
+   const mutationNoVideo = useMapDownload({
+      id: beatmapset.id,
+      fileName,
+      video: false,
+      onlyNoVideo: !beatmapset.video,
+      status: beatmapset.status,
+   })
    const mutationVideo = useMapDownload({ id: beatmapset.id, fileName, video: true, status: beatmapset.status })
 
    const ref = useRef<HTMLDivElement>(null)
@@ -47,7 +54,8 @@ export default function OsuCard({
    }
 
    const isPending = mutationNoVideo.isPending || mutationVideo.isPending
-   const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror) || !BANNED_STATUSES.includes(beatmapset.status)
+   const isDownloadAvailable =
+      useMapDownloadStore((state) => state.isAvailableMirror) || !BANNED_STATUSES.includes(beatmapset.status)
    return (
       <div
          ref={ref}
@@ -82,7 +90,7 @@ export default function OsuCard({
                fill
                sizes="100%"
                loading="lazy"
-               fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
+               fallbackSrc={OSU_FALLBACK_IMAGE}
                className={twJoin(
                   'group-hover:brightness-80 group-hover/play:scale-107 transition-transform duration-300 ease-in-out object-cover min-h-[104px]',
                   currentUrl === beatmapset.preview_url && 'scale-107 brightness-80',
@@ -112,7 +120,7 @@ export default function OsuCard({
                height={104}
                className="z-10 object-cover"
                loading="lazy"
-               fallbackSrc="https://osu.ppy.sh/assets/images/default-bg.7594e945.png"
+               fallbackSrc={OSU_FALLBACK_IMAGE}
             />
             <div
                className={twJoin(
