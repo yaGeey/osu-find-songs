@@ -7,16 +7,29 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { toast } from 'react-toastify'
 import useBaseStore from '@/contexts/useBaseStore'
+import React from 'react'
 
-const displayError = (err: unknown, errMsg: string) => {
+const displayError = (err: unknown, errMsg: string | React.ReactNode) => {
    console.error(err)
-   toast.error(errMsg, { autoClose: 8000 })
-   useBaseStore.getState().notifyRef?.current?.blink({type: 'error'}, 4000)
+   toast.error(errMsg, { autoClose: 7000 })
+   useBaseStore.getState().notifyRef?.current?.blink({ type: 'error' }, 4000)
 }
 
 const persister = createSyncStoragePersister({
    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
 })
+
+declare module '@tanstack/react-query' {
+   interface Register {
+      defaultError: Error
+      queryMeta: {
+         errMsg?: string | React.ReactNode
+      }
+      mutationMeta: {
+         errMsg?: string | React.ReactNode
+      }
+   }
+}
 
 function makeQueryClient() {
    return new QueryClient({
@@ -30,17 +43,14 @@ function makeQueryClient() {
       },
       queryCache: new QueryCache({
          onError: (error, query) => {
-            displayError(
-               error,
-               (query.meta?.errMsg as string) ?? 'An error occurred while fetching data. Open console for details.',
-            )
+            displayError(error, query.meta?.errMsg ?? 'An error occurred while fetching data. Open console for details.')
          },
       }),
       mutationCache: new MutationCache({
          onError: (error, _variables, _context, mutation) => {
             displayError(
                error,
-               (mutation.meta?.errMsg as string) ?? 'An error occurred while performing the action. Open console for details.',
+               mutation.meta?.errMsg ?? 'An error occurred while performing the action. Open console for details.',
             )
          },
       }),

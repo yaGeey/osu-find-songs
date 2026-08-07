@@ -51,6 +51,7 @@ export default function PlaylistPage() {
    const { data: playlistInfo, isFetching: playlistLoading } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
       queryFn: async () => fetchPlaylist(playlistId as string),
+      meta: { errMsg: 'Failed to fetch playlist info' },
    })
 
    // fetching playlist
@@ -70,6 +71,7 @@ export default function PlaylistPage() {
          }
          return await fetchPlaylistContents(playlistId as string, pageParam)
       },
+      meta: { errMsg: 'Failed to fetch playlist tracks' },
       getNextPageParam: (lastPage) => lastPage.nextOffset,
       initialPageParam: 0,
       retry: 0,
@@ -215,24 +217,26 @@ export default function PlaylistPage() {
          }
          `}</style>
 
-         <Progress isVisible={isLoading} value={spotifyTotal > 0 ? Math.min((mapsFetched / spotifyTotal) * 100, 100) : 0}>
-            {msLeft > 5000 && (
-               <span>
-                  {mapsFetched}/{spotifyTotal} | {timeLeft} left
-               </span>
-            )}
-         </Progress>
-         <Progress isVisible={progress !== null} value={progress || 0} color="text-success">
-            {text}
-         </Progress>
-         <ProgressMapDownload />
-
          <header
             className={tw(
-               'min-w-[710px] bg-triangles [--color-dialog:var(--color-main])] fixed z-100 w-screen h-12 flex justify-between items-center px-4 gap-10 border-b-3 border-main-darker',
+               'min-w-[710px] bg-triangles [--color-dialog:var(--color-main])] fixed z-1000 w-screen h-12 flex justify-between items-center gap-10 border-b-3 border-main-darker',
             )}
          >
-            <IconsSection />
+            <Progress isVisible={isLoading} value={spotifyTotal > 0 ? Math.min((mapsFetched / spotifyTotal) * 100, 100) : 0}>
+               {msLeft > 5000 && (
+                  <span>
+                     {mapsFetched}/{spotifyTotal} | {timeLeft} left
+                  </span>
+               )}
+            </Progress>
+            <Progress isVisible={progress !== null} value={progress || 0} color="text-success">
+               {text}
+            </Progress>
+            <ProgressMapDownload />
+
+            <div className="px-4">
+               <IconsSection />
+            </div>
             <AnimatePresence>
                <NotifyHeader ref={progressNotifyRef}>
                   {playlistInfo?.name && (
@@ -249,7 +253,7 @@ export default function PlaylistPage() {
                   )}
                </NotifyHeader>
             </AnimatePresence>
-            <div className="_invisible">
+            <div className="_invisible px-4">
                <DownloadAllBtn
                   disabled={isLoading || isDownloadAvailable === false}
                   maps={maps}

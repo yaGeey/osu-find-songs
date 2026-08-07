@@ -28,12 +28,10 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: Use
             ? await fetchBeatmapWithFallback({ id, video: true, priority: 1, queryClient })
             : await fetchBeatmapWithFallback({ id, video: false, onlyNoVideo, priority: 1, queryClient })
       },
-      onError: (error) => {
-         remove(id)
-
-         toast.error(
+      meta: {
+         errMsg: (
             <div>
-               <p>All mirrors are down 😔</p>
+               <p>Failed to download map</p>
                <a
                   href={`https://osu.ppy.sh/beatmapsets/${id}`}
                   target="_blank"
@@ -42,14 +40,12 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: Use
                >
                   download directly from osu! website
                </a>
-            </div>,
-            {
-               autoClose: 10000,
-               closeOnClick: false,
-            },
-         )
+            </div>
+         ),
+      },
+      onError: (error) => {
+         remove(id)
          sendUnknownError(error, 'MAP_DOWNLOAD')
-         notify({ type: 'error', content: 'Download failed' }, 4000)
       },
       onSuccess: (data) => {
          remove(id)

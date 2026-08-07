@@ -10,6 +10,7 @@ export default function BackgroundFetcher() {
          getInternalTokens().catch(() => {
             throw new Error('Service is currently unavailable. Could not fetch necessary tokens. Please try again later.')
          }),
+      meta: { errMsg: 'Service is currently unavailable. Could not fetch necessary tokens. Please try again later.' },
       throwOnError: true,
       retry: 1,
       refetchOnWindowFocus: false,

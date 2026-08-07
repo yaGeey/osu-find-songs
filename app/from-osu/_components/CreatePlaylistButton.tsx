@@ -20,10 +20,8 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Server
 
    const createPlaylistMutation = useMutation({
       mutationFn: ({ name, description }: { name: string; description: string }) => createPlaylist({ name, description }),
-      onError: (err) => {
-         console.error('Failed to create playlist', err)
-         setTextState('error')
-      },
+      meta: { errMsg: 'Failed to create playlist' },
+      onError: () => setTextState('error'),
    })
    const playlistId = createPlaylistMutation.data?.uri.split(':').pop()
 
@@ -32,10 +30,8 @@ export default function CreatePlaylistButton({ data, dataTotal }: { data: Server
          if (tracksUris.length === 0) throw new Error('No tracks found to add to playlist')
          return await addToPlaylist(playlistUri, tracksUris)
       },
-      onError: (err) => {
-         console.error('Failed to add items to playlist', err)
-         setTextState('error')
-      },
+      meta: { errMsg: 'Failed to add items to playlist' },
+      onError: (err) => setTextState('error'),
    })
 
    // create playlist
