@@ -55,7 +55,7 @@ export default function OsuCard({
 
    const isPending = mutationNoVideo.isPending || mutationVideo.isPending
    const isDownloadAvailable =
-      useMapDownloadStore((state) => state.isAvailableMirror) || !BANNED_STATUSES.includes(beatmapset.status)
+      useMapDownloadStore((state) => state.isAvailableMirror) && !BANNED_STATUSES.includes(beatmapset.status)
    return (
       <div
          ref={ref}

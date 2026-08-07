@@ -13,7 +13,7 @@ export const useMapDownloadStore = create<{
    isAvailableMirror: boolean
 }>((set, get) => ({
    pending: {},
-   isAvailableMirror: false,
+   isAvailableMirror: process.env.NODE_ENV !== 'production',
 
    add: (id, filename) => {
       const { pending } = get()
