@@ -1,6 +1,6 @@
 import axios from 'axios'
 import RateLimitManager from '../limiter/RateLimitManager'
-import { getLazerToken } from './actions/osu'
+import { createLocalApiUrl } from './actions/osu'
 
 const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB
@@ -98,7 +98,7 @@ const testMirrorLatency = async (mirror: Mirror): Promise<number> => {
    if (!buildedUrl) return Infinity
 
    const headers = mirror.buildHeaders ? await mirror.buildHeaders() : undefined
-   const url = mirror.isProxied ? `/api/proxy?url=${encodeURIComponent(buildedUrl)}` : buildedUrl
+   const url = mirror.isProxied ? await createLocalApiUrl(buildedUrl) : buildedUrl
 
    return new Promise((resolve) => {
       const start = performance.now()
@@ -140,7 +140,6 @@ export const getPrioritizedMirrorsFilteredByDead = async (deadMirrorNames?: stri
          return { mirror, bpms }
       }),
    )
-   // console.log(results.filter((r) => r.bpms !== Infinity).sort((a, b) => b.bpms - a.bpms))
    return results
       .filter((r) => r.bpms !== Infinity)
       .sort((a, b) => b.bpms - a.bpms)
@@ -160,7 +159,7 @@ export const getDownloadData = async (mirror: Mirror, video: boolean, id: number
    }
    if (!rawUrl) return { url: null, headers: undefined }
 
-   const url = mirror.isProxied ? `/api/proxy?url=${encodeURIComponent(rawUrl)}` : rawUrl
+   const url = mirror.isProxied ? await createLocalApiUrl(rawUrl) : rawUrl
    const headers = mirror.buildHeaders ? await mirror.buildHeaders() : undefined
    return { url, headers }
 }

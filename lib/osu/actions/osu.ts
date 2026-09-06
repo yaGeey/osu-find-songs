@@ -2,8 +2,26 @@
 import { BeatmapSet, BeatmapSetFromOsu, BeatmapSetFromSpotify } from '@/types/Osu'
 import { customAxios } from '../../serverAxios'
 import { cookies } from 'next/headers'
+import { createHmac } from 'crypto'
 
 let tokenRefreshPromise: Promise<string> | null = null
+
+// Sign the URL with HMAC-SHA256 using the LOCAL_API_SECRET
+export async function createLocalApiUrl(mirrorsUrl: string) {
+   if (!process.env.LOCAL_API_SECRET || !process.env.LOCAL_API_URL)
+      throw new Error('LOCAL_API_SECRET or LOCAL_API_URL is not set')
+
+   const url = new URL(`${process.env.LOCAL_API_URL}/proxy?url=${mirrorsUrl}`)
+
+   const exp = Math.floor(Date.now() / 1000) + 60 * 15
+   const payload = `${mirrorsUrl}${exp}`
+   const sig = createHmac('sha256', process.env.LOCAL_API_SECRET).update(payload).digest('hex')
+
+   url.searchParams.set('exp', exp.toString())
+   url.searchParams.set('sig', sig)
+
+   return url.toString()
+}
 
 function buildHeaders(token?: string) {
    const headers: Record<string, string> = {

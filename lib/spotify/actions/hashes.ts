@@ -7,8 +7,8 @@ const hashes: Record<string, string> = {}
 
 export async function getHash(opName: string) {
    if (!hashes[opName]) {
-      const { data } = await customAxios.get<Response>(`${process.env.SPOTIFY_TOKEN_SERVER_URL}/hashes?names=` + opName, {
-         headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
+      const { data } = await customAxios.get<Response>(`${process.env.LOCAL_API_URL}/hashes?names=` + opName, {
+         headers: { Authorization: process.env.LOCAL_API_SECRET },
          context: 'get hash',
       })
       if (Object.keys(data.all).length) Object.assign(hashes, data.all)
@@ -21,14 +21,10 @@ export async function getHash(opName: string) {
 }
 
 export async function updateHashes(opNames: string[]) {
-   const { data } = await customAxios.put<Response>(
-      `${process.env.SPOTIFY_TOKEN_SERVER_URL}/hashes?names=` + opNames.join(','),
-      null,
-      {
-         headers: { Authorization: process.env.SPOTIFY_TOKEN_SERVER_SECRET },
-         context: 'update hashes',
-      },
-   )
+   const { data } = await customAxios.put<Response>(`${process.env.LOCAL_API_URL}/hashes?names=` + opNames.join(','), null, {
+      headers: { Authorization: process.env.LOCAL_API_SECRET },
+      context: 'update hashes',
+   })
    Object.entries(data.all).forEach(([name, hash]) => (hashes[name] = hash))
    return opNames.length ? data.requested : data.all
 }
