@@ -13,9 +13,13 @@ export default function LandingPage() {
          <Overlay />
          <Link
             href="/from-osu/select"
-            className="relative overflow-hidden flex items-center justify-center group"
+            className="relative overflow-hidden flex items-center justify-center group pointer-events-none after:absolute after:inset-0 after:bg-black/30 after:backdrop-blur-sm"
             transitionTypes={['nav-forward']}
          >
+            <div className="relative z-10 text-white font-medium text-center text-lg">
+               <p className="text-2xl">Temporarly disabled</p> <p>Complete code and logic rewrite in progress</p>
+            </div>
+
             <Image
                src="/fo2.webp"
                alt="fo"
