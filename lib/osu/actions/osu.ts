@@ -42,10 +42,11 @@ async function getToken(): Promise<string> {
    if (cachedToken) return cachedToken
 
    // If expired or not exist
-   tokenRefreshPromise = revalidateOsuToken().then((newToken) => {
-      tokenRefreshPromise = null
-      return newToken
-   })
+   tokenRefreshPromise = revalidateOsuToken()
+      .then((d) => d)
+      .finally(() => {
+         tokenRefreshPromise = null
+      })
    return tokenRefreshPromise
 }
 

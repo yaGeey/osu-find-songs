@@ -12,7 +12,7 @@ export default function BackgroundFetcher() {
          }),
       meta: { errMsg: 'Service is currently unavailable. Could not fetch necessary tokens. Please try again later.' },
       throwOnError: true,
-      retry: 1,
+      retry: 2,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
    })

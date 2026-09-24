@@ -13,13 +13,16 @@ export default async function getLDClient() {
          new Observability({
             // TODO
             // backendUrl: process.env.NEXT_PUBLIC_LD_OBSERVABILITY_BACKEND_URL!,
-            serviceVersion: process.env.VERCEL_GITHUB_COMMIT_SHA!,
+            serviceVersion: process.env.VERCEL_GIT_COMMIT_SHA!,
             environment: process.env.NODE_ENV,
             serviceName: 'server',
          }),
       ],
    })
 
-   await ldClient.waitForInitialization()
+   await ldClient.waitForInitialization({timeout: 5000}).catch((err) => {
+      console.error('LaunchDarkly client failed to initialize:', err)
+      ldClient = null
+   })
    return ldClient
 }
