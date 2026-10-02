@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import useSessionId from './useSessionId'
 
 export default function useUserListener() {
-   const sessionId = useSessionId()
+   const { id: sessionId } = useSessionId()
    useEffect(() => {
       if (!sessionId) return
       console.log(sessionId)

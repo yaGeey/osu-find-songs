@@ -10,7 +10,7 @@ export default function Telemetry() {
    const pathname = usePathname()
    const startTimeRef = useRef<number>(new Date().getTime())
    const recordIfRef = useRef<number | null>(null)
-   const sessionId = useSessionId()
+   const { id: sessionId } = useSessionId()
 
    // Update session duration in DB
    const sendDuration = (durationMs: number) => {

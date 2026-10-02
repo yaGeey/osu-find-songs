@@ -160,10 +160,6 @@ export interface SpotifyArtist {
    }
 }
 
-export interface SpotifyTrackFromOsu {
-   id: string
-}
-
 export interface SpotifyTrack {
    __typename: 'Track'
    id: string

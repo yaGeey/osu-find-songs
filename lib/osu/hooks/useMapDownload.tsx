@@ -17,7 +17,7 @@ type UseMapDownloadOptions = {
 export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: UseMapDownloadOptions) => {
    const remove = useMapDownloadStore((s) => s.remove)
    const notify = useBaseStore((s) => s.notificationBlink)
-   const sessionId = useSessionId()
+   const { id: sessionId } = useSessionId()
    const queryClient = useQueryClient()
 
    return useMutation({

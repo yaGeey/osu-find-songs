@@ -1,6 +1,6 @@
 'use client'
 import { LocalBeatmap } from '@/types/types'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useState } from 'react'
 
 type LocalBeatmapsContextType = {
    localBeatmaps: LocalBeatmap[]
@@ -15,12 +15,4 @@ export function LocalBeatmapsContextProvider({ children }: { children: React.Rea
          {children}
       </LocalBeatmapsContext.Provider>
    )
-}
-
-export function useLocalBeatmapsContext() {
-   const context = useContext(LocalBeatmapsContext)
-   if (!context) {
-      throw new Error('useSongContext must be used within a SongContextProvider')
-   }
-   return context
 }

@@ -32,18 +32,6 @@ export type Beatmap = {
    version: string
 }
 
-export type BeatmapSimplified = {
-   accuracy: number
-   ar: number
-   bpm: number
-   // convert: boolean
-   cs: number
-   difficulty_rating: number
-   drain: number
-   max_combo: number
-   mode: 'osu' | 'taiko' | 'fruits' | 'mania'
-}
-
 export type BeatmapSet = {
    artist: string
    covers: {

@@ -35,8 +35,3 @@ export default function Progress({
       </div>
    )
 }
-
-export function ProgressInline({ value, isError = false, color = 'text-accent', defaultVariant = 'determinate' }: ProgressProps) {
-   const variant = useProgressVariant(value, defaultVariant)
-   return <ProgressBase value={value} indeterminate={variant === 'indeterminate'} color={isError ? 'bg-error' : color} />
-}

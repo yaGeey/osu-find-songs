@@ -1,6 +1,3 @@
-export function roundTo(num: number, decimals: number = 2) {
-   return (Math.round(num * 100) / 100).toFixed(decimals)
-}
 export function formatBytes(bytes: number, decimals = 1, si = false) {
    if (bytes === 0) return '0 Bytes'
    const k = 1024

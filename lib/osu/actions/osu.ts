@@ -146,30 +146,3 @@ async function revalidateOsuToken(): Promise<string> {
    })
    return data.access_token
 }
-
-// --- Lazer login for osu direct mirror ---
-
-let cachedToken: string | null = null
-let tokenExpiresAt: number = 0
-
-export const getLazerToken = async () => {
-   if (cachedToken && Date.now() < tokenExpiresAt - 5000) return cachedToken
-   else return await lazerLogin()
-}
-
-async function lazerLogin() {
-   const { data } = await customAxios.post<AuthResponse>(
-      'https://osu.ppy.sh/oauth/token',
-      `username=${process.env.LAZER_USERNAME}&password=${process.env.LAZER_PWD}&grant_type=password&client_id=5&client_secret=FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk&scope=*`,
-      {
-         headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-         },
-         context: 'lazer login',
-      },
-   )
-   cachedToken = data.access_token
-   tokenExpiresAt = Date.now() + data.expires_in * 1000
-   return data.access_token
-}

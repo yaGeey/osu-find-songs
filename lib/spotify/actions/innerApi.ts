@@ -9,7 +9,6 @@ import { SpotifyPlaylistContentResponse, SpotifyPlaylistResponse } from '@/types
 // TODO for graph handle error when hash is wrong - returns an json error
 
 const hashes = {
-   addToPlaylist: '47b2a1234b17748d332dd0431534f22450e9ecbb3d5ddcdacbd83368636a0990',
    fetchPlaylist: 'a65e12194ed5fc443a1cdebed5fabe33ca5b07b987185d63c72483867ad13cb4',
    searchDesktop: '63a93cc04f6d8dea84a85de315e43f396a76cb681500de9ac5ccf5fc618c84cb', // / searchTopResultsList
 } as const
@@ -196,74 +195,4 @@ export async function searchTopTracks(query: string) {
    if (tracks.length === 0 && types.length) throw new Error(`Spotify innerAPI: ${query} track not found. Types: {${types}}`)
 
    return tracks.map((i) => i.item.data)
-}
-
-export async function createPlaylist({ name, description }: { name: string; description: string }) {
-   const customHeaders = {
-      ...(await buildHeaders()),
-      Accept: 'application/json',
-   }
-
-   const { data } = await customAxios.post<{ uri: string; revision: string }>(
-      'https://spclient.wg.spotify.com/playlist/v2/playlist',
-      {
-         ops: [
-            {
-               kind: 'UPDATE_LIST_ATTRIBUTES',
-               updateListAttributes: {
-                  newAttributes: {
-                     values: {
-                        name,
-                        description,
-                     },
-                  },
-               },
-            },
-         ],
-      },
-      { headers: customHeaders, context: 'create playlist' },
-   )
-
-   // TODO handle dynamic user id (get it from server)
-   await customAxios.post(
-      'https://spclient.wg.spotify.com/playlist/v2/user/313ylfw2p3xrcb5nsyubpkcxs4t4/rootlist/changes',
-      {
-         deltas: [
-            {
-               ops: [
-                  {
-                     kind: 'ADD',
-                     add: {
-                        addFirst: true,
-                        items: [
-                           {
-                              uri: data.uri,
-                              attributes: { timestamp: Date.now().toString() },
-                           },
-                        ],
-                     },
-                  },
-               ],
-               info: { source: { client: 'WEBPLAYER' } },
-            },
-         ],
-      },
-      { headers: customHeaders, context: 'add playlist to rootlist' },
-   )
-   return data
-}
-
-export async function addToPlaylist(playlistUri: string, tracksUris: string[]) {
-   await fetchInnerGraphApi(
-      'addToPlaylist',
-      {
-         newPosition: {
-            fromUid: null,
-            moveType: 'BOTTOM_OF_PLAYLIST',
-         },
-         playlistItemUris: tracksUris,
-         playlistUri,
-      },
-      hashes.addToPlaylist,
-   )
 }

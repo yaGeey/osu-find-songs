@@ -6,7 +6,6 @@ export default function IconsSection({ children }: { children?: React.ReactNode 
       <section className="flex items-center gap-3 -mb-1 transition-all opacity-80">
          <HomeIcon className="hover:scale-105 transition-all no-jump size-[30px]" />
          <GithubIcon className="hover:scale-105 transition-all no-jump size-[30px]" />
-         {/* <SupportIcon className="size-[30px] cursor-pointer hover:scale-105 transition-transform -ml-3 no-jump" /> */}
          {children}
       </section>
    )

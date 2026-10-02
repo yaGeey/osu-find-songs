@@ -14,7 +14,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
    const [progress, setProgress] = useState<null | number>(null)
    const [text, setText] = useState<null | string>(null)
    const manager = RateLimitManager.getInstance('downloadAllQueue')
-   const sessionId = useSessionId()
+   const { id: sessionId } = useSessionId()
    const queryClient = useQueryClient()
 
    // download maps

@@ -42,58 +42,6 @@ export async function getPlaylistsCreatedCount() {
    return 60 + parseInt(result[0].count, 10)
 }
 
-//* Fo Telemetry *//
-
-export async function foTelemetryStart(mapsAmount: number, sessionId?: string) {
-   if (isDev) return
-   const result = await sql`
-      INSERT INTO fo_loading (session_id, maps_amount)
-      VALUES (${sessionId ?? null}, ${mapsAmount})
-      RETURNING id
-   `
-   return result[0].id as number
-}
-export async function foTelemetryFinishedSpotify(id: number) {
-   if (isDev) return
-   await sql`
-      UPDATE fo_loading
-      SET spotify_finish_at = NOW()
-      WHERE id = ${id}
-   `
-}
-export async function foTelemetryFinishedOsu(id: number) {
-   if (isDev) return
-   await sql`
-      UPDATE fo_loading
-      SET osu_finish_at = NOW()
-      WHERE id = ${id}
-   `
-}
-export async function foTelemetryAttachSession(id: number, sessionId: string) {
-   if (isDev) return
-   await sql`
-      UPDATE fo_loading
-      SET session_id = COALESCE(session_id, ${sessionId})
-      WHERE id = ${id}
-   `
-}
-export async function foTelemetryError(id: number, errorMessage: string) {
-   if (isDev) return
-   await sql`
-      UPDATE fo_loading
-      SET error = ${errorMessage}
-      WHERE id = ${id}
-   `
-}
-export async function playlistCreated(playlistId: string, sessionId: string) {
-   if (isDev) return
-   await sql`
-      INSERT INTO fo_playlists (playlist_id, session_id)
-      VALUES (${playlistId}, ${sessionId})
-      RETURNING id
-   `
-}
-
 //* Not a Telemetry *//
 export type Banner = {
    id: number
