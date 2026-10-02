@@ -12,14 +12,10 @@ export default function LandingPage() {
       <main className="relative grid grid-cols-2 max-sm:grid-cols-1 h-screen w-screen text-white">
          <Overlay />
          <Link
-            href="/from-osu/select"
-            className="relative overflow-hidden flex items-center justify-center group pointer-events-none after:absolute after:inset-0 after:bg-black/30 after:backdrop-blur-sm"
+            href="/from-osu"
+            className="relative overflow-hidden flex items-center justify-center group"
             transitionTypes={['nav-forward']}
          >
-            <div className="relative z-10 text-white font-medium text-center text-lg">
-               <p className="text-2xl">Temporarly disabled</p> <p>Complete code and logic rewrite in progress</p>
-            </div>
-
             <Image
                src="/fo2.webp"
                alt="fo"
@@ -30,9 +26,8 @@ export default function LandingPage() {
             />
             <div className="absolute grid items-center text-center gap-7 font-medium group">
                <div className="grid gap-2">
-                  {/* drop-shadow(0_0_8px_rgba(255,255,255,0.3))_ */}
                   <h2 className="text-4xl font-semibold tracking-tight broken-light-title">osu! to Spotify</h2>
-                  <h3 className="text-lg text-main-white">create a playlist with your maps</h3>
+                  <h3 className="text-lg text-main-white">UPDATE! create a playlist with your maps</h3>
                </div>
                <span
                   className="text-2xl underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
@@ -92,14 +87,16 @@ export default function LandingPage() {
 
          <div className="sr-only">
             <section>
-               Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can filter, sort
-               and search results with all the options provided by osu search queries and even custom one. Once you&apos;re happy
-               with the results, you can download each beatmap individually - or grab them all in a single zip archive.
+               Pick any public Spotify playlist and the app will try to match each track to osu! beatmaps. You can
+               filter, sort and search results with all the options provided by osu search queries and even custom one.
+               Once you&apos;re happy with the results, you can download each beatmap individually - or grab them all in
+               a single zip archive.
             </section>
             <section>
-               The app will scan all your .osu files to extract track metadata. It then automatically searches for those songs on
-               Spotify and YouTube. You can view, listen or watch videos in the app, and instantly generate a Spotify playlist.
-               Similarly to the native osu! client, you can organize your songs exactly the way you&apos;re used to.
+               The app will scan all your .osu files to extract track metadata. It then automatically searches for those
+               songs on Spotify and YouTube. You can view, listen or watch videos in the app, and instantly generate a
+               Spotify playlist. Similarly to the native osu! client, you can organize your songs exactly the way
+               you&apos;re used to.
             </section>
          </div>
       </main>

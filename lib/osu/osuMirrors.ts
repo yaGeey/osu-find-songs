@@ -1,12 +1,17 @@
 import axios from 'axios'
 import RateLimitManager from '../limiter/RateLimitManager'
-import { createLocalApiUrl } from './actions/osu'
+import { signLocalApiUrl } from '../actions/signLocalApi'
 
 const TEST_MAP_ID = 320118
 const TEST_CHUNK_SIZE_BYTES = 50 * 1024 // 100 KB
 const MAX_TEST_TIME_MS = 8000
 
 const isProxied = process.env.NEXT_PUBLIC_PROXIED_MIRRORS === '1'
+
+async function createLocalApiUrl(mirrorsUrl: string) {
+   const url = new URL(`${process.env.LOCAL_API_URL}/proxy?url=${mirrorsUrl}`)
+   return signLocalApiUrl(url.toString())
+}
 
 export type Mirror = {
    name: string

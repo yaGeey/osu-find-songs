@@ -24,9 +24,9 @@ body {
    --color-main-gray: oklch(0.3 0 0); /* 1 */
 
    /* Semantic */
-   --color-success: oklch(0.7 0.19 145);
+   --color-success: oklch(57.3% 0.142 151.5);
    --color-success-btn: oklch(0.6 0.19 155);
-   --color-error: oklch(0.65 0.25 25);
+   --color-error: oklch(52.18% 0.191 24.94);
    --color-warning: oklch(0.9 0.7 96);
 
    /* Accent / secondary */

@@ -24,7 +24,6 @@ export default function VirtuosoCards({ sortQuery, maps }: { sortQuery: string; 
             Footer: () => <div className="h-3" />,
          }}
          overscan={200}
-         totalCount={Math.round(maps.length / 2)}
          itemContent={(_, data) => <CardRenderer key={data[0].id} data={data} sortQuery={sortQuery} />}
       />
    )
