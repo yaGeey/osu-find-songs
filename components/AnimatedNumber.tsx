@@ -1,9 +1,17 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSpring, motion } from 'framer-motion'
-import { roundDownAndSaveDigits } from '@/utils/numbers'
+import { formatLocalNumber, roundDownAndSaveDigits } from '@/utils/format'
 
-export default function AnimatedNumber({ value: target, duration = 1000, label }: { value: number; duration?: number, label?: string }) {
+export default function AnimatedNumber({
+   value: target,
+   duration = 1000,
+   label,
+}: {
+   value: number
+   duration?: number
+   label?: string
+}) {
    const rounded = roundDownAndSaveDigits(target)
    const [displayValue, setDisplayValue] = useState(rounded)
 
@@ -19,7 +27,7 @@ export default function AnimatedNumber({ value: target, duration = 1000, label }
 
    return (
       <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-         {displayValue} {label}
+         {formatLocalNumber(displayValue)} {label}
       </motion.span>
    )
 }

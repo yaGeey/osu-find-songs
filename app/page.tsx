@@ -4,8 +4,9 @@ import './page.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { Suspense } from 'react'
-import { MapsDownloaded, PlaylistsCreated } from '@/components/AnimatedNumers'
+import { MapsDownloaded, PlaylistsCreated } from '@/components/StatisticNumbers'
 import Overlay from '@/components/Overlay'
+import { Upload, ListMusic, ArrowRight } from 'lucide-react'
 
 export default function LandingPage() {
    return (
@@ -27,10 +28,10 @@ export default function LandingPage() {
             <div className="absolute grid items-center text-center gap-7 font-medium group">
                <div className="grid gap-2">
                   <h2 className="text-4xl font-semibold tracking-tight broken-light-title">osu! to Spotify</h2>
-                  <h3 className="text-lg text-main-white">UPDATE! create a playlist with your maps</h3>
+                  <h3 className="text-lg text-main-white">create a playlist with your maps</h3>
                </div>
                <span
-                  className="text-2xl underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
+                  className="text-2xl flex items-center justify-center gap-2.5 underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
                   style={
                      {
                         '--shine-base': 'var(--color-brand-osu)',
@@ -38,8 +39,9 @@ export default function LandingPage() {
                      } as React.CSSProperties
                   }
                >
-                  <FontAwesomeIcon icon={faArrowRight} className="mr-2 text-main" />
+                  <ArrowRight className="text-main" />
                   Select an osu folder
+                  <Upload className="text-brand-osu" />
                </span>
                <h4 className="text-base font-normal text-main-white">
                   <Suspense fallback={<span className="opacity-0">...</span>}>
@@ -71,11 +73,12 @@ export default function LandingPage() {
                   <h3 className="text-lg text-main-white">pick a playlist to find beatmaps</h3>
                </div>
                <span
-                  className="text-2xl underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
+                  className="text-2xl flex items-center justify-center gap-2.5 underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
                   style={{ '--shine-base': 'var(--color-brand-spotify)' } as React.CSSProperties}
                >
-                  <FontAwesomeIcon icon={faArrowRight} className="mr-2 text-brand-spotify" />
+                  <ArrowRight className="text-brand-spotify" />
                   Select a playlist
+                  <ListMusic className="text-brand-spotify" />
                </span>
                <h4 className="text-base font-normal text-main-white">
                   <Suspense fallback={<span className="opacity-0">...</span>}>

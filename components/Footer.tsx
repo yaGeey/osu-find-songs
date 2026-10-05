@@ -1,5 +1,3 @@
-import { faArrowUpRightFromSquare, faStar } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getGitHubRepoLastUpdate, getGitHubRepoStarCount } from '@/lib/actions/github'
 import { Heart, ExternalLink } from 'lucide-react'
 

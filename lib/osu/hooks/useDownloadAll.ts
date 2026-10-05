@@ -1,5 +1,4 @@
 import { BeatmapSet } from '@/types/Osu'
-import { getWindowsFriendlyLocalTime } from '@/utils/dates'
 import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -9,6 +8,7 @@ import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import useSessionId from '../../../hooks/useSessionId'
 import { useQueryClient } from '@tanstack/react-query'
 import { fetchBeatmapWithFallback, download, BANNED_STATUSES } from '../osuDownload'
+import { getWindowsFriendlyLocalTime } from '@/utils/format'
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
@@ -39,7 +39,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
             playlistId: window.location.pathname.split('/')[2]!,
             all: true,
          }).catch(() => {})
-         
+
          // UI
          count++
          setText(`Downloading... (${count}/${validMaps.length})`)

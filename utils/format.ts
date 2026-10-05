@@ -10,7 +10,17 @@ export function formatBytes(bytes: number, decimals = 1, si = false) {
 export function roundDownAndSaveDigits(num: number) {
    const intNum = Math.floor(num)
    if (intNum < 10) return 0
-   if (intNum < 100) return intNum / 2 - (intNum / 2 % 10)
+   if (intNum < 100) return intNum / 2 - ((intNum / 2) % 10)
    if (intNum < 1000) return intNum - (intNum % 100)
    return intNum - (intNum % 1000)
+}
+
+export function getWindowsFriendlyLocalTime(date: Date = new Date()) {
+   const locale = navigator.language || 'en-US'
+   const dateTime = date.toLocaleString(locale)
+   return dateTime.replace(/[\/\\:,]/g, '-').replace(/\s+/g, '_')
+}
+
+export function formatLocalNumber(num: number, locale: string = navigator.language || 'en-US') {
+   return num.toLocaleString(locale)
 }
