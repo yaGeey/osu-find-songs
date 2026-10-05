@@ -14,7 +14,7 @@ const SHELL_BY_OS: Record<OS, string> = {
 }
 
 const COMMAND_EXPLANATION =
-   'Scans your osu! Songs folder, reads the title and artist of every map, sends them to this site, and adds the Spotify matches to your playlist.'
+   'Scans your osu!stable beatmaps folder, reads the title and artist of every map, sends them to this site, and adds the Spotify matches to your playlist.'
 
 function Kbd({ children }: { children: React.ReactNode }) {
    return (
@@ -102,11 +102,13 @@ export default function CommandSection({
                Paste this command to get started
             </h2>
             <p className="mt-1 text-sm text-main-gray/80">
-               Scans your osu! Songs folder and sends every map&apos;s title and artist here.
+               Scans your osu!stable beatmaps folder and sends every map&apos;s title and artist here.
             </p>
          </div>
          {osUnsupported && (
-            <AlertBanner title="Unsupported operating system">We couldn&apos;t detect your OS automatically.</AlertBanner>
+            <AlertBanner title="Unsupported operating system">
+               We couldn&apos;t detect your OS automatically.
+            </AlertBanner>
          )}
          <div className="w-full overflow-hidden rounded-lg border-2 border-main-dark-vivid bg-main-light">
             <div className="flex items-center justify-between border-b-2 border-main-dark-vivid pr-3">
@@ -134,7 +136,9 @@ export default function CommandSection({
                   ))}
                </div>
                {selectedOS && (
-                  <span className="font-inter-tight font-medium text-xs text-main-gray/70">{SHELL_BY_OS[selectedOS]}</span>
+                  <span className="font-inter-tight font-medium text-xs text-main-gray/70">
+                     {SHELL_BY_OS[selectedOS]}
+                  </span>
                )}
             </div>
 
@@ -178,7 +182,8 @@ export default function CommandSection({
                <p className="mb-1.5 text-sm font-semibold text-main-gray">First time using a terminal?</p>
                <ol className="list-decimal space-y-1 pl-4 text-xs text-main-gray/80">
                   <li>
-                     Press <Kbd>Win</Kbd>, type <span className="font-semibold text-main-gray">PowerShell</span> and open it.
+                     Press <Kbd>Win</Kbd>, type <span className="font-semibold text-main-gray">PowerShell</span> and
+                     open it.
                   </li>
                   <li>
                      Paste the command with <Kbd>Ctrl</Kbd> + <Kbd>V</Kbd> and press <Kbd>Enter</Kbd>.
