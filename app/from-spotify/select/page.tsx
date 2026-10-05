@@ -3,15 +3,21 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
-import { twMerge as tw, twMerge } from 'tailwind-merge'
-import { useMutation } from '@tanstack/react-query'
+import { twMerge } from 'tailwind-merge'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { fetchPlaylist } from '@/lib/spotify/actions/innerApi'
+import LoadingDots from '@/components/state/LoadingDots'
 
 export default function SelectPage() {
    const [isLoading, setIsLoading] = useState(false)
    const [error, setError] = useState<string | null>(null)
    const inputRef = useRef<HTMLInputElement>(null)
    const router = useRouter()
+
+   const tokensQ = useQuery({
+      queryKey: ['spotifyIntTokens'],
+      enabled: false,
+   })
 
    function parseIdFromUrl(url: string) {
       const parts = url.split('/')
@@ -55,11 +61,11 @@ export default function SelectPage() {
                         }
                      } else setError(null)
                   }}
-                  disabled={isLoading || mutation.isPending}
+                  disabled={tokensQ.isError || tokensQ.isFetching || isLoading || mutation.isPending}
                   ref={inputRef}
                   className={twMerge(
-                     'bg-gray-100 disabled:border-success hover:brightness-115 text-black border-3 w-full border-main-darker rounded-lg pl-2 py-2 pr-8 invalid:[&:not(:placeholder-shown)]:border-error transition-all outline-0',
-                     !error ? ' valid:[&:not(:placeholder-shown)]:border-success' : 'border-error',
+                     'bg-gray-100 disabled:bg-gray-100/50 hover:brightness-115 text-black border-3 w-full border-main-darker rounded-lg pl-2 py-2 pr-8 invalid:[&:not(:placeholder-shown)]:border-error transition-all outline-0',
+                     !error && !tokensQ.isError ? ' valid:[&:not(:placeholder-shown)]:border-success' : 'border-error',
                   )}
                ></input>
                <FontAwesomeIcon
@@ -67,11 +73,25 @@ export default function SelectPage() {
                   className="absolute top-1/2 transform -translate-y-1/2 right-2 text-lg text-black/80"
                />
             </div>
-            <div className="h-6">
-               {(isLoading || mutation.isPending) && <span className={tw('text-center w-full text-success')}>Loading..</span>}
-               {error && !isLoading && !mutation.isPending && (
-                  <span className={tw('text-center w-full text-error')}>{error ?? 'e'}</span>
+            <div className="min-h-6 *:text-center *:w-full *:whitespace-normal font-medium mt-1">
+               {(isLoading || mutation.isPending) && (
+                  <p className="text-success">
+                     Loading
+                     <LoadingDots />
+                  </p>
                )}
+               {(tokensQ.isError || (tokensQ.isFetched && !tokensQ.data)) && (
+                  <p className="text-error">
+                     <p>Required tokens were not fetched due to a server-side issue.</p> <p>Please try again later.</p>
+                  </p>
+               )}
+               {tokensQ.isFetching && (
+                  <p className="text-white/60">
+                     Fetching required tokens
+                     <LoadingDots />
+                  </p>
+               )}
+               {error && <p className="text-error">{error ?? 'Unexpected error occured'}</p>}
             </div>
          </div>
       </div>

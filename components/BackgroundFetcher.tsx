@@ -3,16 +3,11 @@ import { getInternalTokens } from '@/lib/spotify/actions/innerApi'
 import { useQuery } from '@tanstack/react-query'
 
 export default function BackgroundFetcher() {
-   // Sptotify Internal Tokens
    useQuery({
       queryKey: ['spotifyIntTokens'],
-      queryFn: () =>
-         getInternalTokens().catch(() => {
-            throw new Error('Service is currently unavailable. Could not fetch necessary tokens. Please try again later.')
-         }),
-      meta: { errMsg: 'Service is currently unavailable. Could not fetch necessary tokens. Please try again later.' },
-      throwOnError: true,
-      retry: 2,
+      queryFn: () => getInternalTokens(),
+      meta: { errMsg: 'Could not fetch necessary tokens for From Spotify page. Please reload the page or wait.' },
+      retry: 5,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
    })
