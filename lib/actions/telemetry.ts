@@ -1,8 +1,16 @@
 'use server'
 import { neon } from '@neondatabase/serverless'
 import { cacheLife } from 'next/cache'
-const sql = neon(`${process.env.DATABASE_URL}`)
+
 const isDev = process.env.NODE_ENV === 'development'
+
+// Lazily created so a missing/unreachable DATABASE_URL can't crash the module at import
+// time (which would take down any page rendering <BannersContainer/>). See REVIEW.md C7.
+let _sql: ReturnType<typeof neon> | null = null
+function getSql() {
+   if (!_sql) _sql = neon(`${process.env.DATABASE_URL}`)
+   return _sql
+}
 
 export async function sendMapDownloadTelemetry({
    sessionId,
@@ -17,7 +25,7 @@ export async function sendMapDownloadTelemetry({
 }) {
    if (isDev) return
    const all_value = all ?? false
-   await sql`
+   await getSql()`
       INSERT INTO downloads (session_id, map_id, playlist_id, download_all)
       VALUES (${sessionId ?? null}, ${mapId}, ${playlistId}, ${all_value})
    `
@@ -27,19 +35,27 @@ export async function sendMapDownloadTelemetry({
 export async function getMapsDownloadedCount() {
    'use cache'
    cacheLife('days')
-   const result = await sql`
-      SELECT COUNT(*) AS count
-      FROM downloads
-   `
-   return parseInt(result[0].count, 10)
+   try {
+      const result = (await getSql()`
+         SELECT COUNT(*) AS count
+         FROM downloads
+      `) as { count: string }[]
+      return parseInt(result[0].count, 10)
+   } catch {
+      return 0
+   }
 }
 export async function getPlaylistsCreatedCount() {
    'use cache'
    cacheLife('days')
-   const result = await sql`
-      SELECT COUNT(*) AS count FROM fo_playlists
-   `
-   return 60 + parseInt(result[0].count, 10)
+   try {
+      const result = (await getSql()`
+         SELECT COUNT(*) AS count FROM fo_playlists
+      `) as { count: string }[]
+      return 60 + parseInt(result[0].count, 10)
+   } catch {
+      return 60
+   }
 }
 
 //* Not a Telemetry *//
@@ -55,10 +71,14 @@ export type Banner = {
 export async function getActiveBanners() {
    'use cache'
    cacheLife('hours')
-   const results = await sql`
-      SELECT * FROM banners
-      WHERE active = true
-      ORDER BY id DESC
-   `
-   return results as unknown as Banner[]
+   try {
+      const results = await getSql()`
+         SELECT * FROM banners
+         WHERE active = true
+         ORDER BY id DESC
+      `
+      return results as unknown as Banner[]
+   } catch {
+      return []
+   }
 }

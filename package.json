@@ -8,7 +8,10 @@
     "postbuild": "npx --package=@launchdarkly/ldcli ldcli sourcemaps upload --project $LD_PROJECT_KEY --app-version $VERCEL_GIT_COMMIT_SHA --path .next/static --base-path _next/static --access-token $LD_ACCESS_TOKEN ",
     "start": "next start",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -57,6 +60,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@tanstack/eslint-plugin-query": "^5.91.3",
     "@types/canvas-confetti": "^1.9.0",

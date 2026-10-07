@@ -8,6 +8,9 @@ import { SpotifyPlaylistContentResponse, SpotifyPlaylistResponse } from '@/types
 
 // TODO for graph handle error when hash is wrong - returns an json error
 
+// Base URL for Spotify's internal GraphQL (pathfinder) API. Overridable for E2E tests; defaults to prod.
+const SPOTIFY_API_BASE = process.env.SPOTIFY_API_BASE_URL ?? 'https://api-partner.spotify.com'
+
 const hashes = {
    fetchPlaylist: 'a65e12194ed5fc443a1cdebed5fabe33ca5b07b987185d63c72483867ad13cb4',
    searchDesktop: '63a93cc04f6d8dea84a85de315e43f396a76cb681500de9ac5ccf5fc618c84cb', // / searchTopResultsList
@@ -89,7 +92,7 @@ async function fetchInnerGraphApi<T extends Record<string, any>>(
 ) {
    try {
       const { data } = await customAxios.post<BaseSpotifyResponse<T>>(
-         'https://api-partner.spotify.com/pathfinder/v2/query',
+         `${SPOTIFY_API_BASE}/pathfinder/v2/query`,
          {
             variables,
             operationName,

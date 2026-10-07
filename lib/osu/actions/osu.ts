@@ -3,6 +3,9 @@ import { BeatmapSet, BeatmapSetFromOsu, BeatmapSetFromSpotify } from '@/types/Os
 import { customAxios } from '../../serverAxios'
 import { cookies } from 'next/headers'
 
+// Base URL for the osu! API + OAuth. Overridable for E2E tests; defaults to prod.
+const OSU_BASE = process.env.OSU_BASE_URL ?? 'https://osu.ppy.sh'
+
 let tokenRefreshPromise: Promise<string> | null = null
 
 function buildHeaders(token?: string) {
@@ -39,7 +42,7 @@ async function fetchOsu<T>(func: (token: string) => Promise<T>, retries = 3): Pr
 
 export async function getBeatmapById(id: string): Promise<BeatmapSetFromOsu> {
    return fetchOsu(async (token) => {
-      const res = await customAxios.get<BeatmapSet>(`https://osu.ppy.sh/api/v2/beatmapsets/${id}`, {
+      const res = await customAxios.get<BeatmapSet>(`${OSU_BASE}/api/v2/beatmapsets/${id}`, {
          headers: buildHeaders(token),
          context: 'fetch beatmap details from osu',
       })
@@ -74,7 +77,7 @@ export async function beatmapsSearch(queries: Queries): Promise<{ beatmapsets: B
       const queryString = getQueryString(queries)
 
       const res = await customAxios.get<{ beatmapsets: Array<BeatmapSet>; total: number }>(
-         `https://osu.ppy.sh/api/v2/beatmapsets/search?${queryString}`,
+         `${OSU_BASE}/api/v2/beatmapsets/search?${queryString}`,
          {
             headers: buildHeaders(token),
             context: 'search beatmaps',
@@ -128,7 +131,7 @@ async function revalidateOsuToken(): Promise<string> {
       scope: 'public',
    })
 
-   const { data } = await customAxios.post<AuthResponse>('https://osu.ppy.sh/oauth/token', body.toString(), {
+   const { data } = await customAxios.post<AuthResponse>(`${OSU_BASE}/oauth/token`, body.toString(), {
       headers: {
          Accept: 'application/json',
          'Content-Type': 'application/x-www-form-urlencoded',
