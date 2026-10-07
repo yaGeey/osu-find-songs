@@ -159,6 +159,82 @@ body {
       background-size: 20px 20px;
       mix-blend-mode: screen;
    }
+
+   /* ---------- FOOTER SHINE (text only) ---------- */
+   .footer-shine {
+      position: relative;
+   }
+
+   .footer-shine-text {
+      --footer-text: white;
+      background-image:
+         linear-gradient(
+            105deg,
+            transparent 18%,
+            color-mix(in oklch, var(--shine-base, white), white 42%) 38%,
+            color-mix(in oklch, var(--shine-base, white), white 22%) 50%,
+            color-mix(in oklch, var(--shine-base, white), white 42%) 62%,
+            transparent 82%
+         ),
+         linear-gradient(var(--footer-text), var(--footer-text));
+      background-size:
+         260% 100%,
+         100% 100%;
+      background-repeat: no-repeat;
+      background-position:
+         135% 50%,
+         0 0;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-decoration-color: var(--footer-text);
+   }
+
+   .footer-shine-text svg {
+      color: var(--footer-text);
+   }
+
+   .footer-shine-text a {
+      text-decoration-color: var(--footer-text);
+   }
+
+   .footer-shine-text--dim {
+      --footer-text: color-mix(in oklch, white, transparent 40%);
+   }
+
+   .footer-shine--shining .footer-shine-text {
+      animation: footer-shine-text var(--shine-duration, 1.8s) ease-in-out 1 both;
+      will-change: background-position;
+   }
+
+   @keyframes footer-shine-text {
+      0% {
+         background-position:
+            120% 50%,
+            0 0;
+      }
+      100% {
+         background-position:
+            -45% 50%,
+            0 0;
+      }
+   }
+
+   @media (prefers-reduced-motion: reduce) {
+      .footer-shine--shining .footer-shine-text {
+         animation: footer-shine-fade var(--shine-duration, 1.8s) ease-in-out 1 both;
+      }
+      @keyframes footer-shine-fade {
+         0%,
+         100% {
+            filter: brightness(1);
+         }
+         30%,
+         70% {
+            filter: brightness(1.8);
+         }
+      }
+   }
 }
 
 /* @plugin 'tailwind-scrollbar'; */

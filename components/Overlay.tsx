@@ -3,15 +3,14 @@ import icon from '@/public/icon.png'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import Banners from './Banners'
-import { getActiveBanners } from '@/lib/actions/telemetry'
+import { BannersContainer } from './BannersContainer'
 export default function Overlay() {
    return (
       <>
-         <div className="text-white z-10 absolute top-0 w-full h-[70px]  flex items-center justify-center gap-8 px-5 border-b-4 border-main-border">
+         <div className="text-white z-10 absolute top-0 w-full h-[70px] flex items-center justify-center gap-8 px-5 border-b-4 border-main-border">
             <div className="absolute left-0 top-0 w-full h-full bg-triangles -z-1 [--color-dialog:var(--color-main-dark-vivid)] brightness-75" />
             <Link href="/" className="flex gap-4 items-end group">
-               <span className="text-main-white/70">turn beatmaps into playlists</span>
+               <span className="text-main-white/70 md:block hidden">turn beatmaps into playlists</span>
                <h1 className="flex items-center gap-2 text-3xl font-medium tracking-tight group-hover:text-main-lightest transition-colors">
                   <Image
                      src={icon}
@@ -21,7 +20,7 @@ export default function Overlay() {
                   />
                   osufindsongs
                </h1>
-               <span className="text-main-white/70">turn playlists into beatmaps</span>
+               <span className="text-main-white/70 md:block hidden">turn playlists into beatmaps</span>
             </Link>
             <Suspense>
                <BannersContainer />
@@ -34,15 +33,5 @@ export default function Overlay() {
             </Suspense>
          </div>
       </>
-   )
-}
-
-async function BannersContainer() {
-   const res = await getActiveBanners()
-   if (!res.length) return null
-   return (
-      <div className="flex-1 place-items-end">
-         <Banners banners={res} />
-      </div>
    )
 }

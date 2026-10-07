@@ -10,6 +10,7 @@ import PlaylistProgress, { PlaylistStatus } from './_components/PlaylistProgress
 import CommandSection from './_components/CommandSection'
 import AlertBanner from './_components/AlertBanner'
 import useSessionId from '@/hooks/useSessionId'
+import { triggerFooterShine } from '@/contexts/useFooterShine'
 
 // TODO
 // if tab closed - email notification
@@ -94,9 +95,10 @@ export default function FromOsu() {
       const prevStatus = prevStatusRef.current
       prevStatusRef.current = status
 
-      // notify only when this session actually watched the progress (processing -> filled),
+      // this session actually watched the progress (processing -> filled),
       if (status !== 'filled' || prevStatus !== 'processing') return
 
+      triggerFooterShine()
       const notification = new Notification('Your playlist is ready!', {
          body: 'Open it in Spotify to listen to your tracks',
          icon: '/kit.png',
