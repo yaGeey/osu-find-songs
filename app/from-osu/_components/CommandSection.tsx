@@ -5,16 +5,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import AlertBanner from './AlertBanner'
 
-const OS_LIST = ['Windows', 'Mac OS', 'Linux'] as const
+const OS_LIST = ['Windows', 'MacOS', 'Linux'] as const
 type OS = (typeof OS_LIST)[number]
-const SHELL_BY_OS: Record<OS, string> = {
-   Windows: 'PowerShell',
-   'Mac OS': 'Terminal',
-   Linux: 'Terminal',
-}
 
 const COMMAND_EXPLANATION =
-   'Scans your osu!stable beatmaps folder, reads the title and artist of every map, sends them to this site, and adds the Spotify matches to your playlist.'
+   'Scans your osu beatmaps folder, reads the title and artist of every map, sends them to this site, and adds the Spotify matches to your playlist.'
 
 function Kbd({ children }: { children: React.ReactNode }) {
    return (
@@ -40,7 +35,7 @@ export default function CommandSection({
       if (typeof window === 'undefined') return null
       const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera
       if (/Macintosh/i.test(userAgent)) {
-         return 'Mac OS'
+         return 'MacOS'
       } else if (/Windows/i.test(userAgent)) {
          return 'Windows'
       } else if (/Linux/i.test(userAgent)) {
@@ -63,7 +58,7 @@ export default function CommandSection({
 
    const command = useMemo(() => {
       if (!playlistId || !clientId || !selectedOS) return null
-      return commands[selectedOS](playlistId, clientId)
+      return osInstructions[selectedOS].command(playlistId, clientId)
    }, [selectedOS, playlistId, clientId])
 
    const [copied, setCopied] = useState(false)
@@ -102,7 +97,7 @@ export default function CommandSection({
                Paste this command to get started
             </h2>
             <p className="mt-1 text-sm text-main-gray/80">
-               Scans your osu!stable beatmaps folder and sends every map&apos;s title and artist here.
+               Scans your osu (lazer or stable) beatmaps folder and sends every map&apos;s title and artist here.
             </p>
          </div>
          {osUnsupported && (
@@ -137,7 +132,7 @@ export default function CommandSection({
                </div>
                {selectedOS && (
                   <span className="font-inter-tight font-medium text-xs text-main-gray/70">
-                     {SHELL_BY_OS[selectedOS]}
+                     {osInstructions[selectedOS].shell}
                   </span>
                )}
             </div>
@@ -177,20 +172,13 @@ export default function CommandSection({
                )}
             </div>
          </div>
-         {selectedOS === 'Windows' && (
+         {selectedOS && (
             <div className="rounded-lg border-2 border-main-dark-vivid/40 bg-main-light/60 px-3 py-2.5">
                <p className="mb-1.5 text-sm font-semibold text-main-gray">First time using a terminal?</p>
                <ol className="list-decimal space-y-1 pl-4 text-xs text-main-gray/80">
-                  <li>
-                     Press <Kbd>Win</Kbd>, type <span className="font-semibold text-main-gray">PowerShell</span> and
-                     open it.
-                  </li>
-                  <li>
-                     Paste the command with <Kbd>Ctrl</Kbd> + <Kbd>V</Kbd> and press <Kbd>Enter</Kbd>.
-                  </li>
-                  <li>
-                     When it asks for the folder, press <Kbd>Enter</Kbd> to use the default osu! Songs folder.
-                  </li>
+                  {osInstructions[selectedOS].steps.map((step, index) => (
+                     <li key={index}>{step}</li>
+                  ))}
                </ol>
             </div>
          )}
@@ -208,9 +196,44 @@ export default function CommandSection({
 
 // LAZER
 
-const commands: Record<OS, (plId: string, clientId: string) => string | null> = {
-   Windows: (plId, clientId) =>
-      `$url = '${process.env.NEXT_PUBLIC_LOCAL_API_URL}/spotify/playlist/${plId}'; $headers = @{ 'x-client-id' = '${clientId}' }; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $defaultSongs = "$env:LOCALAPPDATA\\osu!\\Songs"; $cr = [char]13; $barW = 24; $pad = 70; Write-Host ''; Write-Host -NoNewline "Select osu folder "; Write-Host -NoNewline "(Enter for default: $defaultSongs)" -ForegroundColor DarkGray; Write-Host -NoNewline ": "; $songs = (Read-Host).Trim().Trim('"'); if (-not $songs) { $songs = $defaultSongs }; if (-not (Test-Path -LiteralPath $songs)) { $songs = $PWD.Path }; $dirs = @(Get-ChildItem -LiteralPath $songs -Directory); $total = $dirs.Count; $i = 0; $data = foreach ($dir in $dirs) { $i++; $filled = [int][math]::Round($i / $total * $barW); $bar = ('#' * $filled).PadRight($barW, '-'); Write-Host -NoNewline ($cr + ("[$bar] $($i)/$($total) Parsing maps...").PadRight($pad)) -ForegroundColor Yellow; $osu = Get-ChildItem -LiteralPath $dir.FullName -Filter *.osu -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -First 1; if ($osu) { $meta = @{}; $section = ''; foreach ($line in [System.IO.File]::ReadLines($osu.FullName)) { if ($line -match '^\\[(.+)\\]') { $section = $Matches[1] } elseif ($section -eq 'Metadata' -and $line -match '^(Title|TitleUnicode|Artist|ArtistUnicode):(.*)$') { $v = $Matches[2].Trim(); if ($v) { $meta[$Matches[1]] = $v } } }; [pscustomobject]@{ Title = $meta['Title']; TitleUnicode = $meta['TitleUnicode']; Artist = $meta['Artist']; ArtistUnicode = $meta['ArtistUnicode'] } } }; $bar = '#' * $barW; Write-Host -NoNewline ($cr + ("[$bar] $total/$total Sending maps to server...").PadRight($pad)) -ForegroundColor Yellow; $json = ConvertTo-Json -InputObject @($data) -Depth 3; $body = [System.Text.Encoding]::UTF8.GetBytes($json); try { $null = Invoke-RestMethod -Uri $url -Method Post -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $body -TimeoutSec 120; Write-Host -NoNewline ($cr + (' ' * $pad) + $cr); Write-Host ''; Write-Host "Done! $(@($data).Count) maps parsed." -ForegroundColor Green; Write-Host "Return back to the app to see progress - ${process.env.NEXT_PUBLIC_APP_URL}/from-osu" -ForegroundColor Green } catch { Write-Host -NoNewline ($cr + (' ' * $pad) + $cr); Write-Host ''; Write-Host "Failed to send maps: $($_.Exception.Message)" -ForegroundColor Red }`,
-   'Mac OS': () => null,
-   Linux: () => null,
+const unixCommand = (plId: string, clientId: string) =>
+   `curl -fsSL '${process.env.NEXT_PUBLIC_APP_URL}/unix.sh' | bash -s -- --playlist '${plId}' --client '${clientId}' --api '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' --app '${process.env.NEXT_PUBLIC_APP_URL}'`
+
+const osInstructions = {
+   Windows: {
+      command: (plId: string, clientId: string) =>
+         `$c = irm '${process.env.NEXT_PUBLIC_APP_URL}/win.ps1'; if ($c -is [byte[]]) { $c = [Text.Encoding]::UTF8.GetString($c) }; & ([scriptblock]::Create($c)) -PlaylistId '${plId}' -ClientId '${clientId}' -ApiBase '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' -AppBase '${process.env.NEXT_PUBLIC_APP_URL}'`,
+      steps: [
+         <>
+            Press <Kbd>Win</Kbd>, type <span className="font-semibold text-main-gray">PowerShell</span> and open it.
+         </>,
+         <>
+            Paste the command with <Kbd>Ctrl</Kbd> + <Kbd>V</Kbd> and press <Kbd>Enter</Kbd>.
+         </>,
+      ],
+      shell: 'PowerShell',
+   },
+   MacOS: {
+      command: unixCommand,
+      steps: [
+         <>
+            Press <Kbd>Cmd</Kbd> + <Kbd>Space</Kbd>, type <span className="font-semibold text-main-gray">Terminal</span>{' '}
+            and open it.
+         </>,
+         <>
+            Paste the command with <Kbd>Cmd</Kbd> + <Kbd>V</Kbd> and press <Kbd>Enter</Kbd>.
+         </>,
+      ],
+      shell: 'bash',
+   },
+   Linux: {
+      command: unixCommand,
+      steps: [
+         <>Open your terminal.</>,
+         <>
+            Paste the command with <Kbd>Ctrl</Kbd> + <Kbd>Shift</Kbd> + <Kbd>V</Kbd> and press <Kbd>Enter</Kbd>.
+         </>,
+      ],
+      shell: 'bash',
+   },
 }
