@@ -1,15 +1,12 @@
 import confetti from 'canvas-confetti'
 import { motion } from 'framer-motion'
-import { ClipboardCheck, Copy, Info, MonitorOff, Terminal } from 'lucide-react'
+import { ClipboardCheck, Copy, MonitorOff, ShieldCheck, SquareArrowOutUpRight, Terminal } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import AlertBanner from './AlertBanner'
 
 const OS_LIST = ['Windows', 'MacOS', 'Linux'] as const
 type OS = (typeof OS_LIST)[number]
-
-const COMMAND_EXPLANATION =
-   'Scans your osu beatmaps folder, reads the title and artist of every map, sends them to this site, and adds the Spotify matches to your playlist.'
 
 function Kbd({ children }: { children: React.ReactNode }) {
    return (
@@ -97,7 +94,8 @@ export default function CommandSection({
                Paste this command to get started
             </h2>
             <p className="mt-1 text-sm text-main-gray/80">
-               Scans your osu (lazer or stable) beatmaps folder and sends every map&apos;s title and artist here.
+               Scans your osu! (lazer or stable) beatmaps and sends their song info here. Run the command to get
+               started.
             </p>
          </div>
          {osUnsupported && (
@@ -173,6 +171,23 @@ export default function CommandSection({
             </div>
          </div>
          {selectedOS && (
+            <p className="flex items-center gap-1.5 text-xs text-main-gray/80">
+               <ShieldCheck size={15} className="shrink-0" />
+               <span>
+                  Want to know what this command does?{' '}
+                  <a
+                     href={osInstructions[selectedOS].source}
+                     target="_blank"
+                     rel="noreferrer"
+                     className="inline-flex items-center gap-1 text-main-gray underline underline-offset-2 transition-colors hover:text-black"
+                  >
+                     View source
+                     <SquareArrowOutUpRight size={12} className="shrink-0" />
+                  </a>
+               </span>
+            </p>
+         )}
+         {selectedOS && (
             <div className="rounded-lg border-2 border-main-dark-vivid/40 bg-main-light/60 px-3 py-2.5">
                <p className="mb-1.5 text-sm font-semibold text-main-gray">First time using a terminal?</p>
                <ol className="list-decimal space-y-1 pl-4 text-xs text-main-gray/80">
@@ -182,19 +197,9 @@ export default function CommandSection({
                </ol>
             </div>
          )}
-         <p title={COMMAND_EXPLANATION} className="flex items-start gap-1.5 text-xs text-main-gray/80">
-            <Info size={14} className="mt-0.5 shrink-0" />
-            <span>Run the command, then come back to this page to watch the progress.</span>
-         </p>
       </div>
    )
 }
-
-// STABLE
-// Win: C:\Users\<Username>\AppData\Local\osu!\Songs
-// Mac: /Applications/osu!.app/Contents/Resources/drive_c/osu!/Songs
-
-// LAZER
 
 const unixCommand = (plId: string, clientId: string) =>
    `curl -fsSL '${process.env.NEXT_PUBLIC_APP_URL}/unix.sh' | bash -s -- --playlist '${plId}' --client '${clientId}' --api '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' --app '${process.env.NEXT_PUBLIC_APP_URL}'`
@@ -212,6 +217,7 @@ const osInstructions = {
          </>,
       ],
       shell: 'PowerShell',
+      source: 'https://github.com/yaGeey/osu-find-songs/blob/main/public/win.ps1',
    },
    MacOS: {
       command: unixCommand,
@@ -225,6 +231,7 @@ const osInstructions = {
          </>,
       ],
       shell: 'bash',
+      source: 'https://github.com/yaGeey/osu-find-songs/blob/main/public/unix.sh',
    },
    Linux: {
       command: unixCommand,
@@ -235,5 +242,6 @@ const osInstructions = {
          </>,
       ],
       shell: 'bash',
+      source: 'https://github.com/yaGeey/osu-find-songs/blob/main/public/unix.sh',
    },
 }

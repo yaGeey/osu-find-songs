@@ -21,6 +21,6 @@ export function getWindowsFriendlyLocalTime(date: Date = new Date()) {
    return dateTime.replace(/[\/\\:,]/g, '-').replace(/\s+/g, '_')
 }
 
-export function formatLocalNumber(num: number, locale: string = navigator.language || 'en-US') {
-   return num.toLocaleString(locale)
+export function formatNumber(num: number) {
+   return String(Math.trunc(num)).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }

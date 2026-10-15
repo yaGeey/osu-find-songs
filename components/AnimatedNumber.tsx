@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSpring, motion } from 'framer-motion'
-import { formatLocalNumber, roundDownAndSaveDigits } from '@/utils/format'
+import { formatNumber, roundDownAndSaveDigits } from '@/utils/format'
 
 export default function AnimatedNumber({
    value: target,
@@ -27,7 +27,7 @@ export default function AnimatedNumber({
 
    return (
       <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-         {formatLocalNumber(displayValue)} {label}
+         {formatNumber(displayValue)} {label}
       </motion.span>
    )
 }
