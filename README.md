@@ -36,7 +36,7 @@ _A tool that links osu! with Spotify: scan your osu! songs to get playlists, or 
 
 **Transform your osu! library into Spotify playlists!**
 
-- 🖥️ The app creates an empty playlist for you and hands you a single command to paste into your terminal. It scans your local osu!stable (lazer is on a way) Songs folder and sends nothing but each map's title and artist.
+- 🖥️ The app hands you a single command to paste into your terminal. It scans your local osu!stable (lazer is on a way) Songs folder and sends nothing but each map's title and artist — a playlist is created for you the moment your tracks arrive.
 - 🔎 Every track is then matched on Spotify and the found songs are added straight to that playlist for you, in batches.
 - 📈 Watch the live progress on the page and get a notification when it's ready, then open the playlist in Spotify.
 

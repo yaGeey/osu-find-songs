@@ -121,7 +121,7 @@ not_contains "$stable_json" 'readme' "ignores non-beatmap files"
 # --- 4. argument validation -----------------------------------------------
 echo "argument validation"
 bash "$UNIX_SH" >/dev/null 2>&1
-assert_eq "$?" "2" "missing --playlist exits 2"
+assert_eq "$?" "2" "missing --client exits 2"
 
 # --- 5. POST round-trip (optional) ----------------------------------------
 if command -v python3 >/dev/null 2>&1; then
@@ -152,15 +152,15 @@ PY
     sleep 1
 
     post_log=$(XDG_DATA_HOME="$xdg" bash "$UNIX_SH" --source lazer \
-        --playlist test-pl --client cid-123 --api "http://127.0.0.1:$port" 2>&1)
+        --client cid-123 --api "http://127.0.0.1:$port" 2>&1)
     assert_eq "$?" "0" "exits 0"
     kill "$recv_pid" 2>/dev/null
     wait "$recv_pid" 2>/dev/null
 
-    if grep -q 'RECV /spotify/playlist/test-pl cid-123' "$recv_log"; then
-        ok "posts to the playlist url with the x-client-id header"
+    if grep -q 'RECV /spotify/playlist/fill cid-123' "$recv_log"; then
+        ok "posts to /spotify/playlist/fill with the x-client-id header"
     else
-        bad "posts to the playlist url with the x-client-id header (log: $(cat "$recv_log" 2>/dev/null))"
+        bad "posts to /spotify/playlist/fill with the x-client-id header (log: $(cat "$recv_log" 2>/dev/null))"
     fi
     assert_eq "$(count_titles "$capture")" "2" "posts the deduplicated payload"
 else

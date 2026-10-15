@@ -6,7 +6,7 @@
 .DESCRIPTION
     Asks which osu! version you use, then reads the Title / TitleUnicode / Artist / ArtistUnicode
     metadata of every beatmap and POSTs the result to the local API, which matches the maps against
-    the chosen Spotify playlist.
+    your Spotify playlist.
 
     osu!stable keeps one folder per beatmap set under `Songs`, so the first `.osu` file of each
     folder is used. osu!(lazer) has no `Songs` folder: every imported file is stored under its
@@ -15,9 +15,6 @@
 
     Nothing is written to disk: the script is meant to be piped straight into PowerShell with
     `irm` (see the website for the exact command).
-
-.PARAMETER PlaylistId
-    Spotify playlist id the maps should be matched against.
 
 .PARAMETER ClientId
     Client id used to authenticate the request (sent as the `x-client-id` header).
@@ -30,13 +27,11 @@
 
 .EXAMPLE
     & ([scriptblock]::Create((irm 'http://localhost:3000/win.ps1'))) `
-        -PlaylistId '37i9dQZF1DXcBWIGoYBM5M' -ClientId 'abc123' `
+        -ClientId 'abc123' `
         -ApiBase 'http://localhost:3000' -AppBase 'http://localhost:3000'
 #>
 [CmdletBinding()]
 param(
-    [string]$PlaylistId,
-
     [string]$ClientId,
 
     [string]$ApiBase,
@@ -297,7 +292,6 @@ function Read-OsuSource {
 }
 
 function Invoke-OsuFindSongs {
-    if (-not $PlaylistId) { throw '-PlaylistId is required.' }
     if (-not $ClientId) { throw '-ClientId is required.' }
     if (-not $ApiBase) { throw '-ApiBase is required.' }
     if ($PSVersionTable.PSVersion.Major -ge 6 -and -not $IsWindows) {
@@ -335,7 +329,7 @@ function Invoke-OsuFindSongs {
     $bar = '#' * $barWidth
     Write-ProgressLine -Text "[$bar] $($maps.Count)/$($maps.Count) Sending maps to server..."
 
-    $uri = ($ApiBase.TrimEnd('/') + '/spotify/playlist/' + $PlaylistId)
+    $uri = ($ApiBase.TrimEnd('/') + '/spotify/playlist/fill')
     $headers = @{ 'x-client-id' = $ClientId }
     $json = ConvertTo-Json -InputObject $maps -Depth 3
     $body = [System.Text.Encoding]::UTF8.GetBytes($json)

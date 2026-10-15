@@ -5,7 +5,7 @@
 # It scans an osu! install, reads the Title / TitleUnicode / Artist / ArtistUnicode metadata of
 # every beatmap and POSTs the result to the local API. No download and no PowerShell needed:
 #
-#   curl -fsSL '<APP_URL>/unix.sh' | bash -s -- --playlist '<PLID>' --client '<CID>' --api '<LOCAL_API_URL>' --app '<APP_URL>'
+#   curl -fsSL '<APP_URL>/unix.sh' | bash -s -- --client '<CID>' --api '<LOCAL_API_URL>' --app '<APP_URL>'
 #
 # Supported data sources:
 #   osu!(lazer)  - macOS and Linux. Files live under the SHA-256 addressed store
@@ -26,7 +26,6 @@
 
 set -u
 
-playlist=""
 client=""
 api=""
 app=""
@@ -36,14 +35,13 @@ dump=""
 
 usage() {
     cat <<'EOF'
-Usage: unix.sh --playlist <id> --client <id> --api <url> [--app <url>]
+Usage: unix.sh --client <id> --api <url> [--app <url>]
                [--source stable|lazer] [--songs <path>] [--dump <file>]
 EOF
 }
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --playlist) playlist="${2:-}"; shift 2 ;;
         --client)   client="${2:-}";   shift 2 ;;
         --api)      api="${2:-}";      shift 2 ;;
         --app)      app="${2:-}";      shift 2 ;;
@@ -56,7 +54,6 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$dump" ]; then
-    [ -n "$playlist" ] || { echo '--playlist is required.' >&2; exit 2; }
     [ -n "$client" ]   || { echo '--client is required.' >&2;   exit 2; }
     [ -n "$api" ]      || { echo '--api is required.' >&2;      exit 2; }
 fi
@@ -276,7 +273,7 @@ bar="########################"
 printf '\r[%s] %s/%s Sending maps to server...\n' "$bar" "$count" "$count"
 
 api=${api%/}
-url="$api/spotify/playlist/$playlist"
+url="$api/spotify/playlist/fill"
 
 http_code=$(curl -sS -o /dev/null -w '%{http_code}' \
     -X POST "$url" \

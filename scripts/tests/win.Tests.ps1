@@ -207,7 +207,7 @@ Describe 'Get-LazerRoot' {
 }
 
 Describe 'Invoke-OsuFindSongs' {
-    It 'requires a playlist id' {
+    It 'requires a client id' {
         $threw = $false
         try { Invoke-OsuFindSongs } catch { $threw = $true }
         $threw | Should Be $true

@@ -17,11 +17,9 @@ function Kbd({ children }: { children: React.ReactNode }) {
 }
 
 export default function CommandSection({
-   playlistId,
    clientId,
    detectedOSOverride,
 }: {
-   playlistId: string
    clientId: string
    /** Preview/testing only: override OS detection. `null` simulates an unsupported OS. */
    detectedOSOverride?: OS | null
@@ -54,9 +52,9 @@ export default function CommandSection({
    const noOSSelected = selectedOS === null
 
    const command = useMemo(() => {
-      if (!playlistId || !clientId || !selectedOS) return null
-      return osInstructions[selectedOS].command(playlistId, clientId)
-   }, [selectedOS, playlistId, clientId])
+      if (!clientId || !selectedOS) return null
+      return osInstructions[selectedOS].command(clientId)
+   }, [selectedOS, clientId])
 
    const [copied, setCopied] = useState(false)
    const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -201,13 +199,13 @@ export default function CommandSection({
    )
 }
 
-const unixCommand = (plId: string, clientId: string) =>
-   `curl -fsSL '${process.env.NEXT_PUBLIC_APP_URL}/unix.sh' | bash -s -- --playlist '${plId}' --client '${clientId}' --api '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' --app '${process.env.NEXT_PUBLIC_APP_URL}'`
+const unixCommand = (clientId: string) =>
+   `curl -fsSL '${process.env.NEXT_PUBLIC_APP_URL}/unix.sh' | bash -s -- --client '${clientId}' --api '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' --app '${process.env.NEXT_PUBLIC_APP_URL}'`
 
 const osInstructions = {
    Windows: {
-      command: (plId: string, clientId: string) =>
-         `$c = irm '${process.env.NEXT_PUBLIC_APP_URL}/win.ps1'; if ($c -is [byte[]]) { $c = [Text.Encoding]::UTF8.GetString($c) }; & ([scriptblock]::Create($c)) -PlaylistId '${plId}' -ClientId '${clientId}' -ApiBase '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' -AppBase '${process.env.NEXT_PUBLIC_APP_URL}'`,
+      command: (clientId: string) =>
+         `$c = irm '${process.env.NEXT_PUBLIC_APP_URL}/win.ps1'; if ($c -is [byte[]]) { $c = [Text.Encoding]::UTF8.GetString($c) }; & ([scriptblock]::Create($c)) -ClientId '${clientId}' -ApiBase '${process.env.NEXT_PUBLIC_LOCAL_API_URL}' -AppBase '${process.env.NEXT_PUBLIC_APP_URL}'`,
       steps: [
          <>
             Press <Kbd>Win</Kbd>, type <span className="font-semibold text-main-gray">PowerShell</span> and open it.
