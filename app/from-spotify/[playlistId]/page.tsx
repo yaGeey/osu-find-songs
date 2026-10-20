@@ -62,6 +62,7 @@ export default function PlaylistPage() {
       hasNextPage,
       isFetchingNextPage,
       isFetching: isTracksFetching,
+      isError: isTracksError,
    } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId],
       queryFn: async ({ pageParam = 0 }) => {
@@ -79,12 +80,16 @@ export default function PlaylistPage() {
 
    // continue fetching
    useEffect(() => {
-      if (hasNextPage && !isFetchingNextPage) fetchNextPage()
-   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+      //? hasNextPage is derived from the last successful page, so it stays true after a
+      //? failed page and the effect would retry it forever
+      if (!hasNextPage || isFetchingNextPage || isTracksError) return
+      fetchNextPage()
+   }, [hasNextPage, isFetchingNextPage, isTracksError, fetchNextPage])
 
    const tracks = data?.pages.flatMap((page) => page.items.map((i) => i.itemV2.data)) || []
    const spotifyTotal = data?.pages?.[0]?.total || 0
-   const isTracksLoadingFinal = isFetchingNextPage || hasNextPage || isTracksFetching || tracks.length < spotifyTotal
+   const isTracksLoadingFinal =
+      !isTracksError && (isFetchingNextPage || hasNextPage || isTracksFetching || tracks.length < spotifyTotal)
 
    // beatmapset search
    const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
@@ -222,7 +227,10 @@ export default function PlaylistPage() {
                'min-w-[710px] bg-triangles [--color-dialog:var(--color-main])] fixed z-1000 w-screen h-12 flex justify-between items-center gap-10 border-b-3 border-main-darker',
             )}
          >
-            <Progress isVisible={isLoading} value={spotifyTotal > 0 ? Math.min((mapsFetched / spotifyTotal) * 100, 100) : 0}>
+            <Progress
+               isVisible={isLoading}
+               value={spotifyTotal > 0 ? Math.min((mapsFetched / spotifyTotal) * 100, 100) : 0}
+            >
                {msLeft > 5000 && (
                   <span>
                      {mapsFetched}/{spotifyTotal} | {timeLeft} left
