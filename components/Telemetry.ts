@@ -8,7 +8,7 @@ const botRegex =
 
 export default function Telemetry() {
    const pathname = usePathname()
-   const startTimeRef = useRef<number>(new Date().getTime())
+   const startTimeRef = useRef<number>(0)
    const recordIfRef = useRef<number | null>(null)
    const { id: sessionId } = useSessionId()
 
