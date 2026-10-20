@@ -1,12 +1,20 @@
 import confetti from 'canvas-confetti'
 import { motion } from 'framer-motion'
 import { ClipboardCheck, Copy, MonitorOff, ShieldCheck, SquareArrowOutUpRight, Terminal } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import AlertBanner from './AlertBanner'
 
 const OS_LIST = ['Windows', 'MacOS', 'Linux'] as const
 type OS = (typeof OS_LIST)[number]
+
+function getOSSnapshot(): OS | null {
+   const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera
+   if (/Macintosh/i.test(userAgent)) return 'MacOS'
+   if (/Windows/i.test(userAgent)) return 'Windows'
+   if (/Linux/i.test(userAgent)) return 'Linux'
+   return null
+}
 
 function Kbd({ children }: { children: React.ReactNode }) {
    return (
@@ -25,30 +33,16 @@ export default function CommandSection({
    detectedOSOverride?: OS | null
 }) {
    // get users operating system
-   const detectedOS = useMemo<OS | null>(() => {
-      if (detectedOSOverride !== undefined) return detectedOSOverride
-      if (typeof window === 'undefined') return null
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera
-      if (/Macintosh/i.test(userAgent)) {
-         return 'MacOS'
-      } else if (/Windows/i.test(userAgent)) {
-         return 'Windows'
-      } else if (/Linux/i.test(userAgent)) {
-         return 'Linux'
-      } else {
-         return null
-      }
-   }, [detectedOSOverride])
-
-   // default to Windows until mounted (keeps SSR output stable), then use the detected os;
-   // the user can still switch manually
-   const [mounted, setMounted] = useState(false)
-   useEffect(() => setMounted(true), [])
+   const detectedOS = useSyncExternalStore(
+      () => () => {},
+      getOSSnapshot,
+      (): OS => 'Windows',
+   )
+   const os: OS | null = detectedOSOverride !== undefined ? detectedOSOverride : detectedOS
 
    const [manualOS, setManualOS] = useState<OS | null>(null)
-   const selectedOS: OS | null = manualOS ?? (mounted ? detectedOS : 'Windows')
-   // OS detection failed — the alert banner stays visible even after a manual pick
-   const osUnsupported = mounted && detectedOS === null
+   const selectedOS: OS | null = manualOS ?? os
+   const osUnsupported = os === null
    const noOSSelected = selectedOS === null
 
    const command = useMemo(() => {
