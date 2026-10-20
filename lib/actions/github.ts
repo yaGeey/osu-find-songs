@@ -1,32 +1,37 @@
 'use server'
 
 import { cacheLife } from 'next/cache'
+import devMemo from '../devMemo'
 import { customAxios } from '../serverAxios'
 
 export async function getGitHubRepoLastUpdate() {
    'use cache'
    cacheLife('hours')
-   const { data } = await customAxios.get(`https://api.github.com/repos/yaGeey/osu-find-songs/commits?per_page=1`, {
-      headers: { Authorization: 'Bearer ' + process.env.GH_PAT },
-      context: 'github',
-      ignoredErrors: [403, 429],
+   return devMemo('github:lastUpdate', 5 * 60 * 1000, async () => {
+      const { data } = await customAxios.get(`https://api.github.com/repos/yaGeey/osu-find-songs/commits?per_page=1`, {
+         headers: { Authorization: 'Bearer ' + process.env.GH_PAT },
+         context: 'github',
+         ignoredErrors: [403, 429],
+      })
+      return {
+         date: new Date(data[0].commit.author.date).toLocaleString('en-US', {
+            dateStyle: 'short',
+            timeStyle: 'short',
+         }),
+         url: data[0].html_url,
+      }
    })
-   return {
-      date: new Date(data[0].commit.author.date).toLocaleString('en-US', {
-         dateStyle: 'short',
-         timeStyle: 'short',
-      }),
-      url: data[0].html_url,
-   }
 }
 
 export async function getGitHubRepoStarCount() {
    'use cache'
    cacheLife('hours')
-   const { data } = await customAxios.get('https://api.github.com/repos/yaGeey/osu-find-songs', {
-      headers: { Authorization: 'Bearer ' + process.env.GH_PAT },
-      context: 'github',
-      ignoredErrors: [403, 429],
+   return devMemo('github:starCount', 5 * 60 * 1000, async () => {
+      const { data } = await customAxios.get('https://api.github.com/repos/yaGeey/osu-find-songs', {
+         headers: { Authorization: 'Bearer ' + process.env.GH_PAT },
+         context: 'github',
+         ignoredErrors: [403, 429],
+      })
+      return data.stargazers_count
    })
-   return data.stargazers_count
 }

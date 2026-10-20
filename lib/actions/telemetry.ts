@@ -1,6 +1,7 @@
 'use server'
 import { neon } from '@neondatabase/serverless'
 import { cacheLife } from 'next/cache'
+import devMemo from '../devMemo'
 const sql = neon(`${process.env.DATABASE_URL}`)
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -55,10 +56,12 @@ export type Banner = {
 export async function getActiveBanners() {
    'use cache'
    cacheLife('hours')
-   const results = await sql`
-      SELECT * FROM banners
-      WHERE active = true
-      ORDER BY id DESC
-   `
-   return results as unknown as Banner[]
+   return devMemo('banners', 60 * 1000, async () => {
+      const results = await sql`
+         SELECT * FROM banners
+         WHERE active = true
+         ORDER BY id DESC
+      `
+      return results as unknown as Banner[]
+   })
 }
