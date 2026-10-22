@@ -1,0 +1,133 @@
+{
+   "$schema": "./node_modules/oxlint/configuration_schema.json",
+   "plugins": ["nextjs", "typescript", "react", "import", "jsx-a11y"],
+   "jsPlugins": ["@tanstack/eslint-plugin-query"],
+   "categories": {
+      "correctness": "error"
+   },
+   "env": {
+      "builtin": true,
+      "browser": true,
+      "node": true
+   },
+   "ignorePatterns": ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"],
+   "options": {
+      "typeAware": true,
+      "typeCheck": true
+   },
+   "rules": {
+      "no-case-declarations": "error",
+      "no-empty": "off",
+      "no-fallthrough": "error",
+      "no-prototype-builtins": "error",
+      "no-redeclare": "error",
+      "no-regex-spaces": "error",
+      "no-unused-vars": [
+         "warn",
+         {
+            "vars": "all",
+            "varsIgnorePattern": "^_",
+            "args": "after-used",
+            "argsIgnorePattern": "^_",
+            "ignoreRestSiblings": true
+         }
+      ],
+      "no-useless-escape": "warn",
+      "no-array-constructor": "error",
+      "no-unused-expressions": "warn",
+      "react/display-name": "error",
+      "react/jsx-no-comment-textnodes": "error",
+      "react/jsx-no-target-blank": "off",
+      "react/no-unescaped-entities": "error",
+      "react/no-unknown-property": "off",
+      "react/no-unsafe": "off",
+      "react/react-in-jsx-scope": "off",
+      "react/rules-of-hooks": "error",
+      "react/exhaustive-deps": "off",
+      "react/use-memo": "warn",
+      "react/incompatible-library": "warn",
+      "react/set-state-in-effect": "warn",
+      "react/unsupported-syntax": "warn",
+      "import/no-anonymous-default-export": "warn",
+      "jsx-a11y/alt-text": [
+         "warn",
+         {
+            "elements": ["img"],
+            "img": ["Image"]
+         }
+      ],
+      "jsx-a11y/aria-props": "warn",
+      "jsx-a11y/aria-proptypes": "warn",
+      "jsx-a11y/aria-unsupported-elements": "warn",
+      "jsx-a11y/role-has-required-aria-props": "warn",
+      "jsx-a11y/role-supports-aria-props": "warn",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+      "jsx-a11y/prefer-tag-over-role": "off",
+      "nextjs/google-font-display": "warn",
+      "nextjs/google-font-preconnect": "warn",
+      "nextjs/next-script-for-ga": "warn",
+      "nextjs/no-async-client-component": "warn",
+      "nextjs/no-before-interactive-script-outside-document": "warn",
+      "nextjs/no-css-tags": "warn",
+      "nextjs/no-head-element": "warn",
+      "nextjs/no-img-element": "warn",
+      "nextjs/no-page-custom-font": "warn",
+      "nextjs/no-styled-jsx-in-document": "warn",
+      "nextjs/no-title-in-document-head": "warn",
+      "nextjs/no-typos": "warn",
+      "nextjs/no-unwanted-polyfillio": "warn",
+      "typescript/ban-ts-comment": "error",
+      "typescript/no-empty-object-type": "error",
+      "typescript/no-explicit-any": "off",
+      "typescript/no-namespace": "off",
+      "typescript/no-non-null-asserted-optional-chain": "warn",
+      "typescript/no-require-imports": "error",
+      "typescript/no-unnecessary-type-constraint": "error",
+      "typescript/no-unsafe-function-type": "error",
+      "typescript/no-redundant-type-constituents": "off",
+      "typescript/no-useless-default-assignment": "off",
+      "typescript/restrict-template-expressions": "off",
+      "typescript/no-floating-promises": "warn",
+      "typescript/await-thenable": "warn",
+      "react-perf/jsx-no-new-array-as-prop": "warn",
+      "react-perf/jsx-no-new-function-as-prop": "warn",
+      "react-perf/jsx-no-new-object-as-prop": "warn",
+      "react-perf/jsx-no-jsx-as-prop": "warn",
+      "@tanstack/query/exhaustive-deps": "off",
+      "@tanstack/query/no-rest-destructuring": "warn",
+      "@tanstack/query/stable-query-client": "error",
+      "@tanstack/query/no-unstable-deps": "error",
+      "@tanstack/query/infinite-query-property-order": "error",
+      "@tanstack/query/no-void-query-fn": "error",
+      "@tanstack/query/mutation-property-order": "error"
+   },
+   "overrides": [
+      {
+         "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+         "rules": {
+            "constructor-super": "off",
+            "getter-return": "off",
+            "no-class-assign": "off",
+            "no-const-assign": "off",
+            "no-dupe-class-members": "off",
+            "no-dupe-keys": "off",
+            "no-func-assign": "off",
+            "no-import-assign": "off",
+            "no-new-native-nonconstructor": "off",
+            "no-obj-calls": "off",
+            "no-redeclare": "off",
+            "no-setter-return": "off",
+            "no-this-before-super": "off",
+            "no-unreachable": "off",
+            "no-unsafe-negation": "off",
+            "no-with": "off",
+            "no-var": "error",
+            "prefer-const": "error",
+            "prefer-rest-params": "error",
+            "prefer-spread": "error"
+         }
+      }
+   ]
+}
