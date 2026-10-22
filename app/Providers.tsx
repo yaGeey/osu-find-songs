@@ -7,7 +7,6 @@ import ErrorCallback from '@/components/ErrorFallback'
 import { Tooltip } from 'react-tooltip'
 import { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import useUserListener from '@/hooks/useUserListener'
 import useBaseStore from '@/contexts/useBaseStore'
 import BackgroundFetcher from '@/components/BackgroundFetcher'
 import { NotifyHandle, ProgressNotify } from '@/components/state/HeaderError'
@@ -15,8 +14,6 @@ import { NotifyHandle, ProgressNotify } from '@/components/state/HeaderError'
 const LDShell = dynamic(() => import('./LDShell'), { ssr: false }) // ~750 KB of JS
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-   useUserListener()
-
    const clientSideID =
       process.env.NODE_ENV === 'production'
          ? process.env.NEXT_PUBLIC_LD_CLIENT_SIDE_ID!
