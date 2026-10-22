@@ -1,5 +1,5 @@
 import useBaseStore from '@/contexts/useBaseStore'
-import { isAxiosError } from 'axios'
+import { isAxiosError, isCancel } from 'axios'
 
 export const sendUnknownError = (err: unknown, context: string, throwErr: boolean = true) => {
    useBaseStore.getState().notificationBlink({ type: 'error' })
@@ -30,6 +30,11 @@ export const modifyErrorMessage = (err: unknown, context: string) => {
 
 const ignoredErrorStatuses = [429, 404, 504]
 export const getErrorHandlingMeta = (err: unknown, context: string) => {
+   // Query cancellation is expected (for example, when a query is no longer observed).
+   if (isCancel(err) || (isAxiosError(err) && err.code === 'ERR_CANCELED')) {
+      return { skip: true, context }
+   }
+
    if (isAxiosError(err)) {
       const ignoredErrors = (err.config?.ignoredErrors || []).concat(ignoredErrorStatuses)
       const status = err.response?.status || err.status
