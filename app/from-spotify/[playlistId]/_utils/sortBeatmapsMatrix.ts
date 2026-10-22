@@ -1,4 +1,8 @@
 import { BeatmapSet } from '@/types/Osu'
+
+const minDifficulty = (set: BeatmapSet[]) =>
+   set[0].beatmaps.reduce((min, beatmap) => Math.min(min, beatmap.difficulty_rating), Infinity)
+
 export const sortBeatmapsMatrix = (a: BeatmapSet[], b: BeatmapSet[], sortFnName: string) => {
    const [name, order] = sortFnName.split('_')
    const sign = order === 'asc' ? 1 : -1
@@ -9,10 +13,9 @@ export const sortBeatmapsMatrix = (a: BeatmapSet[], b: BeatmapSet[], sortFnName:
       case 'artist':
          return sign * a[0].artist.localeCompare(b[0].artist)
       case 'difficulty':
-         return sign * (
-            Math.min(...a[0].beatmaps.map((beatmap) => beatmap.difficulty_rating)) -
-            Math.min(...b[0].beatmaps.map((beatmap) => beatmap.difficulty_rating))
-         )
+         // Avoid spreading potentially large beatmap arrays into Math.min's
+         // argument list, which can exceed the engine's argument/stack limit.
+         return sign * (minDifficulty(a) - minDifficulty(b))
       // TODO don't work
       case 'date ranked':
          if (!a[0].ranked_date) return 1
