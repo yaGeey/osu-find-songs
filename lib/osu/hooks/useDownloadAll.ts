@@ -1,5 +1,4 @@
 import { BeatmapSet } from '@/types/Osu'
-import JSZip from 'jszip'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import sortFn from '@/app/from-spotify/[playlistId]/_utils/sortBeatmaps'
@@ -19,6 +18,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
 
    // download maps
    async function handleDownloadAll() {
+      const { default: JSZip } = await import('jszip') // ~100 KB
       const zip = new JSZip()
       setProgress(0)
       let count = 0
@@ -67,10 +67,6 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
             toast.error('Download failed')
             setProgress(-1)
          })
-
-      toast.promise(promise, {
-         error: 'Download failed',
-      })
    }
 
    return { progress, text, handleDownloadAll }

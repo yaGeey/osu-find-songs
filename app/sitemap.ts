@@ -11,7 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
          priority: 1,
       },
       {
-         url: `${baseUrl}/from-osu/select`,
+         url: `${baseUrl}/from-osu`,
          lastModified: new Date(),
          changeFrequency: 'monthly',
          priority: 0.8,
