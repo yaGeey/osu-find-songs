@@ -5,14 +5,14 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorCallback from '@/components/ErrorFallback'
 import { Tooltip } from 'react-tooltip'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import useUserListener from '@/hooks/useUserListener'
-import { LDProvider } from 'launchdarkly-react-client-sdk'
-import Observability from '@launchdarkly/observability'
-import SessionReplay from '@launchdarkly/session-replay'
 import useBaseStore from '@/contexts/useBaseStore'
 import BackgroundFetcher from '@/components/BackgroundFetcher'
 import { NotifyHandle, ProgressNotify } from '@/components/state/HeaderError'
+
+const LDShell = dynamic(() => import('./LDShell'), { ssr: false }) // ~750 KB of JS
 
 export default function Providers({ children }: { children: React.ReactNode }) {
    useUserListener()
@@ -32,7 +32,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <QueryProvider>
          <NuqsAdapter>
             <LocalBeatmapsContextProvider>
-               <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
+               <Tooltip
+                  id="tooltip"
+                  place="bottom"
+                  style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }}
+               />
                <ProgressNotify ref={progressNotifyRef} />
                <BackgroundFetcher />
                {children}
@@ -44,46 +48,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
    if (process.env.NODE_ENV === 'development') return content
    return (
       <ErrorBoundary FallbackComponent={ErrorCallback}>
-         <LDProvider
-            clientSideID={clientSideID}
-            options={{
-               bootstrap: 'localStorage',
-               plugins: [
-                  new Observability({
-                     tracingOrigins: [
-                        'https://osu.yageey.me/api',
-                        'https://osufindsongs.vercel.app/api',
-                        'http://localhost:3000/api',
-                     ],
-                     networkRecording: {
-                        enabled: true,
-                        recordHeadersAndBody: true,
-                     },
-                     environment: process.env.NODE_ENV,
-                     backendUrl: 'https://pub-ld.yageey.me',
-                     otel: { otlpEndpoint: 'https://otel-ld.yageey.me' },
-                     version: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA!,
-                     serviceName: 'client',
-                  }),
-                  new SessionReplay({
-                     privacySetting: 'none',
-                     version: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA!,
-                     serviceName: 'client',
-                     environment: process.env.NODE_ENV,
-                     backendUrl: 'https://pub-ld.yageey.me',
-                     tracingOrigins: [
-                        'https://osu.yageey.me/api',
-                        'https://osufindsongs.vercel.app/api',
-                        'http://localhost:3000/api',
-                     ],
-                     // inlineImages: false,
-                  }),
-               ],
-               // logger: basicLogger({level: 'warn'})
-            }}
-         >
-            {content}
-         </LDProvider>
+         {content}
+         <LDShell clientSideID={clientSideID} />
       </ErrorBoundary>
    )
 }
