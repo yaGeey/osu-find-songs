@@ -7,9 +7,10 @@
     "build": "next build",
     "postbuild": "npx --package=@launchdarkly/ldcli ldcli sourcemaps upload --project $LD_PROJECT_KEY --app-version $VERCEL_GIT_COMMIT_SHA --path .next/static --base-path _next/static --access-token $LD_ACCESS_TOKEN ",
     "start": "next start",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "typecheck": "tsc --noEmit"
+    "typegen": "next typegen",
+    "lint": "next typegen && oxlint",
+    "lint:fix": "next typegen && oxlint --fix",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
