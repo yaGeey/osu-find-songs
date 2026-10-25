@@ -32,7 +32,7 @@ async function getToken(): Promise<string> {
    return tokenRefreshPromise
 }
 
-async function fetchOsu<T>(func: (token: string) => Promise<T>, retries = 3): Promise<T> {
+async function fetchOsu<T>(func: (token: string) => Promise<T>): Promise<T> {
    const token = await getToken()
    return await func(token)
 }
@@ -80,8 +80,11 @@ export async function beatmapsSearch(queries: Queries): Promise<{ beatmapsets: B
             context: 'search beatmaps',
          },
       )
-      const bs = res.data.beatmapsets
-      if (bs?.find((b) => b.id === 22156) && bs.length === 50) return { beatmapsets: [], total: 0 }
+      const bs = res.data?.beatmapsets
+      if (!Array.isArray(bs)) {
+         throw new Error(`Unexpected osu search response for "${queryString}"`)
+      }
+      if (bs.find((b) => b.id === 22156) && bs.length === 50) return { beatmapsets: [], total: 0 }
       return {
          total: res.data.total,
          beatmapsets: bs.map(

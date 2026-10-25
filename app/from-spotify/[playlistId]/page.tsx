@@ -83,7 +83,7 @@ export default function PlaylistPage() {
       //? hasNextPage is derived from the last successful page, so it stays true after a
       //? failed page and the effect would retry it forever
       if (!hasNextPage || isFetchingNextPage || isTracksError) return
-      fetchNextPage()
+      void fetchNextPage()
    }, [hasNextPage, isFetchingNextPage, isTracksError, fetchNextPage])
 
    const tracks = data?.pages.flatMap((page) => page.items.map((i) => i.itemV2.data)) || []
@@ -97,20 +97,19 @@ export default function PlaylistPage() {
       queries: chunked.map((chunk) => ({
          queryKey: ['search-from-spotify', chunk?.[0]?.uri?.split(':').at(-1) ?? 'err'],
          queryFn: async ({ signal }: QueryFunctionContext) => {
-            const t0 = performance.now()
-            const body = {
-               qs: chunk
-                  .map((item) => {
-                     if (!item) return
-                     const artistName = item.artists?.items?.[0]?.profile?.name
-                     if (!artistName) return //? sometimes no items in artists, idk why
-                     return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}`
-                  })
-                  .filter(Boolean),
-            }
+            const qs = chunk
+               .map((item) => {
+                  if (!item) return
+                  const artistName = item.artists?.items?.[0]?.profile?.name
+                  if (!artistName) return //? sometimes no items in artists, idk why
+                  return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}`
+               })
+               .filter((q): q is string => Boolean(q))
+            if (!qs.length) return []
 
+            const t0 = performance.now()
             const { data } = await clientAxios
-               .post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', body, {
+               .post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', { qs }, {
                   signal,
                   context: 'search from spotify',
                })
