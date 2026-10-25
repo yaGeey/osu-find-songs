@@ -1,6 +1,5 @@
 'use server'
 import { customAxios } from '../../serverAxios'
-import { SpotifySearchQueryResponse, TrackResponseWrapper } from '@/types/graphql-spotify/searchDesktop'
 import { cookies } from 'next/headers'
 import { isAxiosError } from 'axios'
 import { BaseSpotifyResponse, UnexpectedSpotifyError } from '@/types/graphql-spotify/basics'
@@ -10,7 +9,6 @@ import { SpotifyPlaylistContentResponse, SpotifyPlaylistResponse } from '@/types
 
 const hashes = {
    fetchPlaylist: 'a65e12194ed5fc443a1cdebed5fabe33ca5b07b987185d63c72483867ad13cb4',
-   searchDesktop: '63a93cc04f6d8dea84a85de315e43f396a76cb681500de9ac5ccf5fc618c84cb', // / searchTopResultsList
 } as const
 
 const headers = {
@@ -167,32 +165,4 @@ export async function fetchPlaylist(playlistId: string) {
    )
    if (data.playlistV2.__typename === 'NotFound') return null
    return data.playlistV2
-}
-
-export async function searchTopTracks(query: string) {
-   const data = await fetchInnerGraphApi<SpotifySearchQueryResponse>(
-      'searchDesktop',
-      {
-         includeArtistHasConcertsField: false,
-         includeAudiobooks: true,
-         includeAuthors: false,
-         includePreReleases: true,
-         limit: 10,
-         numberOfTopResults: 5,
-         offset: 0,
-         searchTerm: query,
-      },
-      hashes.searchDesktop,
-   )
-   const items = data.searchV2.topResultsV2.itemsV2
-
-   const tracks = items.filter(
-      (i): i is { item: TrackResponseWrapper; matchedFields?: string[] } => i.item.__typename === 'TrackResponseWrapper',
-   )
-
-   // if track not found log error (changed type name)
-   const types = items.map((i) => i.item.__typename).join(', ')
-   if (tracks.length === 0 && types.length) throw new Error(`Spotify innerAPI: ${query} track not found. Types: {${types}}`)
-
-   return tracks.map((i) => i.item.data)
 }
