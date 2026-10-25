@@ -1,8 +1,8 @@
-import useBaseStore from '@/contexts/useBaseStore'
+import useNotifyStore from '@/contexts/useNotifyStore'
 import { isAxiosError, isCancel } from 'axios'
 
 export const sendUnknownError = (err: unknown, context: string, throwErr: boolean = true) => {
-   useBaseStore.getState().notificationBlink({ type: 'error' })
+   useNotifyStore.getState().notificationBlink({ type: 'error' })
 
    const errToReport = modifyErrorMessage(err, context)
    if (throwErr && typeof window !== 'undefined' && typeof window.reportError === 'function') {

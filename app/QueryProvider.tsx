@@ -6,13 +6,13 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { toast } from 'react-toastify'
-import useBaseStore from '@/contexts/useBaseStore'
+import useNotifyStore from '@/contexts/useNotifyStore'
 import React from 'react'
 
 const displayError = (err: unknown, errMsg: string | React.ReactNode) => {
    console.error(err)
    toast.error(errMsg, { autoClose: 7000 })
-   useBaseStore.getState().notifyRef?.current?.blink({ type: 'error' }, 4000)
+   useNotifyStore.getState().notificationBlink({ type: 'error' })
 }
 
 const persister = createSyncStoragePersister({
@@ -43,7 +43,10 @@ function makeQueryClient() {
       },
       queryCache: new QueryCache({
          onError: (error, query) => {
-            displayError(error, query.meta?.errMsg ?? 'An error occurred while fetching data. Open console for details.')
+            displayError(
+               error,
+               query.meta?.errMsg ?? 'An error occurred while fetching data. Open console for details.',
+            )
          },
       }),
       mutationCache: new MutationCache({

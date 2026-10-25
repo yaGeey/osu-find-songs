@@ -1,13 +1,12 @@
 'use client'
 import QueryProvider from './QueryProvider'
-import { LocalBeatmapsContextProvider } from '@/contexts/SongContext'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorCallback from '@/components/ErrorFallback'
 import { Tooltip } from 'react-tooltip'
 import { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import useBaseStore from '@/contexts/useBaseStore'
+import useNotifyStore from '@/contexts/useNotifyStore'
 import BackgroundFetcher from '@/components/BackgroundFetcher'
 import { NotifyHandle, ProgressNotify } from '@/components/state/HeaderError'
 
@@ -22,22 +21,16 @@ export default function Providers({ children }: { children: React.ReactNode }) {
    const progressNotifyRef = useRef<NotifyHandle>(null)
    useEffect(() => {
       if (typeof window === 'undefined') return
-      if (progressNotifyRef.current) useBaseStore.setState({ notifyRef: progressNotifyRef })
+      if (progressNotifyRef.current) useNotifyStore.setState({ notifyRef: progressNotifyRef })
    }, [progressNotifyRef])
 
    const content = (
       <QueryProvider>
          <NuqsAdapter>
-            <LocalBeatmapsContextProvider>
-               <Tooltip
-                  id="tooltip"
-                  place="bottom"
-                  style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }}
-               />
-               <ProgressNotify ref={progressNotifyRef} />
-               <BackgroundFetcher />
-               {children}
-            </LocalBeatmapsContextProvider>
+            <Tooltip id="tooltip" place="bottom" style={{ fontSize: '13px', padding: '0 0.25rem', zIndex: 100000 }} />
+            <ProgressNotify ref={progressNotifyRef} />
+            <BackgroundFetcher />
+            {children}
          </NuqsAdapter>
       </QueryProvider>
    )

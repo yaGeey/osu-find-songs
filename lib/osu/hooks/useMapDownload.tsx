@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
-import useBaseStore from '@/contexts/useBaseStore'
+import useNotifyStore from '@/contexts/useNotifyStore'
 import useSessionId from '@/hooks/useSessionId'
 import { sendUnknownError } from '@/lib/errorHandling'
 import { fetchBeatmapWithFallback, download, BANNED_STATUSES } from '../osuDownload'
@@ -16,7 +16,7 @@ type UseMapDownloadOptions = {
 } & ({ video: true; onlyNoVideo?: never } | { video: false; onlyNoVideo?: boolean })
 export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: UseMapDownloadOptions) => {
    const remove = useMapDownloadStore((s) => s.remove)
-   const notify = useBaseStore((s) => s.notificationBlink)
+   const notify = useNotifyStore((s) => s.notificationBlink)
    const { id: sessionId } = useSessionId()
    const queryClient = useQueryClient()
 

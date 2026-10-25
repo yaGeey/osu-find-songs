@@ -26,7 +26,7 @@ import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
 import IconsSection from '@/components/IconsSection'
 import { fetchPlaylist, fetchPlaylistContents } from '@/lib/spotify/actions/innerApi'
 import clientAxios from '@/lib/clientAxios'
-import useBaseStore from '@/contexts/useBaseStore'
+import useNotifyStore from '@/contexts/useNotifyStore'
 import { NotifyHeader } from '@/components/state/HeaderError'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 
@@ -34,8 +34,8 @@ export default function PlaylistPage() {
    const params = useParams()
    const searchParams = useSearchParams()
    const { playlistId } = params
-   const progressNotifyRef = useBaseStore((state) => state.notifyRef)
-   const notify = useBaseStore((state) => state.notificationBlink)
+   const progressNotifyRef = useNotifyStore((state) => state.notifyRef)
+   const notify = useNotifyStore((state) => state.notificationBlink)
 
    // remove scrollbar
    useEffect(() => {
@@ -109,10 +109,14 @@ export default function PlaylistPage() {
 
             const t0 = performance.now()
             const { data } = await clientAxios
-               .post<(BeatmapSet[] | null)[]>('/api/batch/osu-search', { qs }, {
-                  signal,
-                  context: 'search from spotify',
-               })
+               .post<(BeatmapSet[] | null)[]>(
+                  '/api/batch/osu-search',
+                  { qs },
+                  {
+                     signal,
+                     context: 'search from spotify',
+                  },
+               )
                .catch((err) => (err.response?.status === 404 ? { data: [] } : Promise.reject(err)))
             addTimeLeft(performance.now() - t0)
             return data
