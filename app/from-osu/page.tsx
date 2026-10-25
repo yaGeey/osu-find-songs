@@ -22,7 +22,9 @@ export default function FromOsu() {
    const queryClient = useQueryClient()
 
    useEffect(() => {
-      Notification.requestPermission()
+      if (typeof Notification !== 'undefined') {
+         void Notification.requestPermission()
+      }
    }, [])
 
    // start over / try again: drop the current record so the next upload creates a fresh playlist
@@ -35,7 +37,7 @@ export default function FromOsu() {
       meta: { errMsg: 'f-o: Failed to reset playlist for ' + clientId },
       onSuccess: () => {
          // clear the cached status so the old 'filled'/'error' screen doesn't linger
-         queryClient.resetQueries({ queryKey: ['playlist-by-client-id', clientId] })
+         void queryClient.resetQueries({ queryKey: ['playlist-by-client-id', clientId] })
       },
    })
 
@@ -90,6 +92,8 @@ export default function FromOsu() {
       if (status !== 'filled' || prevStatus !== 'processing') return
 
       triggerFooterShine()
+      if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
+
       const notification = new Notification('Your playlist is ready!', {
          body: 'Open it in Spotify to listen to your tracks',
          icon: '/kit.png',
