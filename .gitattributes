@@ -1,0 +1,2 @@
+# Keep hook scripts LF so `#!/bin/sh` works on Windows checkouts (core.autocrlf=true).
+.githooks/* text eol=lf

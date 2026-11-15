@@ -1,0 +1,32 @@
+#!/bin/sh
+# commit-msg — enforce Conventional Commits (https://www.conventionalcommits.org/en/v1.0.0/).
+# Breaking-change "!" is allowed: "feat!: ...", "feat(scope)!: ...".
+# Called by git with $1 = path to the commit message file.
+
+MSG_FILE="$1"
+
+# First non-empty, non-comment line is the subject (git appends #-comments).
+SUBJECT=$(grep -v '^#' "$MSG_FILE" | grep -v '^$' | head -n 1)
+
+# Let git's own merge commits through.
+case "$SUBJECT" in
+  Merge\ *) exit 0 ;;
+esac
+
+# <type>[optional scope][optional !]: <description>
+# Types follow @commitlint/config-conventional (Angular convention).
+PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?(!)?: [^[:space:]].*$'
+
+if ! printf '%s' "$SUBJECT" | grep -Eq "$PATTERN"; then
+  echo "Invalid commit message: \"$SUBJECT\"" >&2
+  echo "" >&2
+  echo "Expected Conventional Commits format: <type>[optional scope][!]: <description>" >&2
+  echo "Examples:" >&2
+  echo "  feat: add song search" >&2
+  echo "  fix(player): stop double playback" >&2
+  echo "  feat!: drop legacy queue format" >&2
+  echo "  feat(api)!: paginate results" >&2
+  echo "Allowed types: feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert" >&2
+  echo "See https://www.conventionalcommits.org/en/v1.0.0/" >&2
+  exit 1
+fi

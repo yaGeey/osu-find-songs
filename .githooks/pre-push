@@ -1,0 +1,7 @@
+#!/bin/sh
+# pre-push — heavier checks before each push.
+# NOTE: runs `next build` directly (not `pnpm build`) to skip `postbuild`
+# (LaunchDarkly sourcemap upload), which needs LD_* env vars.
+set -e
+pnpm exec next build
+pnpm lint

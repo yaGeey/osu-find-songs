@@ -10,7 +10,8 @@
     "typegen": "next typegen",
     "lint": "next typegen && oxlint",
     "lint:fix": "next typegen && oxlint --fix",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit",
+    "prepare": "git config --local core.hooksPath .githooks || echo 'Can not set git hooks'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
