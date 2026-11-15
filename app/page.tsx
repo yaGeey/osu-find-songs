@@ -14,7 +14,7 @@ export default function LandingPage() {
          <Overlay />
          <Link
             href="/from-osu"
-            className="relative overflow-hidden flex items-center justify-center group"
+            className="relative overflow-hidden flex items-center justify-center group p-8 3xl:p-12 4xl:p-16"
             transitionTypes={['nav-forward']}
          >
             <Image
@@ -25,13 +25,13 @@ export default function LandingPage() {
                sizes="(max-width: 640px) 100vw, 50vw"
                className="object-cover object-right blur-[2px] brightness-25 group-hover:scale-102 transition-[scale] ease-in"
             />
-            <div className="absolute grid items-center text-center gap-7 font-medium group">
-               <div className="grid gap-2">
-                  <h2 className="text-4xl font-semibold tracking-tight broken-light-title">osu! to Spotify</h2>
-                  <h3 className="text-lg text-main-white">create a playlist with your maps</h3>
+            <div className="absolute grid items-center text-center gap-7 3xl:gap-10 4xl:gap-12 5xl:gap-16 px-6 font-medium group">
+               <div className="grid gap-2 3xl:gap-3 4xl:gap-4 5xl:gap-5">
+                  <h2 className="text-4xl 3xl:text-5xl 4xl:text-6xl font-semibold tracking-tight broken-light-title 5xl:text-7xl">osu! to Spotify</h2>
+                  <h3 className="text-lg 3xl:text-xl 4xl:text-2xl 5xl:text-3xl text-main-white">create a playlist with your maps</h3>
                </div>
                <span
-                  className="text-2xl flex items-center justify-center gap-2.5 underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
+                  className="text-2xl 3xl:text-3xl 4xl:text-4xl 5xl:text-5xl flex items-center justify-center gap-2.5 3xl:gap-4 4xl:gap-5 5xl:gap-6 underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
                   style={
                      {
                         '--shine-base': 'var(--color-brand-osu)',
@@ -39,11 +39,11 @@ export default function LandingPage() {
                      } as React.CSSProperties
                   }
                >
-                  <ArrowRight className="text-main" />
+                  <ArrowRight className="text-main size-6 3xl:size-8 4xl:size-9 5xl:size-11" />
                   Select an osu folder
-                  <Upload className="text-brand-osu" />
+                  <Upload className="text-brand-osu size-6 3xl:size-8 4xl:size-9 5xl:size-11" />
                </span>
-               <h4 className="text-base font-normal text-main-white">
+               <h4 className="text-base 3xl:text-lg 4xl:text-xl 5xl:text-2xl font-normal text-main-white">
                   <Suspense fallback={<span className="opacity-0">...</span>}>
                      <PlaylistsCreated />
                   </Suspense>
@@ -51,12 +51,12 @@ export default function LandingPage() {
             </div>
          </Link>
 
-         <div className="absolute top-0 bottom-0 bg-main w-5 brightness-25 mx-auto inset-0 blur-sm z-1 sm:visible invisible" />
-         <div className="absolute left-0 right-0 bg-main h-5 brightness-25 my-auto inset-0 blur-sm z-1 visible sm:invisible" />
+         <div className="absolute top-0 bottom-0 bg-main w-5 3xl:w-6 4xl:w-8 brightness-25 mx-auto inset-0 blur-sm z-1 sm:visible invisible" />
+         <div className="absolute left-0 right-0 bg-main h-5 3xl:h-6 4xl:h-8 brightness-25 my-auto inset-0 blur-sm z-1 visible sm:invisible" />
 
          <Link
             href="/from-spotify/select"
-            className="relative overflow-hidden flex items-center justify-center group"
+            className="relative overflow-hidden flex items-center justify-center group p-8 3xl:p-12 4xl:p-16"
             transitionTypes={['nav-forward']}
          >
             <Image
@@ -67,20 +67,20 @@ export default function LandingPage() {
                sizes="(max-width: 640px) 100vw, 50vw"
                className="object-cover object-left blur-[2px] brightness-25 group-hover:scale-102 transition-[scale] ease-in"
             />
-            <div className="absolute grid items-center text-center gap-7 font-medium group">
-               <div className="grid gap-2">
-                  <h2 className="text-4xl font-semibold tracking-tight broken-light-title">Spotify to osu!</h2>
-                  <h3 className="text-lg text-main-white">pick a playlist to find beatmaps</h3>
+            <div className="absolute grid items-center text-center gap-7 3xl:gap-10 4xl:gap-12 5xl:gap-16 px-6 font-medium group">
+               <div className="grid gap-2 3xl:gap-3 4xl:gap-4 5xl:gap-5">
+                  <h2 className="text-4xl 3xl:text-5xl 4xl:text-6xl font-semibold tracking-tight broken-light-title 5xl:text-7xl">Spotify to osu!</h2>
+                  <h3 className="text-lg 3xl:text-xl 4xl:text-2xl 5xl:text-3xl text-main-white">pick a playlist to find beatmaps</h3>
                </div>
                <span
-                  className="text-2xl flex items-center justify-center gap-2.5 underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
+                  className="text-2xl 3xl:text-3xl 4xl:text-4xl 5xl:text-5xl flex items-center justify-center gap-2.5 3xl:gap-4 4xl:gap-5 5xl:gap-6 underline text-transparent bg-clip-text text-shine-hover hover:[filter:drop-shadow(0_1px_5px_color-mix(var(--color-main-light),transparent_60%))] transition-[filter]"
                   style={{ '--shine-base': 'var(--color-brand-spotify)' } as React.CSSProperties}
                >
-                  <ArrowRight className="text-brand-spotify" />
+                  <ArrowRight className="text-brand-spotify size-6 3xl:size-8 4xl:size-9 5xl:size-11" />
                   Select a playlist
-                  <ListMusic className="text-brand-spotify" />
+                  <ListMusic className="text-brand-spotify size-6 3xl:size-8 4xl:size-9 5xl:size-11" />
                </span>
-               <h4 className="text-base font-normal text-main-white">
+               <h4 className="text-base 3xl:text-lg 4xl:text-xl 5xl:text-2xl font-normal text-main-white">
                   <Suspense fallback={<span className="opacity-0">...</span>}>
                      <MapsDownloaded />
                   </Suspense>

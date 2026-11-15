@@ -21,7 +21,7 @@ export default function Banners({ banners }: { banners: Banner[] }) {
    }, [current, banners])
    return (
       <motion.div
-         className="relative bg-white flex items-center text-black rounded-3xl border-2 border-main-border py-1 h-10 gap-2 overflow-hidden px-3 min-w-10"
+         className="relative bg-white flex items-center text-black rounded-3xl border-2 border-main-border py-1 h-10 3xl:h-12 4xl:h-14 gap-2 overflow-hidden px-3 3xl:px-4 min-w-10"
          initial={false}
          animate={{ width: isOpen ? '100%' : '2.5rem' }}
          transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -38,7 +38,7 @@ export default function Banners({ banners }: { banners: Banner[] }) {
                   onClick={() => setCurrent((p) => p - 1)}
                />
             )}
-            <div className="flex-1 overflow-hidden text-ellipsis line-clamp-2 min-w-0 text-sm/tight">
+            <div className="flex-1 overflow-hidden text-ellipsis line-clamp-2 min-w-0 text-sm/tight 3xl:text-base 4xl:text-lg">
                {banners[current].content}
             </div>
             <div

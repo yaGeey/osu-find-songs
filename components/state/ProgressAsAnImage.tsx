@@ -1,5 +1,6 @@
 'use client'
 import React, { useRef, useState, useEffect } from 'react'
+import { twMerge } from 'tailwind-merge'
 
 interface TileBase {
    id: number
@@ -135,12 +136,14 @@ export default function ProgressAsAnImage({
    max,
    imgSize = 4,
    size,
+   className,
 }: {
    img: HTMLImageElement | null
    val: number
    max: number
    imgSize?: number
    size?: number
+   className?: string
 }) {
    const canvasRef = useRef<HTMLCanvasElement | null>(null)
    const tilesRef = useRef<TileBase[]>([])
@@ -190,8 +193,8 @@ export default function ProgressAsAnImage({
    return (
       <canvas
          ref={canvasRef}
-         style={{ width: size, aspectRatio: img ? `${img.width} / ${img.height}` : undefined }}
-         className="border-2 border-main-border rounded-sm bg-main-darker"
+         style={{ width: className ? undefined : size, aspectRatio: img ? `${img.width} / ${img.height}` : undefined }}
+         className={twMerge('border-2 border-main-border rounded-sm bg-main-darker h-auto max-w-full', className)}
       />
    )
 }

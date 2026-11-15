@@ -50,6 +50,9 @@ body {
 
    --breakpoint-lgx: 75rem;
    --breakpoint-landing: 1220px;
+   --breakpoint-3xl: 1921px;
+   --breakpoint-4xl: 2560px;
+   --breakpoint-5xl: 3840px;
 
    --font-inter: 'Inter', sans-serif;
    --font-inter-tight: 'Inter Tight', sans-serif;

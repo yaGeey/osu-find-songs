@@ -18,7 +18,7 @@ function getOSSnapshot(): OS | null {
 
 function Kbd({ children }: { children: React.ReactNode }) {
    return (
-      <kbd className="rounded-sm border border-main-border/50 bg-main-lightest px-1 font-inter-tight text-[11px] font-semibold text-main-gray">
+      <kbd className="rounded-sm border border-main-border/50 bg-main-lightest px-1 3xl:px-1.5 4xl:px-2 py-px font-inter-tight text-[11px] 3xl:text-xs 4xl:text-sm font-semibold text-main-gray">
          {children}
       </kbd>
    )
@@ -79,13 +79,13 @@ export default function CommandSection({
    }
 
    return (
-      <div className="grid w-full gap-3">
+      <div className="grid w-full gap-3 3xl:gap-5 4xl:gap-6">
          <div className="min-w-0">
-            <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-main-gray">
-               <Terminal size={18} className="shrink-0 opacity-70" />
+            <h2 className="flex items-center gap-2 3xl:gap-3 text-lg 3xl:text-2xl 4xl:text-3xl font-semibold tracking-tight text-main-gray">
+               <Terminal size={18} className="shrink-0 opacity-70 size-[18px] 3xl:size-6 4xl:size-7" />
                Paste this command to get started
             </h2>
-            <p className="mt-1 text-sm text-main-gray/80">
+            <p className="mt-1 3xl:mt-2 text-sm 3xl:text-base 4xl:text-lg text-main-gray/80 leading-relaxed">
                Scans your osu! (lazer or stable) beatmaps and sends their song info here. Run the command to get
                started.
             </p>
@@ -95,14 +95,14 @@ export default function CommandSection({
                We couldn&apos;t detect your OS automatically.
             </AlertBanner>
          )}
-         <div className="w-full overflow-hidden rounded-lg border-2 border-main-dark-vivid bg-main-light">
-            <div className="flex items-center justify-between border-b-2 border-main-dark-vivid pr-3">
-               <div className="flex pl-1.5">
+         <div className="w-full overflow-hidden rounded-lg 3xl:rounded-xl border-2 border-main-dark-vivid bg-main-light">
+            <div className="flex items-center justify-between border-b-2 border-main-dark-vivid pr-3 3xl:pr-5 4xl:pr-6">
+               <div className="flex pl-1.5 3xl:pl-3 4xl:pl-4">
                   {OS_LIST.map((item) => (
                      <button
                         key={item}
                         className={tw(
-                           'relative cursor-pointer px-2.5 py-2 text-sm font-semibold transition-colors',
+                           'relative cursor-pointer px-2.5 3xl:px-4 4xl:px-5 py-2 3xl:py-2.5 4xl:py-3 text-sm 3xl:text-base 4xl:text-lg font-semibold transition-colors',
                            selectedOS === item ? 'text-black' : 'text-main-gray/70 hover:text-main-gray',
                         )}
                         onClick={() => setManualOS(item)}
@@ -121,22 +121,22 @@ export default function CommandSection({
                   ))}
                </div>
                {selectedOS && (
-                  <span className="font-inter-tight font-medium text-xs text-main-gray/70">
+                  <span className="font-inter-tight font-medium text-xs 3xl:text-sm 4xl:text-base text-main-gray/70">
                      {osInstructions[selectedOS].shell}
                   </span>
                )}
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-2.5">
+            <div className="flex items-center gap-2 3xl:gap-3 px-3 3xl:px-5 4xl:px-6 py-2.5 3xl:py-4 4xl:py-5">
                {noOSSelected ? (
-                  <div className="flex min-w-0 flex-1 items-center gap-2 text-sm text-main-gray/70">
-                     <MonitorOff size={16} className="shrink-0 opacity-70" />
+                  <div className="flex min-w-0 flex-1 items-center gap-2 text-sm 3xl:text-base 4xl:text-lg text-main-gray/70">
+                     <MonitorOff size={16} className="shrink-0 opacity-70 3xl:size-5 4xl:size-6" />
                      <p>Pick your platform above to get the command.</p>
                   </div>
                ) : command ? (
                   <>
                      <p
-                        className="min-w-0 flex-1 overflow-hidden font-mono text-sm text-nowrap text-main-gray mask-r-from-90%"
+                        className="min-w-0 flex-1 overflow-hidden font-mono text-sm 3xl:text-base 4xl:text-lg text-nowrap text-main-gray mask-r-from-90%"
                         title={command}
                      >
                         {command}
@@ -151,38 +151,38 @@ export default function CommandSection({
                            initial={{ scale: 0.5, opacity: 0 }}
                            animate={{ scale: 1, opacity: 1 }}
                            transition={{ type: 'spring', stiffness: 600, damping: 28 }}
-                           className="grid place-items-center"
+                           className="grid place-items-center [&>svg]:size-4 3xl:[&>svg]:size-5 4xl:[&>svg]:size-6"
                         >
                            {copied ? <ClipboardCheck size={16} className="text-black" /> : <Copy size={16} />}
                         </motion.span>
                      </button>
                   </>
                ) : (
-                  <p className="text-sm text-main-gray/60">Not implemented for now</p>
+                  <p className="text-sm 3xl:text-base 4xl:text-lg text-main-gray/60">Not implemented for now</p>
                )}
             </div>
          </div>
          {selectedOS && (
-            <p className="flex items-center gap-1.5 text-xs text-main-gray/80">
-               <ShieldCheck size={15} className="shrink-0" />
+            <p className="flex items-center gap-1.5 3xl:gap-2 text-xs 3xl:text-sm 4xl:text-base text-main-gray/80">
+               <ShieldCheck size={15} className="shrink-0 3xl:size-4 4xl:size-5" />
                <span>
                   Want to know what this command does?{' '}
                   <a
                      href={osInstructions[selectedOS].source}
                      target="_blank"
                      rel="noreferrer"
-                     className="inline-flex items-center gap-1 text-main-gray underline underline-offset-2 transition-colors hover:text-black"
+                     className="inline-flex items-center gap-1 3xl:gap-1.5 text-main-gray underline underline-offset-2 transition-colors hover:text-black"
                   >
                      View source
-                     <SquareArrowOutUpRight size={12} className="shrink-0" />
+                     <SquareArrowOutUpRight size={12} className="shrink-0 3xl:size-3.5 4xl:size-4" />
                   </a>
                </span>
             </p>
          )}
          {selectedOS && (
-            <div className="rounded-lg border-2 border-main-dark-vivid/40 bg-main-light/60 px-3 py-2.5">
-               <p className="mb-1.5 text-sm font-semibold text-main-gray">First time using a terminal?</p>
-               <ol className="list-decimal space-y-1 pl-4 text-xs text-main-gray/80">
+            <div className="rounded-lg 3xl:rounded-xl border-2 border-main-dark-vivid/40 bg-main-light/60 px-3 3xl:px-5 4xl:px-6 py-2.5 3xl:py-4 4xl:py-5">
+               <p className="mb-1.5 3xl:mb-2.5 text-sm 3xl:text-base 4xl:text-lg font-semibold text-main-gray">First time using a terminal?</p>
+               <ol className="list-decimal space-y-1 3xl:space-y-1.5 4xl:space-y-2 pl-4 3xl:pl-5 text-xs 3xl:text-sm 4xl:text-base text-main-gray/80">
                   {osInstructions[selectedOS].steps.map((step, index) => (
                      <li key={index}>{step}</li>
                   ))}

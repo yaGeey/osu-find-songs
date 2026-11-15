@@ -111,17 +111,17 @@ export default function FromOsu() {
    }, [])
 
    return (
-      <main className="min-h-screen grid place-items-center">
-         <div className="w-[820px] h-[400px] bg-main-lightest border-4 border-main-dark-vivid rounded-xl p-6 flex gap-6">
-            <div className="grid place-items-center">
+      <main className="min-h-screen grid place-items-center px-4 py-10 3xl:py-14 4xl:py-20">
+         <div className="w-[min(820px,92vw)] min-h-[400px] 3xl:w-[1020px] 3xl:min-h-[500px] 4xl:w-[1200px] 4xl:min-h-[580px] 5xl:w-[1400px] 5xl:min-h-[660px] bg-main-lightest border-4 border-main-dark-vivid rounded-xl 3xl:rounded-2xl p-6 3xl:p-10 4xl:p-12 5xl:p-14 flex gap-6 3xl:gap-10 4xl:gap-12 5xl:gap-14">
+            <div className="grid place-items-center shrink-0">
                {img && status !== 'error' ? (
-                  <ProgressAsAnImage img={img} val={pl?.processed || 0} max={pl?.total || 100} size={300} />
+                  <ProgressAsAnImage img={img} val={pl?.processed || 0} max={pl?.total || 100} size={300} className="w-[300px] 3xl:w-[380px] 4xl:w-[440px] 5xl:w-[500px]" />
                ) : (
-                  <div className="h-[298px] w-[300px] border-2 border-main-border rounded-sm bg-main-darker" />
+                  <div className="h-[298px] w-[300px] 3xl:h-[378px] 3xl:w-[380px] 4xl:h-[438px] 4xl:w-[440px] 5xl:h-[498px] 5xl:w-[500px] border-2 border-main-border rounded-sm bg-main-darker" />
                )}
             </div>
 
-            <div className="flex flex-1 flex-col justify-center min-w-0 p-6">
+            <div className="flex flex-1 flex-col justify-center min-w-0 p-2 sm:p-4 3xl:p-6 4xl:p-8">
                {screen === 'command' && clientId && <CommandSection clientId={clientId} />}
 
                {screen === 'no-client' && <AlertBanner title="Something went wrong">Client ID not found</AlertBanner>}
@@ -135,16 +135,16 @@ export default function FromOsu() {
                )}
 
                {screen === 'server-error' && (
-                  <div className="flex w-full flex-col gap-3 items-center">
+                  <div className="flex w-full flex-col gap-3 3xl:gap-5 4xl:gap-6 items-center">
                      <AlertBanner title="Something went wrong">
                         {pl?.status === 'error' ? pl.message : 'The playlist could not be processed.'}
                      </AlertBanner>
                      <button
                         type="button"
                         onClick={onPlRegenerate}
-                        className="group flex w-fit shrink-0 cursor-pointer items-center gap-1.5 font-medium text-main-gray transition-colors hover:text-black"
+                        className="group flex w-fit shrink-0 cursor-pointer items-center gap-1.5 3xl:gap-2 text-sm 3xl:text-base 4xl:text-lg font-medium text-main-gray transition-colors hover:text-black"
                      >
-                        <RotateCcw size={14} className="shrink-0 transition-transform group-hover:-rotate-45" />
+                        <RotateCcw size={14} className="shrink-0 3xl:size-4 4xl:size-5 transition-transform group-hover:-rotate-45" />
                         Try again
                      </button>
                   </div>
@@ -153,11 +153,13 @@ export default function FromOsu() {
                {screen === 'progress' && pl && <PlaylistProgress data={pl} onStartOver={onPlRegenerate} />}
 
                {(screen === 'checking' || screen === 'preparing') && (
-                  <div className="flex flex-col items-center gap-4 py-4 text-center">
-                     <Spinner radius={40} stroke={3} visible={true} />
-                     <div>
-                        <p className="text-xl font-semibold text-black">Preparing your playlist</p>
-                        <p className="text-sm text-black/60">This may take a moment</p>
+                  <div className="flex flex-col items-center gap-4 3xl:gap-6 4xl:gap-8 py-4 3xl:py-6 text-center">
+                     <span className="scale-100 3xl:scale-125 4xl:scale-150">
+                        <Spinner radius={40} stroke={3} visible={true} />
+                     </span>
+                     <div className="3xl:mt-2 4xl:mt-4">
+                        <p className="text-xl 3xl:text-2xl 4xl:text-3xl font-semibold text-black">Preparing your playlist</p>
+                        <p className="text-sm 3xl:text-base 4xl:text-lg text-black/60 mt-1 3xl:mt-2">This may take a moment</p>
                      </div>
                   </div>
                )}

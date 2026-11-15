@@ -39,7 +39,7 @@ function PlaylistLink({ id }: { id: string }) {
       <CustomLink
          href={`https://open.spotify.com/playlist/${id}`}
          showIcon
-         className="inline-flex w-fit items-center gap-1.5 font-medium text-main-gray"
+         className="inline-flex w-fit items-center gap-1.5 3xl:gap-2 text-base 3xl:text-lg 4xl:text-xl font-medium text-main-gray [&_svg]:3xl:text-sm 4xl:[&_svg]:text-base"
       >
          <FontAwesomeIcon icon={faSpotify} className={DEEP_GREEN} />
          Open in Spotify
@@ -80,27 +80,27 @@ export default function PlaylistProgress({ data, onStartOver }: { data: Playlist
       : 'Searching Spotify for every track you sent. You can close this page and come back later to check the progress.'
 
    return (
-      <div className="flex w-full min-w-0 flex-col gap-5.5">
+      <div className="flex w-full min-w-0 flex-col gap-5.5 3xl:gap-8 4xl:gap-10">
          <div className="min-w-0">
-            <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight text-main-gray">
+            <h2 className="flex items-center gap-2 3xl:gap-3 text-lg 3xl:text-2xl 4xl:text-3xl font-semibold tracking-tight text-main-gray">
                {isFilled ? (
-                  <PartyPopper size={18} className="shrink-0 opacity-70" />
+                  <PartyPopper size={18} className="shrink-0 opacity-70 3xl:size-6 4xl:size-7" />
                ) : (
-                  <Music4 size={18} className="shrink-0 opacity-70" />
+                  <Music4 size={18} className="shrink-0 opacity-70 3xl:size-6 4xl:size-7" />
                )}
                <span className="truncate">{title}</span>
             </h2>
-            <p className="mt-1 text-sm text-main-gray/80">{subtitle}</p>
+            <p className="mt-1 3xl:mt-2 text-sm 3xl:text-base 4xl:text-lg text-main-gray/80 leading-relaxed">{subtitle}</p>
          </div>
 
-         <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-               <div className="flex items-end justify-between gap-3">
-                  <p className="text-3xl leading-none font-bold tracking-tight text-main-gray tabular-nums">
+         <div className="flex flex-col gap-3 3xl:gap-5 4xl:gap-6">
+            <div className="flex flex-col gap-1.5 3xl:gap-2.5 4xl:gap-3">
+               <div className="flex items-end justify-between gap-3 3xl:gap-4">
+                  <p className="text-3xl 3xl:text-4xl 4xl:text-5xl leading-none font-bold tracking-tight text-main-gray tabular-nums">
                      {processed}
-                     <span className="ml-1 text-base font-semibold text-main-gray/70">/ {total} tracks</span>
+                     <span className="ml-1 3xl:ml-2 text-base 3xl:text-lg 4xl:text-xl font-semibold text-main-gray/70">/ {total} tracks</span>
                   </p>
-                  <span className="text-sm font-semibold text-main-gray/80 tabular-nums">{pct}%</span>
+                  <span className="text-sm 3xl:text-base 4xl:text-lg font-semibold text-main-gray/80 tabular-nums">{pct}%</span>
                </div>
                <div
                   role="progressbar"
@@ -108,24 +108,24 @@ export default function PlaylistProgress({ data, onStartOver }: { data: Playlist
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label="Playlist processing progress"
-                  className="h-3.5 overflow-hidden rounded-full border-2 border-main-dark-vivid/50 bg-main-dark-vivid/15"
+                  className="h-3.5 3xl:h-5 4xl:h-6 overflow-hidden rounded-full border-2 border-main-dark-vivid/50 bg-main-dark-vivid/15"
                >
                   <ProgressBase value={pct} color={isFilled ? 'bg-success' : 'bg-main-darker'} className="h-full" />
                </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm font-medium text-main-gray">
-               <span className="flex items-center gap-1.5">
-                  <Check size={15} strokeWidth={3} className={`shrink-0 ${DEEP_GREEN}`} />
+            <div className="flex flex-wrap items-center gap-x-4 3xl:gap-x-6 gap-y-1.5 3xl:gap-y-2 text-sm 3xl:text-base 4xl:text-lg font-medium text-main-gray">
+               <span className="flex items-center gap-1.5 3xl:gap-2">
+                  <Check size={15} strokeWidth={3} className={`shrink-0 3xl:size-4 4xl:size-5 ${DEEP_GREEN}`} />
                   {found} found
                </span>
-               <span className="flex items-center gap-1.5 text-main-gray/80">
-                  <SearchX size={15} className="shrink-0" />
+               <span className="flex items-center gap-1.5 3xl:gap-2 text-main-gray/80">
+                  <SearchX size={15} className="shrink-0 3xl:size-4 4xl:size-5" />
                   {notFound} not found
                </span>
                {errored > 0 && (
-                  <span className="flex items-center gap-1.5 font-semibold text-error">
-                     <TriangleAlert size={15} className="shrink-0" />
+                  <span className="flex items-center gap-1.5 3xl:gap-2 font-semibold text-error">
+                     <TriangleAlert size={15} className="shrink-0 3xl:size-4 4xl:size-5" />
                      {errored} errored
                   </span>
                )}
@@ -133,30 +133,30 @@ export default function PlaylistProgress({ data, onStartOver }: { data: Playlist
          </div>
 
          {isFilled ? (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 3xl:gap-2.5 4xl:gap-3">
                <PlaylistLink id={data.id} />
                <div className="flex items-center justify-between gap-3">
-                  <p className="flex items-center gap-1.5 text-sm text-main-gray/80">
+                  <p className="flex items-center gap-1.5 3xl:gap-2 text-sm 3xl:text-base 4xl:text-lg text-main-gray/80">
                      You can manage it yourself
                      <span
                         title={SAVE_TOOLTIP}
                         className="grid cursor-help place-items-center text-main-gray/80 transition-colors hover:text-main-gray"
                      >
-                        <Info size={14} className="shrink-0" />
+                        <Info size={14} className="shrink-0 3xl:size-4 4xl:size-5" />
                      </span>
                   </p>
                   <button
                      type="button"
                      onClick={onStartOver}
-                     className="group flex shrink-0 cursor-pointer items-center gap-1.5 text-sm font-medium text-main-gray transition-colors hover:text-black"
+                     className="group flex shrink-0 cursor-pointer items-center gap-1.5 3xl:gap-2 text-sm 3xl:text-base 4xl:text-lg font-medium text-main-gray transition-colors hover:text-black"
                   >
-                     <RotateCcw size={14} className="shrink-0 transition-transform group-hover:-rotate-45" />
+                     <RotateCcw size={14} className="shrink-0 3xl:size-4 4xl:size-5 transition-transform group-hover:-rotate-45" />
                      Start over
                   </button>
                </div>
             </div>
          ) : (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-main-gray/80">
+            <div className="flex flex-wrap items-center gap-x-2 3xl:gap-x-3 gap-y-0.5 3xl:gap-y-1 text-sm 3xl:text-base 4xl:text-lg text-main-gray/80">
                <PlaylistLink id={data.id} />
                <span>found tracks are added in batches of 50</span>
             </div>
