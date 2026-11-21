@@ -52,11 +52,27 @@ type TokenResponse = {
    client: { expires_at: number; token: string; version: string }
 }
 
+let tokenResponsePromise: Promise<TokenResponse> | undefined
+
 async function getInternalTokenFromServer() {
-   const { data } = await customAxios.get<TokenResponse>(process.env.LOCAL_API_URL! + '/token', {
-      headers: { Authorization: process.env.LOCAL_API_SECRET },
-      context: 'get internal token',
-   })
+   if (!tokenResponsePromise) {
+      const request = customAxios
+         .get<TokenResponse>(process.env.LOCAL_API_URL! + '/token', {
+            headers: { Authorization: process.env.LOCAL_API_SECRET },
+            context: 'get internal token',
+         })
+         .then(({ data }) => data)
+      tokenResponsePromise = request
+      void request.then(
+         () => {
+            if (tokenResponsePromise === request) tokenResponsePromise = undefined
+         },
+         () => {
+            if (tokenResponsePromise === request) tokenResponsePromise = undefined
+         },
+      )
+   }
+   const data = await tokenResponsePromise
 
    // set cookies
    const storage = await cookies()

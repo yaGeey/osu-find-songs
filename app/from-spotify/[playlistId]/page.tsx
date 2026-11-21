@@ -48,10 +48,21 @@ export default function PlaylistPage() {
    const [filters, setFilters] = useState<SelectedOption[]>([])
    const [searchQuery, setSearchQuery] = useState('')
 
-   const { data: playlistInfo, isFetching: playlistLoading } = useQuery({
+   const tokensQ = useQuery({
+      queryKey: ['spotifyIntTokens'],
+      enabled: false,
+   })
+
+   const {
+      data: playlistInfo,
+      isPending: isPlaylistInfoPending,
+      isError: isPlaylistInfoError,
+      refetch: retryPlaylistInfo,
+   } = useQuery({
       queryKey: ['spotify-playlist-info', playlistId],
       queryFn: async () => fetchPlaylist(playlistId as string),
       meta: { errMsg: 'Failed to fetch playlist info' },
+      enabled: tokensQ.isFetched,
    })
 
    // fetching playlist
@@ -62,7 +73,9 @@ export default function PlaylistPage() {
       hasNextPage,
       isFetchingNextPage,
       isFetching: isTracksFetching,
+      isPending: isTracksPending,
       isError: isTracksError,
+      refetch: retryTracks,
    } = useInfiniteQuery({
       queryKey: ['spotify-playlist', playlistId],
       queryFn: async ({ pageParam = 0 }) => {
@@ -76,6 +89,7 @@ export default function PlaylistPage() {
       getNextPageParam: (lastPage) => lastPage.nextOffset,
       initialPageParam: 0,
       retry: 0,
+      enabled: tokensQ.isFetched,
    })
 
    // continue fetching
@@ -89,7 +103,8 @@ export default function PlaylistPage() {
    const tracks = data?.pages.flatMap((page) => page.items.map((i) => i.itemV2.data)) || []
    const spotifyTotal = data?.pages?.[0]?.total || 0
    const isTracksLoadingFinal =
-      !isTracksError && (isFetchingNextPage || hasNextPage || isTracksFetching || tracks.length < spotifyTotal)
+      !isTracksError &&
+      (isTracksPending || isFetchingNextPage || hasNextPage || isTracksFetching || tracks.length < spotifyTotal)
 
    // beatmapset search
    const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
@@ -125,8 +140,22 @@ export default function PlaylistPage() {
       })),
    })
 
-   const initialLoading = !playlistInfo
-   const isLoading = beatmapsetQueries.some((q) => q.isFetching) || playlistLoading || isTracksLoadingFinal
+   const isTokensUnavailable = tokensQ.isError && !tokensQ.data
+   const pageError = isTokensUnavailable
+      ? 'Could not connect to Spotify right now. Please try again in a moment.'
+      : isPlaylistInfoError
+        ? 'Could not load this Spotify playlist.'
+        : isTracksError
+          ? 'Could not load this playlist’s tracks.'
+          : null
+   const isLoading =
+      !pageError && (beatmapsetQueries.some((q) => q.isFetching) || isPlaylistInfoPending || isTracksLoadingFinal)
+
+   const retryPageLoad = async () => {
+      if (isTokensUnavailable) await tokensQ.refetch()
+      if (isPlaylistInfoError) void retryPlaylistInfo()
+      if (isTracksError) void retryTracks()
+   }
    const { addTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // full data
@@ -328,10 +357,27 @@ export default function PlaylistPage() {
                ) : (
                   <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
                )}
-               {!isLoading && !initialLoading && !maps.length && (
+               {!isLoading && pageError && (
+                  <div
+                     role="alert"
+                     className="mx-auto mt-10 flex max-w-xl flex-col items-center gap-3 rounded-lg border border-error/50 bg-main-light p-5 text-center text-white"
+                  >
+                     <p>{pageError}</p>
+                     <button
+                        type="button"
+                        onClick={retryPageLoad}
+                        className="rounded-md border border-white/40 px-4 py-1.5 transition-colors hover:bg-white/10"
+                     >
+                        Try again
+                     </button>
+                  </div>
+               )}
+               {!isLoading && !pageError && !maps.length && (
                   <div className="no-jump text-black/40 text-2xl h-full w-full text-center mt-10 animate-in fade-in">
-                     No results found
-                     <p className="text-base">Try setting the state to &apos;any&apos; to see unranked maps</p>
+                     {playlistInfo === null ? 'Playlist not found or is private' : 'No results found'}
+                     {playlistInfo !== null && (
+                        <p className="text-base">Try setting the state to &apos;any&apos; to see unranked maps</p>
+                     )}
                   </div>
                )}
                {isLoading && <Loading className="top-39 h-[calc(100%-9.75rem)]" radius={50} />}

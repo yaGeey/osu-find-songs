@@ -89,7 +89,7 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
             persister,
             dehydrateOptions: {
                shouldDehydrateQuery: (query) => {
-                  if (query.queryKey.includes('osuMirrors')) return false
+                  if (query.queryKey.includes('osuMirrors') || query.queryKey[0] === 'spotifyIntTokens') return false
                   return defaultShouldDehydrateQuery(query)
                },
             },
