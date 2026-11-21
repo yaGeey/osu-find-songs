@@ -22,7 +22,7 @@ import Image from 'next/image'
 import CustomLink from '@/components/CustomLink'
 import { AnimatePresence, motion } from 'framer-motion'
 import IconsSection from '@/components/IconsSection'
-import { fetchPlaylist, fetchPlaylistContents } from '@/lib/spotify/actions/innerApi'
+import { fetchPlaylist, fetchPlaylistContents, warmUpInternalTokens } from '@/lib/spotify/actions/innerApi'
 import clientAxios from '@/lib/clientAxios'
 import useNotifyStore from '@/contexts/useNotifyStore'
 import { NotifyHeader } from '@/components/state/HeaderError'
@@ -58,6 +58,7 @@ export default function PlaylistPage() {
 
    const tokensQ = useQuery({
       queryKey: ['spotifyIntTokens'],
+      queryFn: () => warmUpInternalTokens(),
       enabled: false,
    })
 

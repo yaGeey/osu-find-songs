@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpotify } from '@fortawesome/free-brands-svg-icons'
 import { twMerge } from 'tailwind-merge'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { fetchPlaylist } from '@/lib/spotify/actions/innerApi'
+import { fetchPlaylist, warmUpInternalTokens } from '@/lib/spotify/actions/innerApi'
 import LoadingDots from '@/components/state/LoadingDots'
 
 export default function SelectPage() {
@@ -16,6 +16,7 @@ export default function SelectPage() {
 
    const tokensQ = useQuery({
       queryKey: ['spotifyIntTokens'],
+      queryFn: () => warmUpInternalTokens(),
       enabled: false,
    })
 
