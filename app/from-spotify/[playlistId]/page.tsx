@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { twMerge as tw } from 'tailwind-merge'
 import { useParams, useSearchParams } from 'next/navigation'
 import { QueryFunctionContext, useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query'
@@ -14,21 +14,29 @@ import useTimeLeft from '@/hooks/useTimeLeft'
 import VirtuosoCards from './_components/VirtuosoCards'
 import Loading from '@/components/state/Loading'
 import { filterBeatmapsMatrix } from './_utils/filterBeatmapsMatrix'
-import { FS_CHUNK_SIZE, MAPS_AMOUNT_TO_SHOW_VIRTUALIZED } from '@/variables'
 import DevLoadingTime from '@/components/DevLoadingTime'
 import DownloadAllBtn from './_components/DownloadAllBtn'
 import ProgressMapDownload from './_components/ProgressMapDownload'
 import { SelectedOption } from '@/components/selectors/FilterOptions'
 import Image from 'next/image'
-import { CardRenderer } from './_components/CardRenderer'
 import CustomLink from '@/components/CustomLink'
-import { AnimatePresence, motion, stagger, useAnimate } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import IconsSection from '@/components/IconsSection'
 import { fetchPlaylist, fetchPlaylistContents } from '@/lib/spotify/actions/innerApi'
 import clientAxios from '@/lib/clientAxios'
 import useNotifyStore from '@/contexts/useNotifyStore'
 import { NotifyHeader } from '@/components/state/HeaderError'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
+
+const CHUNK_SIZE = 50
+
+export type Queries = {
+   sort: string
+   status: string | null
+   mode: string | null
+   search: string
+   filters: string
+}
 
 export default function PlaylistPage() {
    const params = useParams()
@@ -62,7 +70,6 @@ export default function PlaylistPage() {
       queryKey: ['spotify-playlist-info', playlistId],
       queryFn: async () => fetchPlaylist(playlistId as string),
       meta: { errMsg: 'Failed to fetch playlist info' },
-      enabled: tokensQ.isFetched,
    })
 
    // fetching playlist
@@ -89,7 +96,6 @@ export default function PlaylistPage() {
       getNextPageParam: (lastPage) => lastPage.nextOffset,
       initialPageParam: 0,
       retry: 0,
-      enabled: tokensQ.isFetched,
    })
 
    // continue fetching
@@ -100,24 +106,25 @@ export default function PlaylistPage() {
       void fetchNextPage()
    }, [hasNextPage, isFetchingNextPage, isTracksError, fetchNextPage])
 
-   const tracks = data?.pages.flatMap((page) => page.items.map((i) => i.itemV2.data)) || []
+   const tracks = useMemo(() => data?.pages.flatMap((page) => page.items.map((i) => i.itemV2.data)) || [], [data])
    const spotifyTotal = data?.pages?.[0]?.total || 0
    const isTracksLoadingFinal =
       !isTracksError &&
       (isTracksPending || isFetchingNextPage || hasNextPage || isTracksFetching || tracks.length < spotifyTotal)
 
    // beatmapset search
-   const chunked = chunkArray(tracks, FS_CHUNK_SIZE)
+   const chunked = useMemo(() => chunkArray(tracks, CHUNK_SIZE), [tracks])
+   const searchParamQ = searchParams.get('q') || ''
    const beatmapsetQueries = useQueries({
       queries: chunked.map((chunk) => ({
-         queryKey: ['search-from-spotify', chunk?.[0]?.uri?.split(':').at(-1) ?? 'err'],
+         queryKey: ['search-from-spotify', chunk?.[0]?.uri?.split(':').at(-1) ?? 'err', searchParamQ],
          queryFn: async ({ signal }: QueryFunctionContext) => {
             const qs = chunk
                .map((item) => {
                   if (!item) return
                   const artistName = item.artists?.items?.[0]?.profile?.name
                   if (!artistName) return //? sometimes no items in artists, idk why
-                  return `artist=${artistName} title=${item.name} ${searchParams.get('q') || ''}`
+                  return `artist=${artistName} title=${item.name} ${searchParamQ}`
                })
                .filter((q): q is string => Boolean(q))
             if (!qs.length) return []
@@ -136,7 +143,6 @@ export default function PlaylistPage() {
             addTimeLeft(performance.now() - t0)
             return data
          },
-         enabled: !!tracks,
       })),
    })
 
@@ -159,18 +165,29 @@ export default function PlaylistPage() {
    const { addTimeLeft, timeLeft, msLeft } = useTimeLeft(beatmapsetQueries.filter((q) => !q.isFetched).length)
 
    // full data
-   const mapsFlatten = beatmapsetQueries
-      .map((q) => q.data)
-      .flat()
-      .filter((item) => item != null)
+   const mapsSignature = beatmapsetQueries.map((q) => `${q.dataUpdatedAt}:${q.data?.length ?? 0}`).join('|')
+   const mapsFlatten = useMemo(
+      () =>
+         beatmapsetQueries
+            .map((q) => q.data)
+            .flat()
+            .filter((item) => item != null),
+      [mapsSignature],
+   )
    const mapsFetched = mapsFlatten.length
 
-   // prepara data for display
+   const queries: Queries = {
+      sort: searchParams.get('sort') || 'relevance_asc',
+      status: searchParams.get('s'),
+      mode: searchParams.get('m'),
+      search: searchQuery,
+      filters: JSON.stringify(filters),
+   }
+
+   // prepare data for display
    const maps = useMemo(() => {
-      const status = searchParams.get('s')
-      const mode = searchParams.get('m')
-      const modeMapped = { '0': 'osu', '1': 'taiko', '2': 'fruits', '3': 'mania' }[mode || '']
-      const queryLower = searchQuery.toLowerCase().trim()
+      const modeMapped = { '0': 'osu', '1': 'taiko', '2': 'fruits', '3': 'mania' }[queries.mode || '']
+      const queryLower = queries.search.toLowerCase().trim()
 
       const filtered = filterBeatmapsMatrix(mapsFlatten, filters)
          .map((set) =>
@@ -194,12 +211,10 @@ export default function PlaylistPage() {
          )
          .filter((set) => set.length > 0)
 
-      return uniqueBeatmapsetMatrix(filtered).sort((a, b) =>
-         sortBeatmapsMatrix(a, b, searchParams.get('sort') || 'relevance_asc'),
-      )
-   }, [searchParams, mapsFlatten, filters, searchQuery])
+      return uniqueBeatmapsetMatrix(filtered).sort((a, b) => sortBeatmapsMatrix(a, b, queries.sort))
+   }, [queries, mapsFlatten])
 
-   const { text, progress, handleDownloadAll } = useDownloadAll(maps, searchParams.get('sort') || 'relevance_asc')
+   const { text, progress, handleDownloadAll } = useDownloadAll(maps, queries.sort)
 
    // Handle errors
    useEffect(() => {
@@ -213,35 +228,6 @@ export default function PlaylistPage() {
    useEffect(() => {
       if (progress === -1) notify({ type: 'error', content: 'An error occurred during the download process' }, 4000)
    }, [progress])
-
-   // animation
-   const [scope, animate] = useAnimate()
-   // We use useLayoutEffect instead of useEffect to prevent visual flickering.
-   // It fires synchronously after DOM mutations but BEFORE the browser paints,
-   // ensuring the initial animation state (opacity: 0) is applied before the user sees the elements.
-   useLayoutEffect(() => {
-      if (!scope.current) return
-      if (!maps.length) return
-      animate(
-         'li',
-         { opacity: [0, 1], y: [8, 0], scale: [0.96, 1] },
-         {
-            delay: stagger(0.03, { ease: 'easeOut' }),
-            type: 'spring',
-            duration: 0.5,
-            bounce: 0.3,
-         },
-      )
-   }, [maps, animate, scope])
-
-   const sortQuery = searchParams.get('sort') || 'relevance_asc'
-   const renderedGrid = useMemo(() => {
-      return maps.map((data) => (
-         <li key={data[0].id} className="opacity-0">
-            <CardRenderer data={data} sortQuery={sortQuery} />
-         </li>
-      ))
-   }, [maps, sortQuery])
 
    // TODO when const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror) is not - show an error once
    const isDownloadAvailable = useMapDownloadStore((state) => state.isAvailableMirror)
@@ -346,17 +332,7 @@ export default function PlaylistPage() {
                      )}
                   </div>
                </div>
-
-               {!isLoading && maps.length < MAPS_AMOUNT_TO_SHOW_VIRTUALIZED ? (
-                  <div
-                     ref={scope}
-                     className="list-none grid grid-cols-1 [@media(min-width:810px)]:grid-cols-2 gap-2.5 pt-2.5 pb-3.5 px-[5px] overflow-y-auto max-h-[calc(100dvh-48px-156px)] scrollbar"
-                  >
-                     {renderedGrid}
-                  </div>
-               ) : (
-                  <VirtuosoCards maps={maps} sortQuery={searchParams.get('sort') || 'relevance_asc'} />
-               )}
+               <VirtuosoCards maps={maps} queries={queries} />
                {!isLoading && pageError && (
                   <div
                      role="alert"

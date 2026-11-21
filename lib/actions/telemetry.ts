@@ -11,7 +11,7 @@ export async function sendMapDownloadTelemetry({
    playlistId,
    all,
 }: {
-   sessionId?: string
+   sessionId: string | null
    mapId: number
    playlistId: string
    all?: boolean

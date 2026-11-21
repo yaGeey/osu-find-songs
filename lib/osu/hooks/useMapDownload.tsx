@@ -1,10 +1,8 @@
 'use client'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-toastify'
 import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import useNotifyStore from '@/contexts/useNotifyStore'
-import useSessionId from '@/hooks/useSessionId'
 import { sendUnknownError } from '@/lib/errorHandling'
 import { fetchBeatmapWithFallback, download, BANNED_STATUSES } from '../osuDownload'
 import { Status } from '@/types/Osu'
@@ -13,16 +11,21 @@ type UseMapDownloadOptions = {
    id: number
    fileName: string
    status: Status
-} & ({ video: true; onlyNoVideo?: never } | { video: false; onlyNoVideo?: boolean })
-export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: UseMapDownloadOptions) => {
+}
+export const useMapDownload = ({ id, fileName, status }: UseMapDownloadOptions) => {
    const remove = useMapDownloadStore((s) => s.remove)
    const notify = useNotifyStore((s) => s.notificationBlink)
-   const { id: sessionId } = useSessionId()
    const queryClient = useQueryClient()
 
-   return useMutation({
-      mutationFn: async () => {
-         sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(() => {})
+   const mutation = useMutation({
+      mutationFn: async ({
+         video,
+         onlyNoVideo,
+      }: { video: true; onlyNoVideo?: never } | { video: false; onlyNoVideo?: boolean }) => {
+         const sessionId = localStorage.getItem(process.env.NEXT_PUBLIC_CLIENT_ID_STORAGE_KEY!)
+         sendMapDownloadTelemetry({ sessionId, mapId: id, playlistId: window.location.pathname.split('/')[2]! }).catch(
+            () => {},
+         )
          if (BANNED_STATUSES.includes(status)) throw new Error(`Status not allowed`)
          return video
             ? await fetchBeatmapWithFallback({ id, video: true, priority: 1, queryClient })
@@ -57,4 +60,5 @@ export const useMapDownload = ({ id, fileName, video, onlyNoVideo, status }: Use
          }
       },
    })
+   return mutation.mutate
 }

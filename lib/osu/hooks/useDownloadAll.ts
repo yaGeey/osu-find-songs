@@ -48,7 +48,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
 
          // telemetry
          sendMapDownloadTelemetry({
-            sessionId,
+            sessionId: sessionId ?? null,
             mapId: b.id,
             playlistId: window.location.pathname.split('/')[2]!,
             all: true,

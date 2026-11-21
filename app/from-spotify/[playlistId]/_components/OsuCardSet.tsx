@@ -3,10 +3,8 @@ import { BeatmapSet } from '@/types/Osu'
 import OsuCard from './OsuCard'
 import { twMerge as tw } from 'tailwind-merge'
 import ReactDom from 'react-dom'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import SwitchSort from '@/app/from-osu/_components/switches/SwitchSort'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import sortFn from '../_utils/sortBeatmaps'
 import DummyCard from './DummyCard'
@@ -37,7 +35,7 @@ export default function OsuCardSet({
       <>
          <div
             ref={ref}
-            className={tw('relative h-[105px] group/set min-w-[386px] w-[464px] cursor-pointer transition-all', className)}
+            className={tw('relative h-[105px] group/set min-w-[386px] w-[464px] cursor-pointer', className)}
             onClick={() => setIsDialogOpen(true)}
          >
             {maps[0] && (
@@ -53,11 +51,10 @@ export default function OsuCardSet({
                   key={beatmapset.id}
                   beatmapset={beatmapset}
                   className={tw(
-                     'w-full absolute pointer-events-none transition-all',
+                     'w-full absolute pointer-events-none transition-[top]',
                      i == 0 && 'top-[5px] z-1 group-hover/set:top-[1px] opacity-50',
                      i == 1 && 'top-[8px] z-0 opacity-20',
                   )}
-                  // className="w-full absolute even:top-[5px] last:top-[8px] even:opacity-35 last:opacity-10 pointer-events-none group-hover/set:even:top-[1px] group-hover/set:last:top-[7px] transition-all"
                />
             ))}
          </div>
@@ -80,7 +77,7 @@ export default function OsuCardSet({
                      </div>
                      <div className="h-full bg-main-darker overflow-y-auto scrollbar">
                         <div className="flex p-4 gap-4 flex-wrap pb-20">
-                           {maps.map((beatmapset, i) => (
+                           {maps.map((beatmapset) => (
                               <OsuCard
                                  key={beatmapset.id}
                                  beatmapset={beatmapset}

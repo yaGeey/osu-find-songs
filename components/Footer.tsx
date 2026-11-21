@@ -24,7 +24,7 @@ export default async function Footer() {
                   target="_blank"
                   className="hover:underline flex items-center justify-center gap-1"
                >
-                  GitHub ★ {stargazeCount || 'xx'} · Last update:{' '}
+                  GitHub ★ {stargazeCount || 'xx'} · Last app update:{' '}
                   {lastUpdated ? new Date(lastUpdated.date).toLocaleDateString() : 'x/xx/xx'}{' '}
                   <ExternalLink size={13} className="3xl:size-4 4xl:size-5" />
                </a>

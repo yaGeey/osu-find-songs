@@ -12,9 +12,10 @@ import { useAudioStore } from '@/contexts/useAudioStore'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import Loading from '@/components/state/Loading'
 import { BANNED_STATUSES, sanitizeFilename } from '@/lib/osu/osuDownload'
-import { OSU_FALLBACK_IMAGE } from '@/variables'
 import useAppStateStore from '@/contexts/useAppStateStore'
 import { Gamepad } from 'lucide-react'
+
+const FALLBACK_IMAGE = 'https://osu.ppy.sh/assets/images/default-bg.7594e945.png'
 
 export default function OsuCard({
    beatmapset,
@@ -26,14 +27,11 @@ export default function OsuCard({
    className?: string
 }) {
    const fileName = sanitizeFilename(`${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
-   const mutationNoVideo = useMapDownload({
+   const downloadMutate = useMapDownload({
       id: beatmapset.id,
       fileName,
-      video: false,
-      onlyNoVideo: !beatmapset.video,
       status: beatmapset.status,
    })
-   const mutationVideo = useMapDownload({ id: beatmapset.id, fileName, video: true, status: beatmapset.status })
 
    const ref = useRef<HTMLDivElement>(null)
    const currentUrl = useAudioStore((state) => state.currentUrl)
@@ -51,18 +49,18 @@ export default function OsuCard({
 
    function handleDownload(video: boolean) {
       useMapDownloadStore.getState().add(beatmapset.id, `${beatmapset.artist} - ${beatmapset.title}`)
-      if (video) mutationVideo.mutate()
-      else mutationNoVideo.mutate()
+      if (video) downloadMutate({ video: true })
+      else downloadMutate({ video: false, onlyNoVideo: !beatmapset.video })
    }
 
-   const isPending = mutationNoVideo.isPending || mutationVideo.isPending
+   const isPending = useMapDownloadStore((state) => state.pending[beatmapset.id]) !== undefined
    const isDownloadAvailable =
       useMapDownloadStore((state) => state.isAvailableMirror) && !BANNED_STATUSES.includes(beatmapset.status)
    return (
       <div
          ref={ref}
          className={tw(
-            'no-jump select-none group relative h-26 font-inter overflow-hidden rounded-2xl min-w-[386px] w-[464px] bg-main-border flex _border-2 _border-main-border outline-3 outline-main-border -outline-offset-1 transition-all z-0',
+            'no-jump select-none group relative h-26 font-inter overflow-hidden rounded-2xl min-w-[386px] w-[464px] bg-main-border flex _border-2 _border-main-border outline-3 outline-main-border -outline-offset-1 transition-[height] z-0',
             '_hover:-translate-y-[2px] _hover:shadow-[0_4px_0_0_var(--color-main-border)]',
             className,
          )}
@@ -92,7 +90,7 @@ export default function OsuCard({
                fill
                sizes="100%"
                loading="lazy"
-               fallbackSrc={OSU_FALLBACK_IMAGE}
+               fallbackSrc={FALLBACK_IMAGE}
                className={twJoin(
                   'group-hover:brightness-80 group-hover/play:scale-107 transition-transform duration-300 ease-in-out object-cover min-h-[104px]',
                   currentUrl === beatmapset.preview_url && 'scale-107 brightness-80',
@@ -101,16 +99,9 @@ export default function OsuCard({
          </button>
          <div
             className={twJoin(
-               'relative flex-grow flex justify-end bg-main group-hover:brightness-90 transition-[filter]',
-               'transition-all will-change-[clip-path] duration-300 ease-out',
-
-               // inset(0 0 0 0 round 0) -> Не обрізаємо нічого, кути гострі (або спадкують батьківські)
+               'relative flex-grow flex justify-end bg-main group-hover:brightness-90',
+               'transition-[clip-path,filter] hover:will-change-[clip-path] duration-300 ease-out',
                '[clip-path:inset(0_0_0_0_round_0)]',
-
-               // inset(top right bottom left round TL TR BR BL)
-               // - Обрізаємо 1.5rem (24px = w-6) справа.
-               // - round ...: задаємо нові скруглення для утворених кутів.
-               // - 0 1rem 1rem 0: Скруглюємо тільки праві кути (Top-Right і Bottom-Right) на 1rem (rounded-2xl)
                'group-hover:[clip-path:inset(0_1.5rem_0_0_round_0_1rem_1rem_0)]',
                isPending && '[clip-path:inset(0_1.5rem_0_0_round_0_1rem_1rem_0)]',
             )}
@@ -122,7 +113,7 @@ export default function OsuCard({
                height={104}
                className="z-10 object-cover"
                loading="lazy"
-               fallbackSrc={OSU_FALLBACK_IMAGE}
+               fallbackSrc={FALLBACK_IMAGE}
             />
             <div
                className={twJoin(
@@ -202,7 +193,7 @@ export default function OsuCard({
                                           Math.round((beatmap.difficulty_rating + Number.EPSILON) * 100) / 100
                                        } - ${beatmap.version}`}
                                        key={j}
-                                       className="h-[15px] w-[8px] rounded-full drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.15)]"
+                                       className="h-[15px] w-[8px] rounded-full shadow-[0_1px_1px_rgba(0,0,0,0.15)]"
                                     ></div>
                                  ))}
                            </div>
