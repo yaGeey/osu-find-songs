@@ -6,8 +6,22 @@ import RateLimitManager from '@/lib/limiter/RateLimitManager'
 import { sendMapDownloadTelemetry } from '@/lib/actions/telemetry'
 import useSessionId from '../../../hooks/useSessionId'
 import { useQueryClient } from '@tanstack/react-query'
-import { fetchBeatmapWithFallback, download, BANNED_STATUSES } from '../osuDownload'
+import { fetchBeatmapWithFallback, download, sanitizeFilename, BANNED_STATUSES } from '../osuDownload'
 import { getWindowsFriendlyLocalTime } from '@/utils/format'
+
+const README_TEXT = `HOW TO INSTALL (bulk, no need to click each file)
+Do NOT extract the .osz files themselves - they go into the game as-is.
+
+--- osu! stable ---
+1. Extract this zip so the .osz files are in your Songs folder:
+   %localappdata%/osu!/Songs/  (or osu! Settings -> Open osu! folder -> Songs)
+2. Open song select and press F5 (or restart osu!).
+3. Done.
+
+--- osu! lazer ---
+1. Extract this zip anywhere.
+2. Select all .osz files (Ctrl+A in folder) and drag & drop them onto the osu! window.
+3. Wait for the import notification - done.`
 
 export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string = 'relevance_asc') {
    const [progress, setProgress] = useState<null | number>(null)
@@ -30,7 +44,7 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
 
       const tasks = validMaps.map((b) => async () => {
          const blob = await fetchBeatmapWithFallback({ id: b.id, video: false, onlyNoVideo: !b.video, queryClient })
-         const filename = `${b.id} ${b.artist} - ${b.title}.osz`
+         const filename = sanitizeFilename(`${b.id} ${b.artist} - ${b.title}.osz`)
 
          // telemetry
          sendMapDownloadTelemetry({
@@ -53,10 +67,11 @@ export default function useDownloadAll(maps: BeatmapSet[][], sortQuery: string =
 
       setText('Creating zip...')
       downloadedFiles.forEach(({ filename, blob }) => zip.file(filename, blob))
-      const promise = zip
-         .generateAsync({ type: 'blob' }, (metadata) => {
-            setText(`Creating zip... (${Math.round(metadata.percent)}%)`)
-         })
+      if (downloadedFiles.length) zip.file('_README.txt', README_TEXT)
+
+      zip.generateAsync({ type: 'blob' }, (metadata) => {
+         setText(`Creating zip... (${Math.round(metadata.percent)}%)`)
+      })
          .then((blob) => {
             download(blob, `beatmaps-${getWindowsFriendlyLocalTime()}.zip`)
             setProgress(null)

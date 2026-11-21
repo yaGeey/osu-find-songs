@@ -1,5 +1,5 @@
 'use client'
-import axios, { AxiosResponse, isAxiosError } from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { QueryClient } from '@tanstack/react-query'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import { Mirror, getDownloadData } from './osuMirrors'
@@ -9,6 +9,13 @@ import { Status } from '@/types/Osu'
 const DOWNLOAD_PROGRESS_TIMEOUT_MS = 1000
 
 export const BANNED_STATUSES: readonly Status[] = ['graveyard', 'wip', 'pending']
+
+export function sanitizeFilename(name: string) {
+   return name
+      .replace(/[\\/:*?"<>|]/g, '_')
+      .replace(/\p{Cc}/gu, '')
+      .replace(/[. ]+$/, '')
+}
 
 export function download(blob: Blob, filename: string) {
    const url = window.URL.createObjectURL(blob)

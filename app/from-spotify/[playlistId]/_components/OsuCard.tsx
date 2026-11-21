@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart, faCirclePlay, faCircleCheck, faStar, faClock } from '@fortawesome/free-regular-svg-icons'
 import { faDownload, faFileVideo, faPlay, faPause, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
-import { twMerge as tw, twJoin, twMerge } from 'tailwind-merge'
+import { twMerge as tw, twJoin } from 'tailwind-merge'
 import { useMapDownload } from '@/lib/osu/hooks/useMapDownload'
 import { groupBy } from '@/utils/arrayManaging'
 import { useRef } from 'react'
@@ -11,8 +11,10 @@ import ImageFallback from '@/components/ImageFallback'
 import { useAudioStore } from '@/contexts/useAudioStore'
 import { useMapDownloadStore } from '@/contexts/useMapDownloadStore'
 import Loading from '@/components/state/Loading'
-import { BANNED_STATUSES } from '@/lib/osu/osuDownload'
+import { BANNED_STATUSES, sanitizeFilename } from '@/lib/osu/osuDownload'
 import { OSU_FALLBACK_IMAGE } from '@/variables'
+import useAppStateStore from '@/contexts/useAppStateStore'
+import { Gamepad } from 'lucide-react'
 
 export default function OsuCard({
    beatmapset,
@@ -23,7 +25,7 @@ export default function OsuCard({
    onHover?: boolean
    className?: string
 }) {
-   const fileName = `${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`
+   const fileName = sanitizeFilename(`${beatmapset.id} ${beatmapset.artist} - ${beatmapset.title}.osz`)
    const mutationNoVideo = useMapDownload({
       id: beatmapset.id,
       fileName,
@@ -156,12 +158,16 @@ export default function OsuCard({
                {beatmapset.ranked_date && (
                   <>
                      <FontAwesomeIcon icon={faStar} />
-                     <span className="-ml-1.75 -mb-0.25">{Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}</span>
+                     <span className="-ml-1.75 -mb-0.25">
+                        {Math.round((beatmapset.rating + Number.EPSILON) * 100) / 100}
+                     </span>
                   </>
                )}
                <FontAwesomeIcon icon={beatmapset.ranked_date ? faCircleCheck : faClock} />
                <span className="-ml-1.75 -mb-0.25" data-tooltip-id={'tooltip'} data-tooltip-content={dateString}>
-                  {new Date(beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date).toLocaleDateString()}
+                  {new Date(
+                     beatmapset.ranked_date ? beatmapset.ranked_date : beatmapset.submitted_date,
+                  ).toLocaleDateString()}
                </span>
             </div>
             <div className="flex gap-1 items-center">
@@ -217,6 +223,27 @@ export default function OsuCard({
                isPending && 'right-0',
             )}
          >
+            <a
+               href={`osu://dl/${beatmapset.id}`}
+               className="no-jump inline-block outline-hidden hover:scale-120 active:scale-90 transition-transform duration-200"
+               aria-label="Download directly in game"
+               data-tooltip-id="tooltip"
+               data-tooltip-content="Download directly in game"
+               data-tooltip-delay-show={400}
+               onClick={(e) => {
+                  e.preventDefault()
+                  if (!useAppStateStore.getState().isOsuDlModalSeen) {
+                     alert(`osu! direct download is an osu! feature that allows you to download beatmaps directly in the osu! game client. To use this feature, please follow these steps:
+
+1. Make sure you have osu! installed and running on your computer.
+2. If prompted, allow your browser to open the osu! client.`)
+                     useAppStateStore.setState({ isOsuDlModalSeen: true })
+                  }
+                  window.location.href = `osu://dl/${beatmapset.id}`
+               }}
+            >
+               <Gamepad size={17} className="-mb-1.5" />
+            </a>
             {!isDownloadAvailable ? (
                <a
                   href={`https://osu.ppy.sh/beatmapsets/${beatmapset.id}`}
