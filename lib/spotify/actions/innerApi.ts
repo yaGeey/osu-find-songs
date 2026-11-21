@@ -47,6 +47,11 @@ export async function getInternalTokens() {
    return obj as Awaited<ReturnType<typeof getInternalTokenFromServer>>
 }
 
+export async function warmUpInternalTokens() {
+   await getInternalTokens()
+   return { ok: true as const }
+}
+
 type TokenResponse = {
    access: { clientId: string; accessToken: string; accessTokenExpirationTimestampMs: number }
    client: { expires_at: number; token: string; version: string }
